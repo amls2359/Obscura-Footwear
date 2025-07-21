@@ -77,9 +77,7 @@ app.use((err, req, res, next) => {
       categories: [] 
     });
   });
-app.listen(port, () => {
-    console.log(`Server running on port ${port}`);
-});
+
 
 app.get('/logout', (req, res) => {
     req.session.destroy((err) => {
@@ -97,5 +95,13 @@ mongoose.connect(process.env.MONGODB_URI, {
   useNewUrlParser: true,
   useUnifiedTopology: true
 })
-.then(() => console.log('✅ Connected to MongoDB Atlas'))
+.then(() => {
+  console.log('✅ Connected to MongoDB Atlas');
+  
+  // Start the server only after DB is connected
+  app.listen(port, () => {
+    console.log(`🚀 Server running on port ${port}`);
+  });
+})
 .catch((err) => console.error('❌ MongoDB connection error:', err));
+
