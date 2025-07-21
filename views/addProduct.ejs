@@ -1,0 +1,286 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Add Product</title>
+  <style>
+    /* Your existing styles here */
+    body {
+      font-family: Arial, sans-serif;
+      margin: 20px;
+      line-height: 1.6;
+    }
+    .form-container {
+      max-width: 600px;
+      margin: 0 auto;
+      padding: 20px;
+      border: 1px solid #ddd;
+      border-radius: 5px;
+      background-color: #f9f9f9;
+    }
+    .form-group {
+      margin-bottom: 15px;
+    }
+    label {
+      display: block;
+      margin-bottom: 5px;
+      font-weight: bold;
+    }
+    input[type="text"],
+    input[type="number"],
+    select,
+    textarea {
+      width: 100%;
+      padding: 8px;
+      border: 1px solid #ddd;
+      border-radius: 4px;
+      box-sizing: border-box;
+    }
+    textarea {
+      height: 100px;
+      resize: vertical;
+    }
+    .checkbox-group {
+      display: flex;
+      align-items: center;
+    }
+    .checkbox-group input {
+      width: auto;
+      margin-right: 10px;
+    }
+    .button-group {
+      margin-top: 20px;
+      display: flex;
+      gap: 10px;
+    }
+    button {
+      padding: 10px 15px;
+      color: white;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+    }
+    button[type="submit"] {
+      background-color: #4CAF50;
+    }
+    button[type="button"] {
+      background-color: #f44336;
+    }
+    button:hover {
+      opacity: 0.8;
+    }
+    .error {
+      color: red;
+      margin-bottom: 15px;
+    }
+    .field-error {
+      color: red;
+      font-size: 0.8em;
+      margin-top: 5px;
+    }
+    .category-input {
+      margin-top: 5px;
+    }
+    .hidden {
+      display: none;
+    }
+    .error-message {
+      color: red;
+      padding: 10px;
+      margin-bottom: 15px;
+      border: 1px solid #ffcccc;
+      background-color: #ffeeee;
+    }
+  </style>
+</head>
+<body>
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+  <div class="form-container">
+    <h1>Add Product</h1>
+    <% if (errors && errors.general) { %>
+      <div class="error-message">
+          <%= errors.general %>
+      </div>
+    <% } %>
+    <form action="/addProductPost" method="post" enctype="multipart/form-data">
+      <div class="form-group">
+        <label for="productname">Product Name*</label>
+        <input type="text" id="productname" name="productname" value="<%= formData.productname || '' %>" >
+        <div class="invalid-feedback"></div>
+        <% if (errors && errors.productname) { %>
+          <div class="field-error"><%= errors.productname %></div>
+        <% } %>
+      </div>
+      <div class="form-group">
+        <label for="category">Category*</label>
+        <select id="category" name="category">
+          <option value="">Select a category</option>
+          <% if (categories && categories.length) { %>
+            <% categories.forEach(cat => { %>
+              <option value="<%= cat._id %>" <%= formData.category == cat._id ? 'selected' : '' %>>
+                <%= cat.name %>
+              </option>
+            <% }); %>
+          <% } else { %>
+            <option value="" disabled>No categories found</option>
+          <% } %>
+          <option value="new" <%= formData.category === 'new' ? 'selected' : '' %>>+ Add New Category</option>
+        </select>
+        <% if (errors && errors.category) { %>
+          <div class="field-error"><%= errors.category %></div>
+        <% } %>
+        <input type="text" id="newCategory" name="newCategory" class="category-input <%= formData.category !== 'new' ? 'hidden' : '' %>" placeholder="Enter new category name" value="<%= formData.newCategory || '' %>">
+        <% if (errors && errors.newCategory) { %>
+          <div class="field-error"><%= errors.newCategory %></div>
+        <% } %>
+      </div>
+      <div class="form-group">
+        <label for="price">Price*</label>
+        <input type="number" id="price" name="price" min="0" step="0.01" value="<%= formData.price || '' %>">
+        <% if (errors && errors.price) { %>
+          <div class="field-error"><%= errors.price %></div>
+        <% } %>
+      </div>
+      <div class="form-group">
+        <label for="model">Model:</label>
+        <input type="text" id="model" name="model" value="<%= formData.model || '' %>">
+      </div>
+      <div class="form-group">
+        <label for="description">Description:</label>
+        <textarea id="description" name="description"><%= formData.description || '' %></textarea>
+        <div class="invalid-feedback"></div>
+      </div>
+      <div class="form-group">
+        <label for="image">Product Images:</label>
+        <input type="file" id="image" name="image" multiple accept="image/*">
+      </div>
+      <div class="form-group">
+        <label for="stock">Stock*</label>
+        <input type="number" id="stock" name="stock" min="0" value="<%= formData.stock || '' %>">
+        <% if (errors && errors.stock) { %>
+          <div class="field-error"><%= errors.stock %></div>
+        <% } %>
+      </div>
+      <div class="form-group">
+        <label for="brand">Brand:</label>
+        <input type="text" id="brand" name="brand" value="<%= formData.brand || '' %>">
+      </div>
+      <div class="form-group checkbox-group">
+        <input type="checkbox" id="isListed" name="isListed" <%= (formData.isListed === 'on') ? 'checked' : '' %>>
+        <label for="isListed">Listed (Visible to customers)</label>
+      </div>
+      <div class="button-group">
+        <button type="submit" id="submit-button">Add Product</button>
+        <button type="button" onclick="window.history.back()">Cancel</button>
+      </div>
+    </form>
+  </div>
+  <script>
+    // Show/hide new category input
+    document.getElementById('category').addEventListener('change', function() {
+      const newCategoryInput = document.getElementById('newCategory');
+      if (this.value === 'new') {
+        newCategoryInput.classList.remove('hidden');
+        newCategoryInput.setAttribute('required', '');  
+      } else {
+        newCategoryInput.classList.add('hidden');
+        newCategoryInput.removeAttribute('required');
+      }
+    });
+
+    // Initialize the form state on page load
+    document.addEventListener('DOMContentLoaded', function() {
+      const categorySelect = document.getElementById('category');
+      if (categorySelect.value === 'new') {
+        document.getElementById('newCategory').classList.remove('hidden');
+      }
+    });
+  </script>
+  <script>
+    $(document).ready(function() {
+        // Function to validate the length of the input and check for whitespace
+        function validateInputLength(inputId, maxlength, errorMessage) {
+            var input = $('#' + inputId);
+            var feedback = input.siblings('.invalid-feedback');
+            
+            input.on('input blur', function() {
+                var inputValue = $(this).val().trim();
+                var inputLength = inputValue.length;
+                
+                if (inputLength === 0 || inputLength > maxlength) {
+                    $(this).addClass('is-invalid');
+                    feedback.css('color','red').text(errorMessage);
+                    $('#submit-button').prop('disabled', true);
+                } else {
+                    $(this).removeClass('is-invalid');
+                    feedback.css('color','red').text('');
+                    // Check if there are any other invalid fields
+                    if ($('.is-invalid').length === 0) {
+                        $('#submit-button').prop('disabled', false);
+                    }
+                }
+            });
+            
+            // Trigger validation on page load
+            input.trigger('input');
+        }
+    
+        function validateNumericInput(inputId) {
+            var input = $('#' + inputId);
+            input.on('input', function() {
+                var numericValue = $(this).val().replace(/[^0-9.]/g, '');
+                $(this).val(numericValue);
+            });
+            // Trigger validation on page load
+            input.trigger('input');
+        }
+        
+        // Initialize validations
+        validateInputLength('productname', 50, 'Product name cannot exceed 50 characters and cannot be empty');
+        validateInputLength('description', 400, 'Description cannot exceed 400 characters and cannot be empty');
+        validateNumericInput('price');
+        validateNumericInput('stock');
+        
+        // File validation
+        $('#image').on('change', function() {
+            var files = this.files;
+            var valid = true;
+            var submitButton = $('#submit-button');
+            var feedback = $(this).siblings('.invalid-feedback');
+            
+            if (files.length > 0) {
+                for (var i = 0; i < files.length; i++) {
+                    var file = files[i];
+                    if (!file.type.match('image.*') && !file.name.match(/\.(jpg|jpeg|png|gif|webp)$/i)) {
+                        valid = false;
+                        break;
+                    }
+                }
+                
+                if (!valid) {
+                    $(this).addClass('is-invalid');
+                    feedback.css('color','red').text('Please upload only image files (JPEG, PNG, GIF, etc.)');
+                    submitButton.prop('disabled', true);
+                } else {
+                    $(this).removeClass('is-invalid');
+                    feedback.css('color','red').text('');
+                    // Check if there are any other invalid fields
+                    if ($('.is-invalid').length === 0) {
+                        submitButton.prop('disabled', false);
+                    }
+                }
+            } else {
+                // No files selected - this is okay for an edit form
+                $(this).removeClass('is-invalid');
+                feedback.css('color','red').text('');
+                // Enable button if no other invalid fields
+                if ($('.is-invalid').length === 0) {
+                    submitButton.prop('disabled', false);
+                }
+            }
+        });
+    });
+    </script>
+</body>
+</html>

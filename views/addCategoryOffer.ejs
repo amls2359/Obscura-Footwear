@@ -1,0 +1,248 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Add Category Offer</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+    <style>
+        body {
+            font-family: 'Poppins', sans-serif;
+            background: #f0f0f0;
+        }
+
+        .container {
+            max-width: 1500px;
+            margin: auto;
+            padding: 8%;
+        }
+
+        .row {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .col-md-6 {
+            flex-basis: 50%;
+            max-width: 50%;
+        }
+
+        .card {
+            background: #fff;
+            border-radius: 10px;
+            box-shadow: 0 0 20px 0px rgba(0, 0, 0, 0.1);
+            padding: 20px;
+            width: 100%;
+        }
+
+        .card-body {
+            padding: 20px;
+        }
+
+        .text-center {
+            text-align: center;
+        }
+
+        .text-primary {
+            color: #007bff;
+        }
+
+        /* Form styling */
+        .form-data {
+            margin-bottom: 20px;
+        }
+
+        .form-label {
+            font-weight: bold;
+            margin-bottom: 5px;
+            display: block;
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 5px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            font-family: 'Poppins', sans-serif;
+        }
+
+        /* Button styling */
+        .btn {
+            display: inline-block;
+            background: #007bff;
+            color: #fff;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background 0.3s;
+            width: 100%;
+            text-align: center;
+        }
+
+        .btn:hover {
+            background: #0056b3;
+        }
+
+        .login-button {
+            margin-top: 20px;
+        }
+
+        .mt-2 {
+            margin-top: 10px;
+        }
+
+        /* Error message styling */
+        .text-danger {
+            color: #dc3545;
+            font-size: 14px;
+            margin-top: 5px;
+        }
+
+        /* Select dropdown styling */
+        .select-container {
+            position: relative;
+            margin-bottom: 20px;
+        }
+
+        select {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            background-color: white;
+            appearance: none;
+            -webkit-appearance: none;
+            -moz-appearance: none;
+            cursor: pointer;
+            font-family: 'Poppins', sans-serif;
+        }
+
+        .select-container::after {
+            content: "▼";
+            font-size: 12px;
+            color: #777;
+            position: absolute;
+            right: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            pointer-events: none;
+        }
+
+        select:focus {
+            outline: none;
+            border-color: #007bff;
+            box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
+        }
+
+        /* Offer price input specific styling */
+        #alloffer {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            font-family: 'Poppins', sans-serif;
+        }
+
+        #alloffer:focus {
+            outline: none;
+            border-color: #007bff;
+            box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-md-6">
+                <div class="card">
+                    <div class="card-body">
+                        <h1 class="text-center text-primary">Add Category Offer</h1>
+                        <form id="offerForm" action="/addCategoryOfferPost" method="POST">
+                            <div class="form-data">
+                                <div class="select-container">
+                                    <select name="category" id="category">
+                                        <option value="" disabled selected>Select a Category</option>
+                                        <% categories.forEach(category=>{%>
+                                        <option value="<%=category._id%>"><%=category.name%></option>
+                                        <%})%>
+                                    </select>
+                                </div>
+                                <div id="categoryError" class="text-danger"></div>
+                            </div>
+
+                            <div class="form-data">
+                                <label for="alloffer" class="form-label"></label>
+                                <input type="number" id="alloffer" name="alloffer" class="form-control" placeholder="Enter offer percentage (e.g., 10 for 10%)">
+                                <div id="allofferError" class="text-danger"></div>
+                            </div>
+
+                            <div class="text-center login-button">
+                                <button type="submit" class="btn btn-primary">Add</button>
+                                <a href="/offerManagement" class="btn btn-primary mt-2">Go Back</a>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script>
+        // Function to hide the error message after a specified timeout
+        function hideError(elementId) {
+            const errorElement = document.getElementById(elementId);
+            if (errorElement) {
+                setTimeout(() => {
+                    errorElement.textContent = '';
+                }, 2000);
+            }
+        }
+    
+        document.getElementById('offerForm').addEventListener('submit', function(event) {
+            const categorySelect = document.getElementById('category');
+            const offerInput = document.getElementById('alloffer');
+            
+            const categoryValue = categorySelect.value;
+            const offerValue = offerInput.value.trim();
+
+            // Clear previous error messages
+            document.getElementById('categoryError').textContent = '';
+            document.getElementById('allofferError').textContent = '';
+
+            let isValid = true;
+
+            if (!categoryValue) {
+                document.getElementById('categoryError').textContent = 'Please select a category.';
+                hideError('categoryError');
+                isValid = false;
+            }
+
+            if (!offerValue) {
+                document.getElementById('allofferError').textContent = 'Please enter the offer price.';
+                hideError('allofferError');
+                isValid = false;
+            } else if (isNaN(offerValue)) {
+                document.getElementById('allofferError').textContent = 'Offer must be a number.';
+                hideError('allofferError');
+                isValid = false;
+            } else if (parseFloat(offerValue) < 0) {
+                document.getElementById('allofferError').textContent = 'Offer must be a positive number.';
+                hideError('allofferError');
+                isValid = false;
+            } else if (parseFloat(offerValue) > 100) {
+                document.getElementById('allofferError').textContent = 'Offer cannot be more than 100%.';
+                hideError('allofferError');
+                isValid = false;
+            }
+
+            if (!isValid) {
+                event.preventDefault();
+            }
+        });
+    </script>
+</body>
+</html>

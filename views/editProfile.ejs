@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Edit Profile</title>
+    <link href="https://fonts.googleapis.com/css2?family=Work+Sans:ital,wght@0,100..900;1,100..900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <script src="http://code.jquery.com/jquery-1.11.1.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background-color: #f5f5f5;
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 500px;
+            margin: 0 auto;
+        }
+        
+        .main-content {
+            background-color: white;
+            border-radius: 10px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+            padding: 30px;
+            width: 100%;
+            margin-top: 20px;
+        }
+        
+        .user-icon {
+            text-align: center;
+            margin-bottom: 25px;
+        }
+        
+        .user-icon i {
+            font-size: 60px;
+            color: #e6470d;
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 50%;
+            border: 2px solid #e6470d;
+        }
+        
+        .input-field {
+            position: relative;
+            margin-bottom: 25px;
+        }
+        
+        .input-field label {
+            position: absolute;
+            top: 50%;
+            left: 15px;
+            transform: translateY(-50%);
+            color: #777;
+            pointer-events: none;
+            transition: all 0.3s ease;
+        }
+        
+        .input-field input {
+            width: 100%;
+            padding: 15px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 16px;
+            outline: none;
+            transition: border 0.3s ease;
+        }
+        
+        .input-field input:focus {
+            border-color: #4a90e2;
+        }
+        
+        .input-field input:focus + label,
+        .input-field input:valid + label {
+            top: 0;
+            left: 10px;
+            font-size: 12px;
+            background-color: white;
+            padding: 0 5px;
+            color: #4a90e2;
+        }
+        
+        .update-profile {
+            text-align: center;
+            margin-top: 20px;
+        }
+        
+        .update {
+            display: inline-block;
+            background-color: #e6470d;
+            color: white;
+            padding: 12px 25px;
+            border-radius: 5px;
+            text-decoration: none;
+            font-weight: 500;
+            transition: background-color 0.3s ease;
+            border: none;
+            cursor: pointer;
+        }
+        
+        .update:hover {
+          background-color: #f8f9fa;
+           color: #e6470d;
+           border: 1px solid #e6470d;
+          transform: translateY(-2px);
+          box-shadow: 0 4px 8px rgba(247, 79, 16, 0.2)
+         }
+ 
+        .back-button {
+            margin-bottom: 8px;
+        }
+
+        .back-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 15px 15px;
+            background-color: #f8f9fa;
+            color: #333;
+            border: 1px solid #ddd;
+            border-radius: 30px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            text-decoration: none;
+        }
+
+        .back-btn::before {
+            content: "";
+            width: 8px;
+            height: 8px;
+            border-left: 2px solid #333;
+            border-bottom: 2px solid #333;
+            transform: rotate(45deg);
+            transition: all 0.3s ease;
+        }
+
+        .back-btn:hover {
+            background-color: #e6470d;
+            color: white;
+            border-color: #e6470d;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(230, 71, 13, 0.2);
+        }
+
+        .back-btn:hover::before {
+            border-left: 2px solid white;
+            border-bottom: 2px solid white;
+        }
+
+        .back-btn:active {
+            transform: translateY(0);
+            box-shadow: none;
+        }
+        .error-message
+         {
+          color: #f20505;
+         }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="back-button">
+            <button class="back-btn" onclick="window.location.href='/userProfile'">Back to profile</button>
+        </div>
+        <div class="main-content">
+            <form action="/updateProfile" method="post" id="profile-form" onsubmit="return validateForm()">
+                <div class="user-icon">
+                    <i class="fas fa-user"></i>
+                </div>
+                <div class="input-field">
+                    <input type="text" name="username" id="username" value="<%= user.username %>" >
+                    <label for="username">Username</label>
+                    <div id="username-error" class="error-message"></div>
+                </div>
+                <div class="input-field">
+                    <input type="number" name="number" id="number" value="<%= user.phone %>" >
+                    <label for="number">Mobile number</label>
+                    <div id="mobile-error" class="error-message"></div>
+                </div>
+                <div class="update-profile">
+                    <button type="submit" class="update">Update Profile</button>
+                </div>
+            </form>
+        </div>
+    </div>
+    <script>
+    function validateForm()
+    {
+        console.log('entered into validateform');
+        document.getElementById("username-error").innerHTML=''
+        document.getElementById("mobile-error").innerHTML=""
+
+        const username=  document.getElementById("username").value.trim()
+        const mobile = document.getElementById('number').value.trim()
+
+        if(username==='')
+        {
+          document.getElementById('username-error').innerHTML='Please enter a username';
+          return false
+        }
+
+        if(mobile==='')
+        {
+              document.getElementById("mobile-error").innerHTML="Please enter a mobile number";
+              return false
+        }
+        else if(!/^\d{10}$/.test(mobile))
+        {
+            document.getElementById("mobile-error").innerHTML="Please enter a 10 digit  mobile number";
+            return false
+        }
+        return true
+    }
+    </script>
+</body>
+</html>

@@ -1,0 +1,273 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Signup Form</title>
+  <link rel="preconnect" href="https://fonts.gstatic.com">
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@200;300;400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: 'Poppins', sans-serif;
+    }
+    
+    body {
+      background: radial-gradient(#fff, #ffd6d6);
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    
+    .container {
+      max-width: 1300px;
+      margin: auto;
+      padding: 20px;
+    }
+    
+    .form-container {
+      background: #fff;
+      width: 400px;
+      padding: 30px;
+      border-radius: 10px;
+      box-shadow: 0 0 20px 0px rgba(0,0,0,0.1);
+      margin: 20px auto;
+    }
+    
+    .form-container h2 {
+      text-align: center;
+      margin-bottom: 30px;
+      color: #555;
+      position: relative;
+    }
+    
+    .form-container h2::after {
+      content: '';
+      background: #ff523b;
+      width: 80px;
+      height: 5px;
+      border-radius: 5px;
+      position: absolute;
+      bottom: -10px;
+      left: 50%;
+      transform: translateX(-50%);
+    }
+    
+    .input-field {
+      margin-bottom: 20px;
+    }
+    
+    .input-field label {
+      display: block;
+      margin-bottom: 5px;
+      color: #555;
+      font-weight: 500;
+    }
+    
+    .input-field input {
+      width: 100%;
+      padding: 12px 15px;
+      border: 1px solid #ccc;
+      border-radius: 30px;
+      font-size: 16px;
+      outline: none;
+      transition: all 0.5s;
+    }
+    
+    .input-field input:focus {
+      border-color: #ff523b;
+    }
+    
+    .btn {
+      display: inline-block;
+      background: #ff523b;
+      color: #fff;
+      padding: 12px 30px;
+      margin: 20px 0;
+      border-radius: 30px;
+      transition: background 0.5s;
+      border: none;
+      cursor: pointer;
+      width: 100%;
+      font-size: 16px;
+    }
+    
+    .btn:hover {
+      background: #563434;
+    }
+    
+    .register {
+      text-align: center;
+      margin-top: 20px;
+    }
+    
+    .register a {
+      color: #ff523b;
+      text-decoration: none;
+    }
+    
+    .register a:hover {
+      text-decoration: underline;
+    }
+    
+    .error-message {
+      color: #ff523b;
+      font-size: 12px;
+      margin-top: 5px;
+     
+    }
+    
+    .success-message {
+      background: rgba(0, 200, 0, 0.1);
+      color: #009900;
+      padding: 10px;
+      margin-bottom: 20px;
+      border-radius: 5px;
+      text-align: center;
+      border: 1px solid #009900;
+    }
+    .server-error {
+  display: block;
+  margin-bottom: 10px;
+}
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="form-container">
+      <h2>Sign Up</h2>
+      
+      <!-- Success message container -->
+      <% if (typeof successMessage !== 'undefined' && successMessage) { %>
+        <div class="success-message" id="success-message" style="display: block;"><%= successMessage %></div>
+      <% } else { %>
+        <div class="success-message" id="success-message" style="display: none;"></div>
+      <% } %>
+
+      <!-- Error message container -->
+   <% if (typeof errorMessage !== 'undefined' && errorMessage) { %>
+    <div class="error-message" style="display: block; text-align: center;"><%= errorMessage %></div>
+    <% } %>
+      
+      <form id="signup-form" action="/userSignupPost" method="post">
+        <div class="input-field">
+          <label for="username">Username</label>
+          <input type="text" name="username" id="username" placeholder="Enter your username">
+          <div id="username-error" class="error-message"></div>
+        </div>
+        
+        <div class="input-field">
+          <label for="email">Email</label>
+          <input type="text" name="email" id="email" placeholder="Enter your email">
+          <div id="email-error" class="error-message"></div>
+        </div>
+        
+        <div class="input-field">
+          <label for="password">Password</label>
+          <input type="password" name="password" id="password" placeholder="Enter your password">
+          <div id="password-error" class="error-message"></div>
+        </div>
+        
+        <div class="input-field">
+          <label for="number">Phone Number</label>
+          <input type="number" name="number" id="number" placeholder="Enter your phone number">
+          <div id="number-error" class="error-message"></div>
+        </div>
+        
+        <div class="input-field">
+          <label for="referal">Referral Code (Optional)</label>
+          <input type="text" name="referalcode" id="referal" placeholder="Enter referral code if any">
+        </div>
+        
+        <button type="submit" class="btn">Sign Up</button>
+        <div class="register">
+          <p>Already have an account? <a href="/UserLogin">Login here</a></p>
+        </div>
+      </form>
+    </div>
+  </div>
+  
+  <script>
+    document.getElementById('signup-form').addEventListener('submit', function(event) {
+      event.preventDefault(); // Prevent default form submission
+      
+      // Clear previous errors
+      document.querySelectorAll('.error-message').forEach(el => {
+          el.style.display = 'none';
+          el.textContent = '';
+      });
+      
+      let isValid = true;
+      
+      // Get form values
+      const username = document.getElementById('username').value.trim();
+      const email = document.getElementById('email').value.trim();
+      const password = document.getElementById('password').value.trim();
+      const phone = document.getElementById('number').value.trim();
+      
+      // Validate username
+      if (!username) {
+          showError('username-error', 'Please enter a username');
+          isValid = false;
+      } else if (username.length < 2) {
+          showError('username-error', 'Username must be at least 2 characters');
+          isValid = false;
+      }
+      
+      // Validate email
+      if (!email) {
+          showError('email-error', 'Please enter an email');
+          isValid = false;
+      } else if (!validateEmail(email)) {
+          showError('email-error', 'Please enter a valid email');
+          isValid = false;
+      }
+      
+      // Validate password
+      if (!password) {
+          showError('password-error', 'Please enter a password');
+          isValid = false;
+      } else if (!isValidPassword(password)) {
+          showError('password-error', 'Password must contain at least 7 characters, one uppercase letter, one number, and one special character');
+          isValid = false;
+      }
+      
+      // Validate phone number
+      if (!phone) {
+          showError('number-error', 'Please enter a phone number');
+          isValid = false;
+      } else if (!/^\d{10}$/.test(phone)) {
+          showError('number-error', 'Please enter a valid 10-digit phone number');
+          isValid = false;
+      }
+      
+      if (isValid) {
+          this.submit();  
+      }
+    });
+    
+    // Helper function to show errors
+    function showError(id, message) {
+      const errorElement = document.getElementById(id);
+      errorElement.textContent = message;
+      errorElement.style.display = 'block';
+    }
+    
+    // Email validation
+    function validateEmail(email) {
+      const re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+      return re.test(email);
+    }
+    
+    // Password validation
+    function isValidPassword(password) {
+      const passwordRegex=/^(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[@#$%^&*()_+\-=[\]{};':"\\|,.<>/?]).{7,}$/;
+      return passwordRegex.test(password);
+    }
+  </script>
+</body>
+</html>

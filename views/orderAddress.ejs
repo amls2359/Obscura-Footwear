@@ -1,0 +1,296 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Order Address</title>
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    }
+
+    body {
+      background-color: #f5f5f5;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      padding: 20px;
+    }
+
+    .main-content {
+      background-color: white;
+      border-radius: 10px;
+      box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+      padding: 30px;
+      width: 100%;
+      max-width: 600px;
+    }
+
+    .mainheading {
+      color: #2c3e50;
+      text-align: center;
+      margin-bottom: 30px;
+      font-size: 24px;
+      font-weight: 600;
+    }
+
+    .input-field {
+      position: relative;
+      margin-bottom: 25px;
+    }
+
+    .input-field input {
+      width: 100%;
+      padding: 15px;
+      border: 1px solid #ddd;
+      border-radius: 5px;
+      font-size: 16px;
+      transition: all 0.3s ease;
+    }
+
+    .input-field input:focus {
+      border-color: #3498db;
+      outline: none;
+      box-shadow: 0 0 0 2px rgba(52, 152, 219, 0.2);
+    }
+
+    .input-field label {
+      position: absolute;
+      top: 15px;
+      left: 15px;
+      color: #777;
+      font-size: 16px;
+      transition: all 0.3s ease;
+      pointer-events: none;
+      background-color: white;
+      padding: 0 5px;
+    }
+
+    .input-field input:focus + label,
+    .input-field input:not(:placeholder-shown) + label {
+      top: -10px;
+      font-size: 12px;
+      color: #3498db;
+    }
+
+    .select-state {
+      margin-bottom: 25px;
+    }
+
+    .select-state label {
+      display: block;
+      margin-bottom: 8px;
+      color: #555;
+      font-size: 14px;
+    }
+
+    .select-state select {
+      width: 100%;
+      padding: 15px;
+      border: 1px solid #ddd;
+      border-radius: 5px;
+      font-size: 16px;
+      appearance: none;
+      background-image: url("data:image/svg+xml,%3csvg viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
+      background-repeat: no-repeat;
+      background-position: right 15px center;
+      background-size: 15px;
+    }
+
+    .select-state select:focus {
+      border-color: #3498db;
+      outline: none;
+      box-shadow: 0 0 0 2px rgba(52, 152, 219, 0.2);
+    }
+
+    button {
+      background-color: #3498db;
+      color: white;
+      border: none;
+      padding: 15px 30px;
+      font-size: 16px;
+      border-radius: 5px;
+      cursor: pointer;
+      transition: background-color 0.3s ease;
+      width: 100%;
+      font-weight: 600;
+      margin-top: 10px;
+    }
+
+    button:hover {
+      background-color: #2980b9;
+    }
+
+    #backbutton {
+      background-color: #e74c3c;
+      margin-top: 15px;
+    }
+
+    #backbutton:hover {
+      background-color: #c0392b;
+    }
+
+    .error-message {
+      color: #e74c3c;
+      font-size: 12px;
+      margin-top: 5px;
+      display: none;
+    }
+
+    @media (max-width: 768px) {
+      .main-content {
+        padding: 20px;
+      }
+
+      .mainheading {
+        font-size: 20px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="main-content">
+    <form action="/checkoutaddress" id="addressForm" method="post">
+      <h2 class="mainheading">Add Checkout Address</h2>
+
+      <div class="input-field">
+        <input id="firstname" type="text" name="firstname" placeholder=" " >
+        <label for="firstname">First Name</label>
+        <div class="error-message" id="firstname-error"></div>
+      </div>
+
+      <div class="input-field">
+        <input id="lastname" type="text" name="lastname" placeholder=" " >
+        <label for="lastname">Last Name</label>
+        <div class="error-message" id="lastname-error"></div>
+      </div>
+
+      <div class="input-field">
+        <input id="address" type="text" name="address" placeholder=" " >
+        <label for="address">Address</label>
+        <div class="error-message" id="address-error"></div>
+      </div>
+
+      <div class="input-field">
+        <input id="city" type="text" name="city" placeholder=" ">
+        <label for="city">City/Town</label>
+        <div class="error-message" id="city-error"></div>
+      </div>
+
+      <div class="select-state">
+        <label for="state"></label>
+        <select name="state" id="state" >
+          <option value="" disabled selected>Select a state</option>
+          <option value="kerala">Kerala</option>
+          <option value="tamilnadu">Tamil Nadu</option>
+          <option value="karnataka">Karnataka</option>
+          <option value="rajasthan">Rajasthan</option>
+          <option value="gujarat">Gujarat</option>
+        </select>
+        <div class="error-message" id="state-error"></div>
+      </div>
+
+      <div class="input-field">
+        <input id="pincode" type="text" name="pincode" placeholder=" ">
+        <label for="pincode">Pincode</label>
+        <div class="error-message" id="pincode-error"></div>
+      </div>
+
+      <div class="input-field">
+        <input id="email" type="email" name="email" placeholder=" " >
+        <label for="email">Email</label>
+        <div class="error-message" id="email-error"></div>
+      </div>
+
+      <div class="input-field">
+        <input type="tel" name="phone" id="phone" placeholder=" ">
+        <label for="phone">Phone Number</label>
+        <div class="error-message" id="phone-error"></div>
+      </div>
+
+      <button type="submit">Submit</button>
+    </form>
+    <button id="backbutton">Go Back</button>
+  </div>
+
+  <script>
+    document.getElementById("backbutton").addEventListener("click", function () {
+      window.history.back();
+    });
+
+    document.getElementById("addressForm").addEventListener("submit", function (event) {
+      event.preventDefault();
+      let isValid = true;
+
+      // Clear previous errors
+      document.querySelectorAll(".error-message").forEach(el => {
+        el.style.display = "none";
+        el.textContent = "";
+      });
+
+      const firstname = document.getElementById("firstname").value.trim();
+      const lastname = document.getElementById("lastname").value.trim();
+      const address = document.getElementById("address").value.trim();
+      const city = document.getElementById("city").value.trim();
+      const state = document.getElementById("state").value;
+      const pincode = document.getElementById("pincode").value.trim();
+      const email = document.getElementById("email").value.trim();
+      const phone = document.getElementById("phone").value.trim();
+
+      if (!firstname || /\d/.test(firstname)) {
+        showError("firstname-error", "First name cannot be empty or contain numbers");
+        isValid = false;
+      }
+
+      if (!lastname || /\d/.test(lastname)) {
+        showError("lastname-error", "Last name cannot be empty or contain numbers");
+        isValid = false;
+      }
+
+      if (!address) {
+        showError("address-error", "Please enter your address");
+        isValid = false;
+      }
+
+      if (!city || /\d/.test(city)) {
+        showError("city-error", "City name cannot be empty or contain numbers");
+        isValid = false;
+      }
+
+      if (!state) {
+        showError("state-error", "Please select a state");
+        isValid = false;
+      }
+
+      if (!pincode || !/^[1-9][0-9]{5}$/.test(pincode)) {
+        showError("pincode-error", "Please enter a valid 6-digit pincode");
+        isValid = false;
+      }
+
+      if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+        showError("email-error", "Please enter a valid email address");
+        isValid = false;
+      }
+
+      if (!phone || !/^[0-9]{10}$/.test(phone)) {
+        showError("phone-error", "Please enter a valid 10-digit phone number");
+        isValid = false;
+      }
+
+      if (isValid) {
+        this.submit();
+      }
+    });
+
+    function showError(id, message) {
+      const errorElement = document.getElementById(id);
+      errorElement.textContent = message;
+      errorElement.style.display = "block";
+    }
+  </script>
+</body>
+</html>

@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Payment Failed</title>
+    <style>
+        :root {
+            --error-red: #ff4d4f;
+            --dark-red: #d9363e;
+            --light-bg: #fff9f9;
+            --text-dark: #2a2a2a;
+            --text-light: #5a5a5a;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+            background: linear-gradient(135deg, #fff9f9 0%, #f0f0f0 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+            color: var(--text-dark);
+        }
+        
+        .card {
+            background: white;
+            border-radius: 16px;
+            box-shadow: 0 10px 30px rgba(217, 54, 62, 0.15);
+            width: 100%;
+            max-width: 420px;
+            padding: 40px;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 6px;
+            background: linear-gradient(90deg, var(--error-red) 0%, var(--dark-red) 100%);
+        }
+        
+        .error-icon {
+            width: 80px;
+            height: 80px;
+            background: linear-gradient(135deg, var(--error-red) 0%, var(--dark-red) 100%);
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin: 0 auto 25px;
+            box-shadow: 0 5px 15px rgba(217, 54, 62, 0.3);
+        }
+        
+        .error-icon svg {
+            width: 40px;
+            height: 40px;
+            fill: white;
+        }
+        
+        h1 {
+            font-size: 28px;
+            font-weight: 700;
+            margin-bottom: 12px;
+            color: var(--dark-red);
+        }
+        
+        p {
+            font-size: 16px;
+            color: var(--text-light);
+            line-height: 1.6;
+            margin-bottom: 30px;
+        }
+        
+        .btn-group {
+            display: flex;
+            gap: 12px;
+            justify-content: center;
+        }
+        
+        .btn {
+            padding: 12px 24px;
+            border-radius: 8px;
+            font-weight: 600;
+            font-size: 15px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-block;
+        }
+        
+        .btn-retry {
+            background: var(--error-red);
+            color: white;
+            border: none;
+        }
+        
+        .btn-retry:hover {
+            background: var(--dark-red);
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(217, 54, 62, 0.3);
+        }
+        
+        .btn-secondary {
+            background: white;
+            color: var(--error-red);
+            border: 1px solid #e0e0e0;
+        }
+        
+        .btn-secondary:hover {
+            border-color: var(--error-red);
+            transform: translateY(-2px);
+        }
+    </style>
+</head>
+<body>
+    <div class="card">
+        <div class="error-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+                <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-2h2v2zm0-4h-2V7h2v6z"/>
+            </svg>
+        </div>
+        
+        <h1>Payment Failed</h1>
+        <p>We couldn't process your payment. Please check your payment details and try again later.</p>
+        
+        <!-- <div class="btn-group">
+            <button class="btn btn-retry" onclick="window.history.back()">Try Again</button>
+            <button class="btn btn-secondary" onclick="location.href='/'">Back to Home</button>
+        </div> -->
+    </div>
+    <script>
+        setTimeout(() => {
+            window.location.href='/checkout'
+        }, 3000);
+    </script>
+</body>
+</html>

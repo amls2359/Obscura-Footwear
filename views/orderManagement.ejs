@@ -1,0 +1,349 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Order Management</title>
+    <style>
+        /* General Styles */
+        body { 
+            font-family: Arial, sans-serif; 
+            margin: 0;
+            padding: 0;
+            display: flex;
+            min-height: 100vh;
+            background-color: #f5f5f5;
+        }
+        
+        /* Sidebar Styles */
+        .sidebar {
+            width: 215px;
+            background-color: #333;
+            color: white;
+            padding: 20px;
+            height: 100vh;
+            position: fixed;
+            box-shadow: 2px 0 5px rgba(0,0,0,0.1);
+            z-index: 10;
+        }
+        
+        .sidebar h2 {
+            text-align: center;
+            color: white;
+            margin-bottom: 30px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid #444;
+        }
+
+        .sidebar ul {
+            list-style-type: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        .sidebar ul li {
+            margin: 15px 0;
+        }
+
+        .sidebar ul li a {
+            color: #fff;
+            text-decoration: none;
+            display: block;
+            padding: 8px 10px;
+            border-radius: 4px;
+            transition: background-color 0.3s;
+        }
+
+        .sidebar ul li a:hover {
+            background-color: #444;
+        }
+        
+        /* Main Content Styles */
+        .main_content {
+            flex: 1;
+            margin-left: 250px;
+            padding: 20px 20px 20px 30px;
+            background-color: white;
+            border-radius: 5px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            position: relative;
+            z-index: 1;
+        }
+        
+        .header-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+        
+        .heading {
+            flex-grow: 1;
+            text-align: center;
+            color: #333;
+        }
+        
+        /* Table Container Styles */
+        .table-container {
+            max-height: 500px;
+            overflow-y: auto;
+            margin-top: 20px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            position: relative;
+            z-index: 1;
+        }
+        
+        /* Table Styles */
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        
+        th, td {
+            padding: 12px;
+            text-align: left;
+            border: 1px solid #ddd;
+        }
+        
+        th {
+            background-color: #333;
+            color: #fff;
+            font-weight: bold;
+            border: 1px solid #444;
+            position: sticky;
+            top: 0;
+            z-index: 5;
+        }
+        
+        tr:nth-child(even) {
+            background-color: #f9f9f9;
+        }
+        
+        tr:hover {
+            background-color: #f1f1f1;
+        }
+        
+        /* Button Styles */
+        .btn {
+            padding: 6px 12px;
+            border-radius: 4px;
+            font-size: 14px;
+            cursor: pointer;
+            text-decoration: none;
+            display: inline-block;
+            text-align: center;
+            transition: background-color 0.3s;
+            border: none;
+        }
+        
+        .btn-success {
+            background-color: #4CAF50;
+            color: white;
+        }
+        
+        .btn-danger {
+            background-color: #f44336;
+            color: white;
+        }
+        
+        .btn-edit {
+            background-color: #2196F3;
+            color: white;
+        }
+        
+        /* Dropdown Styles */
+        .dropdown select {
+            padding: 6px 12px;
+            border-radius: 4px;
+            border: 1px solid #ddd;
+            background-color: white;
+            cursor: pointer;
+        }
+        
+        /* Update Button */
+        .update {
+            background-color: #4CAF50;
+            color: white;
+            padding: 6px 12px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+        
+        .update:hover {
+            background-color: #45a049;
+        }
+        
+        /* Status Styles */
+        .status-pending {
+            color: #FFA500;
+            font-weight: bold;
+        }
+        
+        .status-shipped {
+            color: #2196F3;
+            font-weight: bold;
+        }
+        
+        .status-cancelled {
+            color: #f44336;
+            font-weight: bold;
+        }
+        
+        .status-delivered {
+            color: #4CAF50;
+            font-weight: bold;
+        }
+        
+        .status-returned {
+            color: #9C27B0;
+            font-weight: bold;
+        }
+        
+        /* Action Button Styles */
+        .action-buttons {
+            display: flex;
+            gap: 5px;
+        }
+        
+        /* Responsive Adjustments */
+        @media (max-width: 768px) {
+            .sidebar {
+                width: 100%;
+                height: auto;
+                position: relative;
+                padding: 10px;
+            }
+            
+            .main_content {
+                margin-left: 0;
+                padding: 15px;
+            }
+            
+            .table-container {
+                max-height: none;
+                overflow-y: visible;
+            }
+            
+            .action-buttons {
+                flex-direction: column;
+                gap: 3px;
+            }
+            
+            th, td {
+                padding: 8px;
+                font-size: 14px;
+            }
+        }
+    </style>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+</head>
+<body>
+    <!-- Sidebar -->
+    <div class="sidebar">
+        <h2>Admin Panel</h2>
+        <ul>
+            <li><a href="/admin/dashboard">Dashboard</a></li>
+            <li><a href="/admin/usermanagement">User Management</a></li>
+            <li><a href="/admin/categorymanagement">Category Management</a></li>
+            <li><a href="/admin/productmanagement">Product Management</a></li>
+            <li><a href="/admin/orderManagement">Order Management</a></li>
+            <li><a href="/couponManagement">Coupon Management</a></li>
+            <li><a href="/salesReport">Sales</a></li>
+            <li><a href="/offerManagement">Offer Management</a></li>
+            <li><a href="/admin/adminLogin" id="logout-link">Logout</a></li>
+        </ul>
+    </div>
+
+    <!-- Main Content -->
+    <div class="main_content">
+        <div class="header-container">
+            <h2 class="heading">Order Management</h2>
+        </div>
+        
+        <!-- Table Container with Scroll -->
+        <div class="table-container">
+            <table id="order-table">
+                <thead>
+                    <tr>
+                        <th>Id</th>
+                        <th>User Name</th>
+                        <th>Product Name</th>
+                        <th>Quantity</th>
+                        <th>Total Price</th>
+                        <th>Payment Method</th>
+                        <th>Status</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <% let productIndex=1 %>
+                    <% if(orderdetail && Array.isArray(orderdetail)){ %>
+                        <% orderdetail.forEach((order)=>{ %>
+                            <% if(order.productCollection && Array.isArray(order.productCollection)){ %>
+                                <% order.productCollection.forEach((product)=>{ %>
+                                    <tr>
+                                        <td><%=productIndex %></td>
+                                        <td><%=order.Username %></td>
+                                        <td><%=product.productname %></td>
+                                        <td><%=product.quantity %></td>
+                                        <td><%=order.totalPrice || 'N/A' %></td>
+                                        <td><%=order.paymentMethod %></td>
+                                        <td>
+                                            <span class="status-<%= product.status.toLowerCase() %>">
+                                                <%= product.status.charAt(0).toUpperCase() + product.status.slice(1).toLowerCase() %>
+                                            </span>
+                                        </td>
+                                        <td>
+                                            <form action="/admin/updateOrder/<%=order._id%>/<%=product.productid %>" method="post">
+                                                <div class="dropdown">
+                                                    <select name="status" class="form-select" aria-label="Select Status">
+                                                        <option value="pending" <%= product.status === 'pending' ? 'selected' : '' %>>Pending</option>
+                                                        <option value="shipped" <%= product.status === 'shipped' ? 'selected' : '' %>>Shipped</option>
+                                                        <option value="cancelled" <%= product.status === 'cancelled' ? 'selected' : '' %>>Cancelled</option>
+                                                        <option value="delivered" <%= product.status === 'delivered' ? 'selected' : '' %>>Delivered</option>
+                                                        <option value="returned" <%= product.status === 'returned' ? 'selected' : '' %>>Returned</option>
+                                                    </select>
+                                                </div>
+                                                <input type="hidden" name="orderId" value="<%= order._id %>">
+                                                <input type="hidden" name="productId" value="<%= product.productid %>">
+                                                <div class="action-buttons" style="margin-top: 5px;">
+                                                    <% if(product.status !== 'cancelled' && product.status !== 'delivered' && product.status !== 'returned'){ %>
+                                                        <button type="submit" class="update">Update</button>
+                                                    <% } %>
+                                                </div>
+                                            </form>
+                                        </td>
+                                    </tr>
+                                    <% productIndex++ %>
+                                <% }) %>
+                            <% } %>
+                        <% }) %>
+                    <% } %>
+                </tbody>
+            </table>
+        </div>
+    </div>
+    <script>
+        document.getElementById('logout-link').addEventListener('click', function (e) {
+            e.preventDefault(); // Prevent the default link behavior
+
+            Swal.fire({
+                title: "Are you sure you want to logout?",
+                icon: "question",
+                showCancelButton: true,
+                confirmButtonText: "Yes, logout",
+                cancelButtonText: "Cancel",
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    // Redirect to the logout route
+                    window.location.href = "/admin/adminLogin";
+                }
+            });
+        });
+    </script>
+</body>
+</html>

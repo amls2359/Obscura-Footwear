@@ -1,0 +1,278 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>User Management</title>
+    <style>
+        /* General Styles */
+        body { 
+            font-family: Arial, sans-serif; 
+            margin: 0;
+            padding: 0;
+            display: flex;
+            min-height: 100vh;
+            background-color: #f5f5f5;
+        }
+        
+        /* Sidebar Styles */
+        .sidebar {
+            width: 215px;
+            background-color: #333;
+            color: white;
+            padding: 20px;
+            height: 100vh;
+            position: fixed;
+            box-shadow: 2px 0 5px rgba(0,0,0,0.1);
+        }
+        
+        .sidebar h2 {
+            text-align: center;
+            color: white;
+            margin-bottom: 30px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid #444;
+        }
+
+        .sidebar ul {
+            list-style-type: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        .sidebar ul li {
+            margin: 15px 0;
+        }
+
+        .sidebar ul li a {
+            color: #fff;
+            text-decoration: none;
+            display: block;
+            padding: 8px 10px;
+            border-radius: 4px;
+            transition: background-color 0.3s;
+        }
+
+        .sidebar ul li a:hover {
+            background-color: #444;
+        }
+        
+        /* Main Content Styles */
+        .main-content {
+            flex: 1;
+            margin-left: 250px;
+            padding: 20px;
+            background-color: white;
+            border-radius: 5px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+        
+        .header-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+        
+        .heading {
+            flex-grow: 1;
+            text-align: center;
+            color: #333;
+        }
+        
+        /* Table Styles */
+        #example {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+            border: 1px solid #ebdcdc;
+        }
+
+        #example th, #example td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+            border-right: 1px solid #ddd;
+        }
+
+        #example th {
+            background-color: #333;
+            color: #fff;
+            border-right: 1px solid #555;
+        }
+
+        #example th:last-child,
+        #example td:last-child {
+            border-right: none;
+        }
+
+        #example tr:nth-child(even) {
+            background-color: #f9f9f9;
+        }
+
+        #example tr:hover {
+            background-color: #f1f1f1;
+        }
+
+        .btn-danger {
+            background-color: #dc3545;
+            color: white;
+            padding: 5px 10px;
+            border: none;
+            border-radius: 4px;
+            text-decoration: none;
+        }
+
+        .btn-danger:hover {
+            background-color: #c82333;
+        }
+
+        .btn-success {
+            background-color: #28a745;
+            color: white;
+            padding: 5px 10px;
+            border: none;
+            border-radius: 4px;
+            text-decoration: none;
+        }
+
+        .btn-success:hover {
+            background-color: #218838;
+        }
+
+        /* Search Form Styles */
+        .search-form {
+            margin-bottom: 20px;
+            display: flex;
+            gap: 10px;
+        }
+
+        .search-input {
+            padding: 8px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            flex: 1;
+        }
+
+        .search-button {
+            padding: 8px 16px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+
+        /* Responsive Adjustments */
+        @media (max-width: 768px) {
+            .sidebar {
+                width: 100%;
+                height: auto;
+                position: relative;
+            }
+            
+            .main-content {
+                margin-left: 0;
+            }
+        }
+    </style>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+</head>
+<body>
+    <!-- Sidebar -->
+    <div class="sidebar">
+        <h2>Admin Panel</h2>
+        <ul>
+            <li><a href="/admin/dashboard">Dashboard</a></li>
+            <li><a href="/admin/usermanagement">User Management</a></li>
+            <li><a href="/admin/categorymanagement">Category Management</a></li>
+            <li><a href="/productmanagement">Product Management</a></li>
+            <li><a href="/admin/orderManagemnt">Order Management</a></li>
+            <li><a href="/couponManagement">Coupon Management</a></li>
+            <li><a href="/salesReport">Sales</a></li>
+            <li><a href="/offerManagement">Offer Management</a></li>
+            <li><a href="/admin/adminLogin" id="logout-link">Logout</a></li>
+        </ul>
+    </div>
+
+    <!-- Main Content -->
+    <div class="main-content">
+        <div class="header-container">
+            <h2 class="heading">User Management</h2>
+        </div>
+    
+        <!-- Search and Filter Form -->
+        <form action="/admin/usermanagement" method="GET" class="search-form">
+            <input
+                type="text"
+                name="search"
+                placeholder="Search by username"
+                value="<%= searchQuery %>"
+                class="search-input"
+            />
+            <button type="submit" class="search-button">
+                Search
+            </button>
+        </form>
+    
+        <!-- User Table -->
+        <table id="example" class="table-striped">
+            <thead>
+                <tr>
+                    <th>Id</th>
+                    <th>User Name</th>
+                    <th>Email</th>
+                    <th>Status</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+            <tbody>
+                <% userdata.forEach((user, index) => { %>
+                    <tr>
+                        <td><%= index + 1 %></td>
+                        <td><%= user.username %></td>
+                        <td><%= user.email %></td>
+                        <td>
+                            <% if(user.isblocked){ %>
+                                <span style="color: red;">Blocked</span>
+                            <% } else { %>
+                                <span style="color: green;">Active</span>
+                            <% } %>
+                        </td>
+                        <td>
+                            <!-- Block Button -->
+                            <% if(!user.isblocked){ %>
+                                <a href="/admin/blockuser/<%= user._id %>" class="btn-danger">Block</a>
+                            <% } %>
+
+                            <!-- Unblock Button -->
+                            <% if(user.isblocked){ %>
+                                <a href="/admin/unblockuser/<%= user._id %>" class="btn-success">Unblock</a>
+                            <% } %>
+                        </td>
+                    </tr>
+                <% }) %>
+            </tbody>
+        </table>
+    </div>
+    <script>
+        document.getElementById('logout-link').addEventListener('click', function (e) {
+            e.preventDefault(); // Prevent the default link behavior
+
+            Swal.fire({
+                title: "Are you sure you want to logout?",
+                icon: "question",
+                showCancelButton: true,
+                confirmButtonText: "Yes, logout",
+                cancelButtonText: "Cancel",
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    // Redirect to the logout route
+                    window.location.href = "/admin/adminLogin";
+                }
+            });
+        });
+    </script>
+</body>
+</html>

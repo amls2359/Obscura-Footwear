@@ -1,0 +1,851 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title><%= product.productname %> - Product Details</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Work+Sans:ital,wght@0,100..900;1,100..900&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <!-- JavaScript Libraries -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- jQuery (already included) -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/elevatezoom/3.0.8/jquery.elevateZoom.min.js"></script>
+    <style>
+        * {
+            padding: 0;
+            margin: 0;
+            font-family: 'Poppins', sans-serif;
+            box-sizing: border-box;
+        }
+        body {
+            width: 100%;
+            min-height: 100vh;
+            overflow-x: hidden;
+            background-color: white;
+            font-family: "Roboto", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", sans-serif;
+        }
+        h1, h2, h3, h4, h5, h6,
+        .h1, .h2, .h3, .h4, .h5, .h6 {
+            font-family: "Roboto", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", sans-serif;
+        }
+        a {
+            transition: .3s all ease;
+        }
+        a, a:hover {
+            text-decoration: none !important;
+        }
+
+        /* ===== Navigation Styles ===== */
+        nav {
+            width: 100%;
+            height: 70px;
+            background: white;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+        }
+
+        .nav-container {
+            width: 100%;
+            height: 100%;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 20px;
+        }
+
+        .logo img {
+            width: 150px;
+        }
+
+        .nav-links {
+            display: flex;
+            align-items: center;
+        }
+
+        .nav-links a {
+            color: black;
+            text-decoration: none;
+            cursor: pointer;
+            position: relative;
+            margin: 0 20px;
+            transition: 0.3s linear;
+            font-weight: 600;
+        }
+
+        .nav-links a::before {
+            content: "";
+            position: absolute;
+            left: 0;
+            bottom: -4px;
+            width: 0;
+            background-color: #f74f10;
+            height: 3.5px;
+            transition: 0.3s linear;
+        }
+
+        .nav-links a:hover::before,
+        .nav-links a:hover {
+            color: #f74f10;
+            width: 100%;
+        }
+
+        .wishlist-link i {
+            font-size: 1.2rem;
+            color: #333;
+            transition: all 0.3s ease;
+            margin-left: 20px;
+        }
+        
+        .cart-link i {
+            font-size: 1.2rem;
+            color: #333;
+            transition: all 0.3s ease;
+            margin-left: 20px;
+        }
+        
+        .wishlist-link i:hover,
+        .cart-link i:hover {
+            color: #f74f10;
+            transform: scale(1.1);
+        }
+        
+        .logout-link {
+            padding: 8px 18px;
+            transition: all 0.3s ease;
+            font-weight: 600;
+            margin-left: 20px;
+            color: #333;
+        }
+        
+        .logout-link:hover {
+            color: white;
+            border-color: #f74f10;
+        }
+
+        .mobile-menu-toggle {
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            cursor: pointer;
+            display: none;
+        }
+
+        /* Product Detail Section */
+        .product-detail-container {
+            max-width: 1200px;
+            margin: 30px auto;
+            padding: 0 15px;
+        }
+        
+        .product-row {
+            display: flex;
+            flex-wrap: wrap;
+            margin: 0 -15px;
+        }
+        
+        .product-col {
+            padding: 0 15px;
+            flex: 0 0 50%;
+            max-width: 50%;
+        }
+        
+        .img-container {
+            background: #fff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+            margin-bottom: 20px;
+            position: relative;
+            height: 100%;
+        }
+        
+        .big_img {
+            width: 100%;
+            height: auto;
+            max-height: 500px;
+            object-fit: contain;
+            border-radius: 4px;
+            cursor: zoom-in;
+        }
+        
+        .product-info-section {
+            background: #fff;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+            height: 100%;
+        }
+        
+        .product-info-section h1 {
+            font-size: 2rem;
+            margin-bottom: 15px;
+            color: #212529;
+        }
+        
+        .product-info-section h3 {
+            font-size: 1.2rem;
+            margin-bottom: 15px;
+            color: #495057;
+        }
+        
+        .rating {
+            color: #f74f10;
+            margin-bottom: 20px;
+        }
+        
+        .rating span {
+            color: #6c757d;
+            font-size: 0.9rem;
+        }
+        
+        .product-price {
+            margin-bottom: 20px;
+        }
+        
+        .last-price {
+            text-decoration: line-through;
+            color: #6c757d;
+            margin-bottom: 5px;
+        }
+        
+        .offer-price {
+            color: #28a745;
+            font-weight: 500;
+            margin-bottom: 5px;
+        }
+        
+        .new-price {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: #f74f10;
+            margin-bottom: 5px;
+        }
+        
+        .discount-amount {
+            color: #28a745;
+            font-weight: 500;
+        }
+        
+        .no-offer {
+            color: #6c757d;
+            margin-bottom: 10px;
+        }
+        
+        .description {
+            margin-bottom: 25px;
+            color: #495057;
+            line-height: 1.7;
+        }
+        
+        .product-actions {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+        
+        .btn {
+            display: inline-block;
+            background: #f74f10;
+            color: white;
+            padding: 10px 20px;
+            margin: 10px 0;
+            border-radius: 5px;
+            text-decoration: none;
+            transition: background 0.3s;
+            border: none;
+            cursor: pointer;
+            font-size: 0.9rem;
+        }
+        .btn:hover {
+            background: #8a3313;
+            color: white;
+        }
+        
+        .btn-outline {
+            background: transparent;
+            border: 1px solid #f74f10;
+            color: #f74f10;
+        }
+        
+        .btn-outline:hover {
+            background: #f74f10;
+            color: white;
+        }
+        
+        .wishlist-section {
+            margin-top: 20px;
+        }
+        
+        /* Related Products */
+        .related-products-title {
+            text-align: center;
+            margin: 40px 0 20px;
+            color: #333;
+            font-weight: 600;
+            position: relative;
+        }
+        
+        .related-products-title::after {
+            content: "";
+            position: absolute;
+            left: 50%;
+            bottom: -10px;
+            transform: translateX(-50%);
+            width: 100px;
+            height: 3px;
+            background-color: #f74f10;
+        }
+        
+        .related {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 30px;
+            padding: 0 20px;
+            margin-bottom: 40px;
+        }
+        
+        .product-card {
+            background: #fff;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+            transition: transform 0.3s, box-shadow 0.3s;
+            width: 300px;
+        }
+        
+        .product-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+        }
+        
+        .card-img {
+            width: 100%;
+            height: 200px;
+            object-fit: contain;
+            padding: 15px;
+        }
+        
+        .cardbody {
+            padding: 15px;
+            text-align: center;
+        }
+        
+        .cardtitle {
+            font-size: 1.1rem;
+            margin-bottom: 10px;
+            color: #212529;
+        }
+        
+        .cardtext {
+            color: #f74f10;
+            font-weight: 500;
+            margin-bottom: 15px;
+        }
+        
+        .btn-view {
+            display: inline-block;
+            padding: 8px 15px;
+            background-color: #f8f9fa;
+            color: #f74f10;
+            border: 1px solid #f74f10;
+            border-radius: 4px;
+            text-decoration: none;
+            transition: all 0.3s;
+        }
+        
+        .btn-view:hover {
+            background-color: #f74f10;
+            color: #fff;
+        }
+
+        /* New Footer Styles */
+        .simple-footer {
+            background-color: #141d2a;
+            color: white;
+            padding: 4rem 0;
+            margin-top: 50px;
+        }
+        
+        .footer-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-between;
+        }
+        
+        .footer-section {
+            flex: 1;
+            min-width: 200px;
+            margin-bottom: 30px;
+            padding: 0 15px;
+        }
+        
+        .footer-section h3 {
+            font-size: 18px;
+            margin-bottom: 20px;
+            color: white;
+            position: relative;
+            padding-bottom: 10px;
+        }
+        
+        .footer-section h3::after {
+            content: "";
+            position: absolute;
+            left: 0;
+            bottom: 0;
+            width: 40px;
+            height: 2px;
+            background-color: #f74f10;
+        }
+        
+        .footer-section ul {
+            list-style: none;
+            padding: 0;
+        }
+        
+        .footer-section ul li {
+            margin-bottom: 10px;
+        }
+        
+        .footer-section ul li a {
+            color: #aaa;
+            text-decoration: none;
+            transition: color 0.3s;
+        }
+        
+        .footer-section ul li a:hover {
+            color: white;
+        }
+        
+        .footer-cta {
+            width: 100%;
+            text-align: center;
+            margin-bottom: 40px;
+            padding: 20px 0;
+            border-bottom: 1px solid #333;
+        }
+        
+        .footer-cta h2 {
+            font-size: 24px;
+            margin-bottom: 15px;
+            color: white;
+        }
+        
+        .footer-cta p {
+            font-size: 16px;
+            margin-bottom: 20px;
+            color: #aaa;
+            font-weight: bold;
+        }
+        
+        .footer-actions {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin-top: 20px;
+        }
+        
+        .weather-widget {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 15px;
+            border-radius: 8px;
+            text-align: center;
+            margin-top: 20px;
+        }
+        
+        .weather-widget .temp {
+            font-size: 24px;
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+        
+        .weather-widget .condition {
+            font-size: 14px;
+            color: #aaa;
+        }
+
+        /* Zoom result styling */
+          .lens {
+        position: absolute;
+        border: 1px solid #000;
+        width: 100px;
+        height: 100px;
+        display: none;
+        pointer-events: none;
+        z-index: 10;
+    }
+
+        .result {
+        width: 100%;
+        height: 300px;
+        border: 1px solid #ddd;
+        background-repeat: no-repeat;
+        display: none;
+        margin-top: 30px;
+        background-color: white;
+        background-position: 0 0;
+        background-size: cover;
+        border-radius: 4px;
+    }
+        /* Responsive */
+        @media (max-width: 992px) {
+            .product-info-section {
+                padding: 20px;
+            }
+        }
+        
+        @media (max-width: 768px) {
+            .nav-links {
+                position: fixed;
+                top: 70px;
+                left: -100%;
+                width: 100%;
+                height: calc(100vh - 70px);
+                background: white;
+                flex-direction: column;
+                justify-content: flex-start;
+                padding: 30px 20px;
+                gap: 15px;
+                transition: 0.5s;
+                z-index: 999;
+                box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+            }
+            
+            .nav-links.active {
+                left: 0;
+            }
+            
+            .nav-links a {
+                margin: 10px 0;
+                padding: 8px 0;
+                font-size: 1.1rem;
+            }
+            
+            .wishlist-link i,
+            .cart-link i {
+                margin-left: 0;
+                margin-right: 10px;
+            }
+            
+            .logout-link {
+                margin-left: 0;
+                display: inline-block;
+                width: 100%;
+                text-align: left;
+                padding: 8px 0;
+            }
+            
+            .mobile-menu-toggle {
+                display: block;
+            }
+            
+            .product-col {
+                flex: 0 0 100%;
+                max-width: 100%;
+            }
+            
+            .related {
+                flex-direction: column;
+                align-items: center;
+            }
+            
+            .product-card {
+                width: 100%;
+                max-width: 350px;
+            }
+            
+            .footer-section {
+                min-width: 50%;
+            }
+            
+            .result {
+                display: none !important;
+            }
+        }
+        
+        @media (max-width: 576px) {
+            .product-actions {
+                flex-direction: column;
+            }
+            
+            .footer-section {
+                min-width: 100%;
+                text-align: center;
+            }
+            
+            .footer-section h3::after {
+                left: 50%;
+                transform: translateX(-50%);
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Header Section -->
+    <nav>
+        <div class="nav-container">
+            <div class="logo">
+                <a href="/"><img src="/images/logo.png" alt="Logo"></a>
+            </div>
+            <div class="nav-links">
+                <a href="/Homepage">HOME</a>
+                <a href="/allproduct">PRODUCTS</a>
+                <a href="">ABOUT</a>
+                <a href="">CONTACT</a>
+                <a href="/userProfile">ACCOUNT</a>
+                <a href="" id="logout-button" class="logout-link">LOGOUT</a>
+                <a href="/wishlist" class="wishlist-link">
+                    <i class="fas fa-heart"></i>
+                </a>
+                <a href="/cart" class="cart-link">
+                    <i class="fa fa-shopping-cart"></i>
+                </a>
+            </div>
+            <button class="mobile-menu-toggle">
+                <i class="fas fa-bars"></i>
+            </button>
+        </div>
+    </nav>
+
+    <!-- Main Content Section -->
+    <div class="product-detail-container">
+        <div class="product-row">
+            <!-- Product Images -->
+            <div class="product-col">
+    <div class="img-container">
+        <img id="main-image" src="/<%=product.image[0] %>" alt="<%=product.productname%>" class="big_img" />
+        <div class="lens"></div>
+        <div id="zoom-result" class="result"></div>
+    </div>
+   
+</div>
+            
+            <!-- Product Info -->
+            <div class="product-col">
+                <div class="product-info-section">
+                    <h1><%= product.productname %></h1>
+                    
+                    <% if(product.brand) { %>
+                        <h3>Brand: <%= product.brand %></h3>
+                    <% } %>
+                    <% if(product.stock === 0 ) {%>
+                        <h3 style="color:red;">Out of stock</h3>
+                    <% } else { %>
+                        <p>Stock: <%=product.stock %></p>
+                    <% } %>
+                    <div class="rating">
+                        <i class="fa fa-star"></i>
+                        <i class="fa fa-star"></i>
+                        <i class="fa fa-star"></i>
+                        <i class="fa fa-star-half"></i> 4.2 <span>(210 reviews)</span>
+                    </div>
+
+                    <div class="product-price">
+                        <% if(productoffer || categoryoffer) { %>
+                            <p class="last-price">Original Price: <span>₹<%=product.price%>.00</span></p>
+                            
+                            <% if(productoffer && productoffer.productoffer > 0) { %>
+                                <p class="offer-price">Product Offer: <%=productoffer.productoffer %>% off</p>
+                            <% } %>
+                            
+                            <% if(categoryoffer && categoryoffer.alloffer > 0) { %>
+                                <p class="offer-price">Category Offer: <%=categoryoffer.alloffer %>% off</p>
+                            <% } %>
+                            
+                            <p class="new-price">Discounted Price: ₹<%= product.discountedPrice.toFixed(2) %></p>
+                            <p class="discount-amount">You Save: ₹<%= (product.price - product.discountedPrice).toFixed(2) %></p>
+                        <% } else { %>
+                            <p class="no-offer">No offers available</p>
+                            <p class="new-price">Price: ₹<%=product.price%>.00</p>
+                        <% } %>
+                    </div>
+                    
+                    <% if(product.description) { %>
+                        <p class="description"><%= product.description %></p>
+                    <% } %>
+                    
+                    <div class="product-actions">
+                        <form action="/addcart/<%= product._id %>" method="POST" class="d-inline">
+                            <input type="hidden" name="_method" value="POST">
+                            <% if(product.stock === 0) { %>
+                                <button type="button" class="btn" disabled>Add to Cart</button>
+                                <button type="button" class="btn" disabled>Buy now</button>
+                            <% } else { %>
+                                <button type="submit" class="btn">Add to Cart</button>
+                                <!-- <button type="button" class="btn" id="buyNowBtn">Buy now</button> -->
+                            <% } %>
+                        </form>
+                    </div>
+                    
+                    <div class="wishlist-section">
+                        <% if(product.isInWishlist) { %>
+                            <form action="/removefromWishlist/<%=product._id%>" method="POST">
+                                <!-- <input type="hidden" name="_method" value="DELETE"> -->
+                                <button type="submit" class="btn btn-outline">
+                                    <i class="fas fa-heart"></i> Remove from Wishlist
+                                </button>
+                            </form>
+                        <% } else { %>
+                            <form action="/addwishlist/<%=product._id%>" method="POST">
+                                <button type="submit" class="btn">
+                                    <i class="far fa-heart"></i> Add to Wishlist
+                                </button>
+                            </form>
+                        <% } %>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Related Products Section -->
+    <h2 class="related-products-title">Related Products</h2>
+    <div class="related">
+        <% relatedProducts.slice(0,3).forEach(function(relatedProduct){ %>
+            <div class="product-card">
+                <a href="/getproduct/<%= relatedProduct._id %>">
+                    <img src="/<%=relatedProduct.image[0] %>" class="card-img" alt="Related Product Image">
+                </a>
+
+                <div class="cardbody">
+                    <h5 class="cardtitle"><%= relatedProduct.productname %></h5>
+                    <p class="cardtext">Price: ₹<%= relatedProduct.price %></p>
+                    <a href="/productdetails/<%= relatedProduct._id %>" class="btn-view">View Details</a>
+                </div>
+            </div>
+        <% }); %>
+    </div>
+
+    <!-- Footer Section -->
+    <footer class="simple-footer">
+        <div class="footer-container">
+            <div class="footer-cta">
+                <h2>Ready for a next project?</h2>
+                <p>Let's get started!</p>
+                <div class="footer-actions">
+                    <a href="#" class="btn">Enter</a>
+                    <a href="#" class="btn btn-outline">Continue</a>
+                </div>
+            </div>
+            
+            <div class="footer-section">
+                <h3>COLORLIB</h3>
+                <ul>
+                    <li><a href="#">Celebrate</a></li>
+                    <li><a href="#">Buyer</a></li>
+                    <li><a href="#">Supplier</a></li>
+                </ul>
+            </div>
+            
+            <div class="footer-section">
+                <h3>Charging</h3>
+                <ul>
+                    <li><a href="#">Abstract</a></li>
+                    <li><a href="#">Content</a></li>
+                    <li><a href="#">Comment</a></li>
+                </ul>
+            </div>
+            
+            <div class="footer-section">
+                <h3>Further Information</h3>
+                <ul>
+                    <li><a href="#">Terms & Conditions</a></li>
+                    <li><a href="#">Privacy Policy</a></li>
+                </ul>
+            </div>
+            
+            <div class="footer-section">
+                <div class="weather-widget">
+                    <div class="temp">27°C</div>
+                    <div class="condition">Partly cloudy</div>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+    $(document).ready(function () {
+      // Mobile menu toggle functionality
+      $('.mobile-menu-toggle').click(function() {
+          $('.nav-links').toggleClass('active');
+      });
+
+      const image = document.getElementById("main-image");
+      const lens = document.querySelector(".lens");
+      const result = document.getElementById("zoom-result");
+      const zoom = 2;
+
+      function setZoomBackground() {
+        result.style.backgroundImage = `url('${image.src}')`;
+        result.style.backgroundSize = `${image.width * zoom}px ${image.height * zoom}px`;
+      }
+
+      // Ensure zoom settings are initialized on image load
+      image.onload = setZoomBackground;
+      if (image.complete) setZoomBackground();
+
+      $(".img-container").on("mouseenter", function () {
+        lens.style.display = "block";
+        result.style.display = "block";
+      });
+
+      $(".img-container").on("mouseleave", function () {
+        lens.style.display = "none";
+        result.style.display = "none";
+      });
+
+      $(".img-container").on("mousemove", function (e) {
+        const bounds = image.getBoundingClientRect();
+        const x = e.clientX - bounds.left;
+        const y = e.clientY - bounds.top;
+
+        const lensWidth = lens.offsetWidth;
+        const lensHeight = lens.offsetHeight;
+
+        let lensX = x - lensWidth / 2;
+        let lensY = y - lensHeight / 2;
+
+        lensX = Math.max(0, Math.min(lensX, image.width - lensWidth));
+        lensY = Math.max(0, Math.min(lensY, image.height - lensHeight));
+
+        lens.style.left = lensX + "px";
+        lens.style.top = lensY + "px";
+
+        result.style.backgroundPosition = `-${lensX * zoom}px -${lensY * zoom}px`;
+      });
+
+      // Other scripts like logout and Buy Now
+      $('#buyNowBtn').on('click', function () {
+        window.location.href = '/checkout/<%= product._id %>';
+      });
+
+      $('#logout-button').on('click', function (e) {
+        e.preventDefault();
+        Swal.fire({
+          title: "Are you sure you want to logout?",
+          icon: "question",
+          showCancelButton: true,
+          confirmButtonText: "Yes, logout",
+          cancelButtonText: "Cancel",
+        }).then((result) => {
+          if (result.isConfirmed) {
+            window.location.href = "/UserLogin";
+          }
+        });
+      });
+    });
+    </script>
+</body>
+</html>

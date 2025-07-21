@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Edit Category</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: 'Poppins', sans-serif;
+            background: #f0f0f0;
+        }
+
+        .container {
+            max-width: 1300px;
+            margin: auto;
+            padding-left: 25px;
+            padding-right: 25px;
+        }
+
+        .row {
+            display: flex;
+            align-items: center;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
+        .col-md-4 {
+            flex-basis: 33.33%;
+            max-width: 33.33%;
+        }
+
+        .card {
+            background: #fff;
+            border-radius: 10px;
+            box-shadow: 0 0 20px 0px rgba(0, 0, 0, 0.1);
+            padding: 20px;
+        }
+
+        .card-body {
+            padding: 20px;
+        }
+
+        .text-center {
+            text-align: center;
+        }
+
+        .text-primary {
+            color: #007bff;
+        }
+
+        .form-label {
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 15px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+
+        .btn {
+            display: inline-block;
+            background: #007bff;
+            color: #fff;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+
+        .btn:hover {
+            background: #0056b3;
+        }
+
+        .alert {
+            padding: 10px;
+            margin-bottom: 15px;
+            border-radius: 5px;
+        }
+
+        .alert-danger {
+            background: #ffebee;
+            color: #c62828;
+            border: 1px solid #ffcdd2;
+        }
+
+        .login-button {
+            margin-top: 20px;
+        }
+
+        .w-100 {
+            width: 100%;
+        }
+
+        .mt-2 {
+            margin-top: 10px;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container" style="padding: 8%;">
+        <div class="row justify-content-center">
+            <div class="col-md-4">
+                <div class="card">
+                    <div class="card-body">
+                        <h1 class="text-center text-primary">Edit Category</h1>
+                        <form id="categoryForm" action="/admin/editcategory/<%= category._id %>" method="POST">
+                            <div class="mb-3 mt-4">
+                                <label for="categoryname" class="form-label">Category Name</label>
+                                <input type="text" class="form-control" id="categoryname" name="categoryname" value="<%= category.category %>">
+                                <div id="categorynameError" class="text-danger mt-2"></div>
+                            </div>
+                            <div class="text-center login-button mb-4">
+                                <button type="submit" class="btn btn-primary w-100">Edit</button>
+                                <a href="/admin/categorymanagement" class="btn btn-primary w-100 mt-2">Go Back</a>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script>
+        // Function to hide the error message after a specified timeout
+        function hideError(elementId) {
+            const errorElement = document.getElementById(elementId);
+            if (errorElement) {
+                setTimeout(() => {
+                    errorElement.textContent = ''; // Clear the error message
+                }, 2000); // 2000 milliseconds = 2 seconds
+            }
+        }
+    
+        // Function to hide the error message after 3 seconds
+        function hideErrorMessage() {
+            const errorMessage = document.getElementById('errorMessage');
+            if (errorMessage) {
+                setTimeout(() => {
+                    errorMessage.style.display = 'none';
+                }, 2000); // 3000 milliseconds = 3 seconds
+            }
+        }
+    
+        // Call the function when the page loads
+        window.onload = hideErrorMessage;
+    
+        document.getElementById('categoryForm').addEventListener('submit', function(event) {
+            event.preventDefault();
+            const categoryNameInput = document.getElementById('categoryname'); // Corrected ID
+            const categoryName = categoryNameInput.value.trim();
+            const maxLength = 15; // Set a maximum length for the category name
+            const isAllCaps = /^[A-Z\s]+$/.test(categoryName); // Check if the name is in all capital letters
+            const isUrl = /^(ftp|http|https):\/\/[^ "]+$/.test(categoryName); // Check if the name looks like a URL
+            const hasNumbers = /\d/.test(categoryName); // Check if the name contains any numbers
+    
+            // Debugging: Log the category name and validation results
+            console.log('Category Name:', categoryName);
+            console.log('Is All Caps:', isAllCaps);
+            console.log('Is URL:', isUrl);
+            console.log('Has Numbers:', hasNumbers);
+    
+            // Check if category name is already added and only the first letter is capitalized
+            const existingCategories = Array.from(document.querySelectorAll('.existing-category')).map(category => category.textContent.trim());
+            const firstLetterCapitalized = categoryName.charAt(0) === categoryName.charAt(0).toUpperCase();
+            const categoryExists = existingCategories.includes(categoryName.toLowerCase());
+    
+            // Debugging: Log existing categories and validation results
+            console.log('Existing Categories:', existingCategories);
+            console.log('First Letter Capitalized:', firstLetterCapitalized);
+            console.log('Category Exists:', categoryExists);
+    
+            // Clear previous error messages
+            document.getElementById('categorynameError').textContent = '';
+    
+            if (!categoryName) {
+                document.getElementById('categorynameError').textContent = 'Please enter a category name.';
+                hideError('categorynameError'); // Hide the error message after 2 seconds
+            } else if (categoryName.length > maxLength) {
+                document.getElementById('categorynameError').textContent = 'Category name cannot be longer than ' + maxLength + ' characters.';
+                hideError('categorynameError'); // Hide the error message after 2 seconds
+            } else if (isAllCaps) {
+                document.getElementById('categorynameError').textContent = 'Category name cannot be in all capital letters.';
+                hideError('categorynameError'); // Hide the error message after 2 seconds
+            } else if (isUrl) {
+                document.getElementById('categorynameError').textContent = 'Category name cannot be a URL.';
+                hideError('categorynameError'); // Hide the error message after 2 seconds
+            } else if (hasNumbers) {
+                document.getElementById('categorynameError').textContent = 'Category name cannot contain numbers.';
+                hideError('categorynameError'); // Hide the error message after 2 seconds
+            } else if (categoryExists && firstLetterCapitalized) {
+                document.getElementById('categorynameError').textContent = 'Category name cannot be entered again if only the first letter is capitalized.';
+                hideError('categorynameError'); // Hide the error message after 2 seconds
+            } else {
+                // Proceed with form submission
+                this.submit();
+            }
+        });
+    </script>t>
+</body>
+</html>

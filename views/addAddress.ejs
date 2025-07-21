@@ -1,0 +1,348 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Add Address</title>
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500&display=swap" rel="stylesheet">
+
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Roboto', sans-serif;
+        }
+
+        body {
+            background-color: #f5f5f5;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .main-content {
+            background-color: white;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            width: 100%;
+            max-width: 600px;
+            padding: 30px;
+        }
+
+        h2 {
+            color: #333;
+            margin-bottom: 25px;
+            font-weight: 500;
+            text-align: center;
+            font-size: 24px;
+        }
+        /* Add this to your existing CSS */
+.sidebar-link.active {
+    background-color: #f8f9fa;
+    color: #e6470d;
+    border-color: #e6470d;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(247, 79, 16, 0.2);
+}
+
+/* Optional: You might want to remove hover effect when active */
+.sidebar-link.active:hover {
+    background-color: #f8f9fa;
+    color: #e6470d;
+}
+
+        .input-field {
+            position: relative;
+            margin-bottom: 25px;
+        }
+
+        .input-field label {
+            position: absolute;
+            top: 12px;
+            left: 10px;
+            color: #999;
+            font-size: 16px;
+            font-weight: 300;
+            transition: all 0.2s ease;
+            pointer-events: none;
+            background-color: white;
+            padding: 0 5px;
+        }
+
+        .input-field input,
+        .input-field select {
+            width: 100%;
+            padding: 12px 15px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 16px;
+            outline: none;
+            transition: border-color 0.3s;
+        }
+
+        .input-field input:focus,
+        .input-field select:focus {
+            border-color: #db3705;
+        }
+
+        .input-field input:focus + label,
+        .input-field input:not(:placeholder-shown) + label,
+        .input-field select:focus + label,
+        .input-field select:valid + label {
+            top: -10px;
+            left: 10px;
+            font-size: 12px;
+            color: #db3705;
+        }
+
+        .input-field i.material-icons {
+            position: absolute;
+            top: 12px;
+            right: 15px;
+            color: #999;
+        }
+
+        .input-field input:focus ~ i.material-icons {
+            color: #4285f4;
+        }
+
+        .error-message {
+            color: #d32f2f;
+            font-size: 12px;
+            margin-top: 5px;
+            display: none;
+        }
+
+        .submit-btn {
+            background-color: #f74f10;
+             color: white;
+            border: 2px solid #f74f10;
+            padding: 12px 20px;
+            border-radius: 4px;
+            font-size: 16px;
+            cursor: pointer;
+            width: 100%;
+            margin-top: 10px;
+            transition: background-color 0.3s;
+        }
+
+        .submit-btn:hover {
+              background-color: #f8f9fa;
+              color: #e6470d;
+              border-color: #e6470d;
+              transform: translateY(-2px);
+              box-shadow: 0 4px 8px rgba(247, 79, 16, 0.2);
+          }
+
+        #back-btn {
+            background-color: #f5f5f5;
+            color: #333;
+            border: 1px solid #ddd;
+            padding: 12px 20px;
+            border-radius: 4px;
+            font-size: 16px;
+            cursor: pointer;
+            width: 100%;
+            margin-top: 15px;
+            transition: background-color 0.3s;
+        }
+
+        #back-btn:hover {
+            background-color: #e0e0e0;
+        }
+        
+        .error-message {
+            color: #f20505;
+        }
+        
+        
+        @media (max-width: 480px) {
+            .main-content {
+                padding: 20px;
+            }
+            
+            h2 {
+                font-size: 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="main-content">
+        <form action="/addAddressPost" method="post" id="address-form">
+            <div class="address-details">
+                <h2>Address Information</h2>
+
+                <div class="input-field">
+                    <input type="text" name="firstname" id="firstname" placeholder=" ">
+                    <label for="firstname">First Name</label>
+                    <div id="firstname-error" class="error-message"></div>
+                </div>
+
+                <div class="input-field">
+                    <input type="text" name="lastname" id="lastname" placeholder=" ">
+                    <label for="lastname">Last Name</label>
+                    <div id="lastname-error" class="error-message"></div>
+                </div>
+
+                <div class="input-field">
+                    <input type="text" name="address" id="address" placeholder=" ">
+                    <label for="address">Address</label>
+                    <div id="address-error" class="error-message"></div>
+                </div>
+
+                  <div class="input-field">
+                    <input type="text" name="pincode" id="pincode" placeholder="">
+                    <label for="pincode">pincode</label>
+                    <div id="pincode-error" class="error-message"></div>
+                </div>
+
+
+                <div class="input-field">
+                    <input id="city" type="text" name="city" placeholder=" ">
+                    <label for="city">City/Town</label>
+                    <div class="error-message" id="city-error"></div>
+                </div>
+             <div class="input-field">
+            <select id="state" class="browser-default" name="state">
+               <option value=""></option>
+               <option value="Kerala">Kerala</option>
+                <option value="Tamil Nadu">Tamil Nadu</option>
+               <option value="Karnataka">Karnataka</option>
+                <option value="Rajasthan">Rajasthan</option>
+               <option value="Gujarat">Gujarat</option>
+              </select>
+            <label for="state">State</label>
+              <div class="error-message" id="state-error"></div>
+               </div>
+                
+                <div class="input-field">
+                    <input id="email" type="email"  class="validate"  name="email" placeholder=" ">
+                    <label for="email">Email</label>
+                    <i class="material-icons">email</i>
+                    <div id='email-error' class="error-message"></div>
+                </div>
+
+             <div class="input-field">
+               <input id="phone" type="tel" class="validate" name="phone" placeholder=" ">
+                <label for="phone">Phone Number</label>
+               <i class="material-icons">contact_phone</i>
+              <div id='phone-error' class="error-message"></div>
+              </div>
+                
+                <button class="submit-btn" type="submit">Submit</button>
+                <button id="back-btn" type="button">Go Back</button>
+            </div>
+        </form>
+    </div>
+    <script>
+  document.getElementById('address-form').addEventListener('submit', function(event) {
+    event.preventDefault(); // Prevent default form submission
+    
+    // Clear previous errors
+    document.querySelectorAll('.error-message').forEach(el => {
+        el.style.display = 'none';
+        el.textContent = '';
+    });
+    
+    let isValid = true;
+    
+    // Validate each field
+    const firstname = document.getElementById("firstname").value.trim();
+    const lastname = document.getElementById("lastname").value.trim();
+    const address = document.getElementById("address").value.trim();
+    const pincode =document.getElementById("pincode").value.trim();
+    const city = document.getElementById("city").value.trim();
+    const state = document.getElementById("state").value;
+    const email = document.getElementById("email").value.trim();
+    const phone = document.getElementById("phone").value.trim();
+    
+    // Validation for first name (no numbers allowed)
+    if (!firstname) {
+        showError('firstname-error', 'Please enter the first name');
+        isValid = false;
+    } else if (/\d/.test(firstname)) {
+        showError('firstname-error', 'First name cannot contain numbers');
+        isValid = false;
+    }
+    
+    // Validation for last name (no numbers allowed)
+    if (!lastname) {
+        showError('lastname-error', 'Please enter the last name');
+        isValid = false;
+    } else if (/\d/.test(lastname)) {
+        showError('lastname-error', 'Last name cannot contain numbers');
+        isValid = false;
+    }
+    
+    // Address can contain numbers, so no additional validation needed
+    if (!address) {
+        showError('address-error', 'Please enter the address');
+        isValid = false;
+    }
+    
+    // Validation for city (no numbers allowed)
+    if (!city) {
+        showError('city-error', 'Please enter the city');
+        isValid = false;
+    } else if (/\d/.test(city)) {
+        showError('city-error', 'City name cannot contain numbers');
+        isValid = false;
+    }
+    
+    if (!state) {
+        showError('state-error', 'Please select a state');
+        isValid = false;
+    }
+    
+    if (!email) {
+        showError('email-error', 'Please enter the email');
+        isValid = false;
+    } else if (!validateEmail(email)) {
+        showError('email-error', 'Please enter a valid email');
+        isValid = false;
+    }
+    
+    if (!phone) {
+        showError('phone-error', 'Please enter the phone number');
+        isValid = false;
+    } else if (!/^\d{10}$/.test(phone)) {
+        showError('phone-error', 'Please enter a 10 digit mobile number');
+        isValid = false;
+    }
+   if (!pincode) {
+    showError('pincode-error', 'Please enter the pincode');
+    isValid = false;
+} else if (!/^[1-9][0-9]{5}$/.test(pincode)) {
+    showError('pincode-error', 'Please enter a valid 6-digit pincode');
+    isValid = false;
+}
+    if (isValid) {
+        this.submit(); // Submit the form if valid
+    }
+});
+
+// Helper function to show errors
+function showError(id, message) {
+    const errorElement = document.getElementById(id);
+    errorElement.textContent = message;
+    errorElement.style.display = 'block';
+}
+
+// Email validation
+function validateEmail(email) {
+    const re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    return re.test(email);
+}
+        
+        // Back button functionality
+        document.getElementById('back-btn').addEventListener('click', function() {
+            window.history.back();
+        });
+    </script>
+</body>
+</html>

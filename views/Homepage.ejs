@@ -1,0 +1,907 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Redstore | Ecommerce website</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
+    <style>
+        /* ===== Base Styles ===== */
+        * {
+            padding: 0;
+            margin: 0;
+            font-family: 'Poppins', sans-serif;
+            box-sizing: border-box;
+        }
+        
+        body {
+            width: 100%;
+            min-height: 100vh;
+            overflow-x: hidden;
+            background-color: #f8f9fa;
+            font-family: "Roboto", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", sans-serif;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        h1, h2, h3, h4, h5, h6 {
+            font-family: "Roboto", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", sans-serif;
+        }
+        
+        a {
+            transition: .3s all ease;
+        }
+        
+        a, a:hover {
+            text-decoration: none !important;
+        }
+
+        /* ===== Navigation Styles ===== */
+        nav {
+            width: 100%;
+            height: 10vh;
+            background: white;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+        }
+
+        .nav-container {
+            width: 100%;
+            height: 100%;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 20px;
+        }
+
+        .logo img {
+            width: 150px;
+        }
+
+        .nav-links {
+            display: flex;
+            align-items: center;
+        }
+
+        .nav-links a {
+            color: black;
+            text-decoration: none;
+            cursor: pointer;
+            position: relative;
+            margin: 0 20px;
+            transition: 0.3s linear;
+            font-weight: 600;
+        }
+
+        .nav-links a::before {
+            content: "";
+            position: absolute;
+            left: 0;
+            bottom: -4px;
+            width: 0;
+            background-color: #f74f10;
+            height: 3.5px;
+            transition: 0.3s linear;
+        }
+
+        .nav-links a:hover::before,
+        .nav-links a:hover {
+            color: #f74f10;
+            width: 100%;
+        }
+
+        .wishlist-link i {
+            font-size: 1.2rem;
+            color: #333;
+            transition: all 0.3s ease;
+            margin-left: 20px;
+        }
+        
+        .cart-link i {
+            font-size: 1.2rem;
+            color: #333;
+            transition: all 0.3s ease;
+            margin-left: 20px;
+        }
+        
+        .wishlist-link i:hover,
+        .cart-link i:hover {
+            color: #f74f10;
+            transform: scale(1.1);
+        }
+        
+        .logout-link {
+            padding: 8px 18px;
+            transition: all 0.3s ease;
+            font-weight: 600;
+            margin-left: 20px;
+            color: #333;
+        }
+        
+        .logout-link:hover {
+            color: white;
+            border-color: #f74f10;
+        }
+
+        .mobile-menu-toggle {
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            cursor: pointer;
+            display: none;
+        }
+
+        /* ===== Hero Section ===== */
+        .hero {
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            padding: 80px 0;
+            margin-bottom: 50px;
+        }
+        
+        .hero-content {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 0 30px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+        
+        .hero-text {
+            flex: 1;
+            padding-right: 50px;
+        }
+        
+        .hero-text h1 {
+            font-size: 2.5rem;
+            margin-bottom: 20px;
+            color: #333;
+            font-weight: 700;
+        }
+        
+        .hero-text p {
+            font-size: 1.1rem;
+            color: #555;
+            margin-bottom: 30px;
+            line-height: 1.6;
+        }
+        
+        .hero-image {
+            flex: 1;
+            text-align: center;
+        }
+        
+        .hero-image img {
+            max-width: 100%;
+            height: auto;
+            animation: float 3s ease-in-out infinite;
+        }
+        
+        @keyframes float {
+            0% { transform: translateY(0px); }
+            50% { transform: translateY(-15px); }
+            100% { transform: translateY(0px); }
+        }
+        
+        .btn {
+            display: inline-block;
+            background: #f74f10;
+            color: white;
+            padding: 12px 30px;
+            border-radius: 8px;
+            font-weight: 600;
+            transition: all 0.3s;
+            border: none;
+            cursor: pointer;
+            font-size: 1rem;
+        }
+        
+        .btn:hover {
+            background: #e6470d;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(247, 79, 16, 0.3);
+        }
+
+        /* ===== Categories Section ===== */
+        .categories {
+            padding: 60px 0;
+            background-color: #fff;
+        }
+        
+        .small-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 0 30px;
+        }
+        
+        .row {
+            display: flex;
+            flex-wrap: wrap;
+            margin: 0 -15px;
+        }
+        
+        .col-3 {
+            flex: 0 0 calc(33.33% - 30px);
+            margin: 0 15px 30px;
+        }
+        
+        .image-container {
+            position: relative;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s ease;
+        }
+        
+        .image-container:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.15);
+        }
+        
+        .image-container img {
+            width: 100%;
+            height: 300px;
+            object-fit: cover;
+            display: block;
+        }
+        
+        .text {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            color: white;
+            font-size: 24px;
+            font-weight: bold;
+            text-shadow: 1px 1px 3px rgba(0,0,0,0.8);
+        }
+
+        /* ===== Featured Products ===== */
+        .featured-products {
+            padding: 60px 0;
+            background-color: #f8f9fa;
+        }
+        
+        .title {
+            text-align: center;
+            margin: 0 0 40px;
+            color: #333;
+            font-weight: 700;
+            position: relative;
+            display: inline-block;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 2rem;
+        }
+        
+        .title::after {
+            content: "";
+            position: absolute;
+            left: 0;
+            bottom: -8px;
+            width: 100%;
+            height: 4px;
+            background: linear-gradient(90deg, #f39405 0%, #f74f10 100%);
+            border-radius: 3px;
+        }
+        
+        .col-4 {
+            flex: 0 0 calc(25% - 30px);
+            margin: 0 15px 30px;
+            background: white;
+            border-radius: 12px;
+            padding: 20px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.03);
+            transition: all 0.3s ease;
+        }
+        
+        .col-4:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.1);
+        }
+        
+        .col-4 img {
+            width: 100%;
+            height: 200px;
+            object-fit: contain;
+            margin-bottom: 15px;
+            border-radius: 8px;
+        }
+        
+        .col-4 h4 {
+            font-size: 1.1rem;
+            margin-bottom: 8px;
+            color: #333;
+            font-weight: 600;
+        }
+        
+        .rating {
+            color: #f74f10;
+            margin: 8px 0;
+            font-size: 0.9rem;
+        }
+        
+        .col-4 p {
+            font-weight: 700;
+            color: #333;
+            margin: 12px 0;
+            font-size: 1.2rem;
+        }
+
+        /* ===== Offer Section ===== */
+        .offer {
+            padding: 80px 0;
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            margin: 50px 0;
+        }
+        
+        .offer-img {
+            max-width: 100%;
+            height: auto;
+            animation: pulse 2s ease-in-out infinite;
+        }
+        
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
+        }
+        
+        .offer .col-2 {
+            flex: 0 0 calc(50% - 30px);
+            margin: 0 15px;
+        }
+        
+        .offer p {
+            color: #555;
+            font-size: 1.1rem;
+            margin-bottom: 10px;
+        }
+        
+        .offer h1 {
+            font-size: 2.5rem;
+            color: #333;
+            margin-bottom: 20px;
+            font-weight: 700;
+        }
+        
+        .offer small {
+            color: #666;
+            display: block;
+            margin-bottom: 20px;
+            line-height: 1.6;
+        }
+
+        /* ===== Testimonial Section ===== */
+        .testimonial {
+            padding: 80px 0;
+            background-color: #fff;
+        }
+        
+        .testimonial .col-3 {
+            background: white;
+            border-radius: 12px;
+            padding: 30px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+            transition: all 0.3s ease;
+            text-align: center;
+        }
+        
+        .testimonial .col-3:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.1);
+        }
+        
+        .testimonial i {
+            font-size: 2rem;
+            color: #f74f10;
+            margin-bottom: 20px;
+        }
+        
+        .testimonial p {
+            color: #555;
+            margin-bottom: 20px;
+            line-height: 1.6;
+            font-style: italic;
+        }
+        
+        .testimonial img {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            object-fit: cover;
+            margin-bottom: 15px;
+            border: 3px solid #f74f10;
+        }
+        
+        .testimonial h3 {
+            font-size: 1.2rem;
+            color: #333;
+            font-weight: 600;
+        }
+
+        /* ===== Brands Section ===== */
+        .brands {
+            padding: 60px 0;
+            background-color: #f8f9fa;
+        }
+        
+        .brands .col-5 {
+            flex: 0 0 calc(20% - 30px);
+            margin: 0 15px;
+            text-align: center;
+        }
+        
+        .brands img {
+            width: 100%;
+            max-width: 150px;
+            filter: grayscale(100%);
+            opacity: 0.7;
+            transition: all 0.3s ease;
+        }
+        
+        .brands img:hover {
+            filter: grayscale(0%);
+            opacity: 1;
+        }
+
+        /* ===== Footer Styles ===== */
+        .footer {
+            background-color: #141d2a;
+            color: white;
+            padding: 4rem 0 2rem;
+            width: 100%;
+            margin-top: auto;
+        }
+        
+        .footer-col-1, .footer-col-2, .footer-col-3, .footer-col-4 {
+            flex: 1;
+            min-width: 250px;
+            margin-bottom: 30px;
+            padding: 0 15px;
+        }
+        
+        .footer-col-2 img {
+            width: 150px;
+            margin-bottom: 20px;
+        }
+        
+        .footer-col-1 h3, 
+        .footer-col-2 h3, 
+        .footer-col-3 h3, 
+        .footer-col-4 h3 {
+            font-size: 1.2rem;
+            margin-bottom: 20px;
+            color: white;
+            position: relative;
+            padding-bottom: 10px;
+        }
+        
+        .footer-col-1 h3::after,
+        .footer-col-2 h3::after,
+        .footer-col-3 h3::after,
+        .footer-col-4 h3::after {
+            content: "";
+            position: absolute;
+            left: 0;
+            bottom: 0;
+            width: 40px;
+            height: 2px;
+            background-color: #f74f10;
+        }
+        
+        .footer-col-1 p, 
+        .footer-col-2 p {
+            color: #aaa;
+            margin-bottom: 20px;
+            line-height: 1.6;
+        }
+        
+        .footer-col-3 ul, 
+        .footer-col-4 ul {
+            list-style: none;
+            padding: 0;
+        }
+        
+        .footer-col-3 ul li, 
+        .footer-col-4 ul li {
+            margin-bottom: 12px;
+        }
+        
+        .footer-col-3 ul li a, 
+        .footer-col-4 ul li a {
+            color: #aaa;
+            text-decoration: none;
+            transition: color 0.3s;
+            font-size: 0.95rem;
+        }
+        
+        .footer-col-3 ul li a:hover, 
+        .footer-col-4 ul li a:hover {
+            color: white;
+        }
+        
+        .app-logo img {
+            width: 140px;
+            margin-right: 10px;
+            margin-bottom: 10px;
+        }
+        
+        hr {
+            border-color: rgba(255, 255, 255, 0.1);
+            margin: 30px 0;
+        }
+        
+        .copyright {
+            text-align: center;
+            color: #aaa;
+            font-size: 0.9rem;
+        }
+
+        /* ===== Responsive Styles ===== */
+        @media (max-width: 1200px) {
+            .col-4 {
+                flex: 0 0 calc(33.33% - 30px);
+            }
+        }
+        
+        @media (max-width: 992px) {
+            .hero-content {
+                flex-direction: column;
+                text-align: center;
+            }
+            
+            .hero-text {
+                padding-right: 0;
+                margin-bottom: 40px;
+            }
+            
+            .col-3, .col-4 {
+                flex: 0 0 calc(50% - 30px);
+            }
+            
+            .offer .col-2 {
+                flex: 0 0 100%;
+                margin-bottom: 30px;
+            }
+            
+            .brands .col-5 {
+                flex: 0 0 calc(33.33% - 30px);
+                margin-bottom: 30px;
+            }
+        }
+        
+        @media (max-width: 768px) {
+            nav {
+                height: 70px;
+            }
+            
+            .nav-container {
+                padding: 0 20px;
+            }
+            
+            .nav-links {
+                display: none;
+                position: absolute;
+                top: 70px;
+                left: 0;
+                width: 100%;
+                background: white;
+                flex-direction: column;
+                padding: 20px;
+                gap: 15px;
+                box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+            }
+            
+            .nav-links.active {
+                display: flex;
+            }
+            
+            .mobile-menu-toggle {
+                display: block;
+            }
+            
+            .logo img {
+                width: 130px;
+            }
+            
+            .col-3, .col-4 {
+                flex: 0 0 100%;
+            }
+            
+            .brands .col-5 {
+                flex: 0 0 calc(50% - 30px);
+            }
+        }
+        
+        @media (max-width: 576px) {
+            .hero-text h1 {
+                font-size: 2rem;
+            }
+            
+            .title {
+                font-size: 1.8rem;
+            }
+            
+            .offer h1 {
+                font-size: 2rem;
+            }
+            
+            .brands .col-5 {
+                flex: 0 0 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <nav>
+        <div class="nav-container">
+            <div class="logo">
+                <a href="/"><img src="images/logo.png" alt="Logo"></a>
+            </div>
+            <div class="nav-links">
+                <a href="/Homepage">HOME</a>
+                <a href="/allproduct">PRODUCTS</a>
+                <a href="#footer-section">ABOUT</a>
+                <a href="#footer-section">CONTACT</a>
+                <a href="/userProfile">ACCOUNT</a>
+                <a href="/guesthomepage" id="logout-button" class="logout-link">LOGOUT</a>
+                <a href="/wishList" class="wishlist-link">
+                    <i class="fas fa-heart"></i>
+                </a>
+                <a href="/cart" class="cart-link">
+                    <i class="fas fa-shopping-cart"></i>
+                </a>
+            </div>
+            <button class="mobile-menu-toggle">
+                <i class="fas fa-bars"></i>
+            </button>
+        </div>
+    </nav>
+
+    <section class="hero">
+        <div class="hero-content">
+            <div class="hero-text">
+                <h1>Give your Workout <br>A New Style!</h1>
+                <p>Success isn't always about greatness. It's about consistency. Consistent<br>hard work gains success. Greatness will come.</p>
+                <a href="#categories" class="btn">Explore Now &#8594;</a>
+            </div>
+            <div class="hero-image">
+                <img src="images/image1.png" alt="Hero Image">
+            </div>
+        </div>
+    </section>
+    
+    <section class="categories">
+        <div class="small-container">
+            <h2 class="title">Categories</h2>
+            <div class="row">
+                <div class="col-3">
+                    <div class="image-container">
+                        <img src="images/category-1.jpg" alt="Category 1">
+                        <div class="text">Formals</div>
+                    </div>
+                </div>
+                <div class="col-3">
+                    <div class="image-container">
+                        <img src="images/category-2.jpg" alt="Category 2">
+                        <div class="text">Casuals</div>
+                    </div>
+                </div>
+                <div class="col-3">
+                    <div class="image-container">
+                        <img src="images/category-3 (2).jpg" alt="Category 3">
+                        <div class="text">Sports</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+    
+    <section class="featured-products" id="categories">
+        <div class="small-container">
+            <h2 class="title">Featured Products</h2>
+            <div class="row">
+                <% if (productCollection) { %>
+                    <% productCollection.forEach(product => { %>
+                        <div class="col-4">
+                            <a href="/productdetails/<%= product._id %>"><img src="<%= product.image[0] %>"></a>
+                            <a href="/productdetails/<%= product._id %>"><h4><%= product.productname %></h4></a>
+                            <p><%= product.category ? product.category.name : 'No category' %></p>
+                            <div class="rating">
+                                <% for(let i = 0; i < 5; i++) { %>
+                                    <% if(i < Math.floor(product.rating || 0)) { %>
+                                        <i class="fas fa-star"></i>
+                                    <% } else if(i < Math.ceil(product.rating || 0)) { %>
+                                        <i class="fas fa-star-half-alt"></i>
+                                    <% } else { %>
+                                        <i class="far fa-star"></i>
+                                    <% } %>
+                                <% } %>
+                            </div>
+                            <p>₹<%= product.price.toLocaleString() %></p>
+                            <a href="/productdetails/<%= product._id %>" class="btn">View Details</a>
+                        </div>
+                    <% }) %>
+                <% } %>
+            </div>
+        </div>
+    </section>
+    
+    <section class="offer">
+        <div class="small-container">
+            <div class="row">
+                <div class="col-2">
+                    <img src="images/image1.png" class="offer-img" alt="Special Offer">
+                </div>
+                <div class="col-2">
+                    <p>Exclusively Available on RedStore</p>
+                    <h1>Sports Shoes</h1>
+                    <small>Buy latest collections of sports shoes online on Redstore at best prices from top brands such as Adidas, Nike, Puma, Asics, and Sparx at your leisure at best prices.</small>
+                    <a href="#categories" class="btn">Buy Now &#8594;</a>
+                </div>
+            </div>
+        </div>
+    </section>
+    
+    <section class="testimonial">
+        <div class="small-container">
+            <h2 class="title">Testimonials</h2>
+            <div class="row">
+                <div class="col-3">
+                    <i class="fas fa-quote-left"></i>
+                    <p>Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book.</p>
+                    <div class="rating">
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                        <i class="far fa-star"></i>
+                    </div>
+                    <img src="images/user-1.png" alt="User 1">
+                    <h3>Sean Parkar</h3>
+                </div>
+                <div class="col-3">
+                    <i class="fas fa-quote-left"></i>
+                    <p>It is a long established fact that a reader will be distracted by the readable content of a page when looking at its layout. The point of using Lorem Ipsum is that it has a more-or-less normal distribution of letters.</p>
+                    <div class="rating">
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                        <i class="far fa-star"></i>
+                    </div>
+                    <img src="images/user-2.png" alt="User 2">
+                    <h3>Mike Smith</h3>
+                </div>
+                <div class="col-3">
+                    <i class="fas fa-quote-left"></i>
+                    <p>Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book.</p>
+                    <div class="rating">
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                        <i class="far fa-star"></i>
+                    </div>
+                    <img src="images/user-3.png" alt="User 3">
+                    <h3>Mabel Joe</h3>
+                </div>
+            </div>
+        </div>
+    </section>
+    
+    <section class="brands">
+        <div class="small-container">
+            <div class="row">
+                <div class="col-5">
+                    <img src="images/logo-godrej.png" alt="Godrej">
+                </div>
+                <div class="col-5">
+                    <img src="images/logo-oppo.png" alt="Oppo">
+                </div>
+                <div class="col-5">
+                    <img src="images/logo-coca-cola.png" alt="Coca Cola">
+                </div>
+                <div class="col-5">
+                    <img src="images/logo-paypal.png" alt="Paypal">
+                </div>
+                <div class="col-5">
+                    <img src="images/logo-philips.png" alt="Philips">
+                </div>
+            </div>
+        </div>
+    </section>
+    
+    <footer class="footer" id="footer-section">
+        <div class="container">
+            <div class="row">
+                <div class="footer-col-1">
+                    <h3>Download Our App</h3>
+                    <p>Download App for Android and ios mobile phone.</p>
+                    <div class="app-logo">
+                        <img src="images/play-store.png" alt="Play Store">
+                        <img src="images/app-store.png" alt="App Store">
+                    </div>
+                </div>
+                <div class="footer-col-2">
+                    <img src="images/logo-white.png" alt="Logo">
+                    <p>Our Purpose Is To Sustainably Make the Pleasure and Benefits of Sports Accessible to the Many.</p>
+                </div>
+                <div class="footer-col-3">
+                    <h3>Useful Links</h3>
+                    <ul>
+                        <li><a href="#">Coupons</a></li>
+                        <li><a href="#">Blog Post</a></li>
+                        <li><a href="#">Return Policy</a></li>
+                        <li><a href="#">Join Affiliate</a></li>
+                    </ul>
+                </div>
+                <div class="footer-col-4">
+                    <h3>Follow us</h3>
+                    <ul>
+                        <li><a href="#">Facebook</a></li>
+                        <li><a href="#">Twitter</a></li>
+                        <li><a href="#">Instagram</a></li>
+                        <li><a href="#">Youtube</a></li>
+                    </ul>
+                </div>
+            </div>
+            <hr>
+            <p class="copyright">Copyright 2024 - AMAL S</p>
+        </div>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.12/cropper.min.js"></script>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script>
+        // Mobile menu toggle
+        document.querySelector('.mobile-menu-toggle').addEventListener('click', function() {
+            document.querySelector('.nav-links').classList.toggle('active');
+        });
+
+        // Logout confirmation
+        document.getElementById('logout-button')?.addEventListener('click', function(e) {
+            e.preventDefault();
+            Swal.fire({
+                title: "Are you sure you want to logout?",
+                icon: "question",
+                showCancelButton: true,
+                confirmButtonText: "Yes, logout",
+                cancelButtonText: "Cancel",
+                confirmButtonColor: "#f74f10",
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    window.location.href = "/guesthomepage";
+                }
+            });
+        });
+
+        // Auto-dismiss alerts after 5 seconds
+        document.addEventListener('DOMContentLoaded', function() {
+            const alerts = document.querySelectorAll('.alert');
+            
+            alerts.forEach(alert => {
+                setTimeout(() => {
+                    alert.style.opacity = '0';
+                    setTimeout(() => alert.remove(), 500);
+                }, 5000);
+                
+                const closeButton = alert.querySelector('.alert-close');
+                if (closeButton) {
+                    closeButton.addEventListener('click', () => {
+                        alert.style.opacity = '0';
+                        setTimeout(() => alert.remove(), 500);
+                    });
+                }
+            });
+        });
+    </script>
+</body>
+</html>

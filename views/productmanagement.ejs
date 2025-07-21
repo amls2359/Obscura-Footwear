@@ -1,0 +1,355 @@
+    <!DOCTYPE html>
+    <html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Product Management</title>
+        <style>
+            /* General Styles */
+            body { 
+                font-family: Arial, sans-serif; 
+                margin: 0;
+                padding: 0;
+                display: flex;
+                min-height: 100vh;
+                background-color: #f5f5f5;
+            }
+            
+            /* Sidebar Styles */
+            .sidebar {
+        width: 215px;
+        background-color: #333;
+        color: white;
+        padding: 20px;
+        height: 100vh;
+        position: fixed;
+        box-shadow: 2px 0 5px rgba(0,0,0,0.1);
+        z-index: 10; /* Higher than main content */
+    }
+            
+            .sidebar h2 {
+                text-align: center;
+                color: white;
+                margin-bottom: 30px;
+                padding-bottom: 10px;
+                border-bottom: 1px solid #444;
+            }
+
+            .sidebar ul {
+                list-style-type: none;
+                padding: 0;
+                margin: 0;
+            }
+
+            .sidebar ul li {
+                margin: 15px 0;
+            }
+
+            .sidebar ul li a {
+                color: #fff;
+                text-decoration: none;
+                display: block;
+                padding: 8px 10px;
+                border-radius: 4px;
+                transition: background-color 0.3s;
+            }
+
+            .sidebar ul li a:hover {
+                background-color: #444;
+            }
+            
+            /* Main Content Styles */
+            .main-content {
+        flex: 1;
+        margin-left: 250px;
+        padding: 20px 20px 20px 30px; /* Added more left padding */
+        background-color: white;
+        border-radius: 5px;
+        box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        position: relative;
+        z-index: 1; /* Lower than sidebar */
+    }
+            
+            .header-container {
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                margin-bottom: 20px;
+            }
+            
+            .heading {
+                flex-grow: 1;
+                text-align: center;
+                color: #333;
+            }
+            
+            /* Table Container Styles */
+        .table-container {
+        max-height: 500px;
+        overflow-y: auto;
+        margin-top: 20px;
+        border: 1px solid #ddd;
+        border-radius: 5px;
+        position: relative;
+        z-index: 1;
+    }
+            
+            /* Table Styles */
+            table {
+                width: 100%;
+                border-collapse: collapse;
+            }
+            
+            th, td {
+                padding: 12px;
+                text-align: left;
+                border: 1px solid #ddd;
+            }
+            
+            th {
+        background-color: #333;
+        color: #fff;
+        font-weight: bold;
+        border: 1px solid #444;
+        position: sticky;
+        top: 0;
+        z-index: 5; /* Below sidebar but above table content */
+    }
+            tr:nth-child(even) {
+                background-color: #f9f9f9;
+            }
+            
+            tr:hover {
+                background-color: #f1f1f1;
+            }
+            
+            /* Button Styles */
+            .btn {
+                padding: 6px 12px;
+                border-radius: 4px;
+                font-size: 14px;
+                cursor: pointer;
+                text-decoration: none;
+                display: inline-block;
+                text-align: center;
+                transition: background-color 0.3s;
+                border: none;
+            }
+            
+            .btn-success {
+                background-color: #4CAF50;
+                color: white;
+            }
+            
+            .btn-danger {
+                background-color: #f44336;
+                color: white;
+            }
+            
+            .btn-edit {
+                background-color: #2196F3;
+                color: white;
+            }
+            
+            /* Status Styles */
+            .status-listed {
+                color: green;
+                font-weight: bold;
+            }
+            
+            .status-unlisted {
+                color: red;
+                font-weight: bold;
+            }
+            
+            /* Image Styles */
+            .product-image {
+                max-height: 50px;
+                max-width: 50px;
+                display: block;
+            }
+            
+            /* Action Button Styles */
+            .btn-edit1 {
+                color: #f2f2f2;
+                font-weight: bold;
+                background-color: #2196F3;
+                padding: 6px 12px;
+                border-radius: 4px;
+                text-decoration: none;
+                display: inline-block;
+            }
+            
+            .btn-edit2 {
+                color: #f2f2f2;
+                font-weight: bold;
+                background-color: #f44336;
+                padding: 6px 12px;
+                border-radius: 4px;
+                text-decoration: none;
+                display: inline-block;
+                margin-left: 5px;
+            }
+            
+            /* Responsive Adjustments */
+            @media (max-width: 768px) {
+        /* ... (keep your existing mobile styles) ... */
+        
+        .action-buttons {
+            flex-direction: row; /* Ensure buttons stay in line */
+            flex-wrap: nowrap; /* Prevent wrapping */
+        }
+        
+        .btn-edit1, .btn-edit2 {
+            font-size: 12px; /* Smaller font on mobile */
+            padding: 4px 8px; /* Smaller padding on mobile */
+        }
+    }
+                /* Add this to your style section */
+                .action-buttons {
+        display: flex;
+        gap: 5px; /* Space between buttons */
+        min-width: 100px; /* Give enough width for both buttons */
+    }
+
+    /* Update the existing button styles */
+    .btn-edit1, .btn-edit2 {
+        color: #f2f2f2;
+        font-weight: bold;
+        padding: 6px 12px;
+        border-radius: 4px;
+        text-decoration: none;
+        text-align: center;
+        box-sizing: border-box; /* Include padding in width calculation */
+        margin-left: 0; /* Remove left margin */
+        white-space: nowrap; /* Prevent text wrapping */
+    }
+
+    .btn-edit1 {
+        background-color: #2196F3;
+    }
+
+    .btn-edit2 {
+        background-color: #f44336;
+    }
+
+    /* Update the table cell to prevent text wrapping */
+    td {
+        white-space: nowrap; /* Prevent text wrapping */
+        vertical-align: middle; /* Center content vertically */
+    }
+            
+        </style>
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
+        <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    </head>
+    <body>
+        <!-- Sidebar -->
+        <div class="sidebar">
+            <h2>Admin Panel</h2>
+            <ul>
+                <li><a href="/admin/dashboard">Dashboard</a></li>
+                <li><a href="/admin/usermanagement">User Management</a></li>
+                <li><a href="/admin/categorymanagement">Category Management</a></li>
+                <li><a href="/productmanagement">Product Management</a></li>
+                <li><a href="/admin/orderManagement">Order Management</a></li>
+                <li><a href="/couponManagement">Coupon Management</a></li>
+                <li><a href="/salesReport">Sales</a></li>
+                <li><a href="/offerManagement">Offer Management</a></li>
+                <li><a href="/admin/adminLogin" id="logout-link">Logout</a></li>
+            </ul>
+        </div>
+
+        <!-- Main Content -->
+        <div class="main-content">
+            <div class="header-container">
+                <h2 class="heading">Product Management</h2>
+                <button id="add-category-btn" class="btn btn-success" style="padding: 8px 15px; font-weight: bold;">
+                    + Add product
+                </button>
+            </div>
+            
+            <!-- Table Container with Scroll -->
+            <div class="table-container">
+                <!-- Category Table -->
+                <table id="category-table" class="table-striped">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Product Name</th>
+                            <th>Category</th>
+                            <th>Price</th>
+                            <th>Image</th>
+                            <th>Stock</th>
+                            <th>Brand</th>
+                            <th>Status</th>
+                            <th>List/UnList</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <% products.forEach((products,index) => { %>
+                            <tr>
+                                <td><%= index+1 %></td>
+                                <td><%= products.productname %> </td>
+                                <td><%=products.category.name %> </td>
+                                <td><%=products.price %></td>
+                                <td>
+                                    <% if(products.image && products.image.length > 0) { %>
+                                        <img style="max-height: 50px; max-width: 50px;" src="<%= products.image[0] %>" alt="no img">
+                                    <% } else { %>
+                                        <span>No Image</span>
+                                    <% } %>
+                                </td>
+                                <td><%=products.stock %> </td>
+                                <td><%= products.brand || 'N/A' %></td>
+                                <td>
+                                    <% if(products.isListed) { %>
+                                        <span class="status-listed">Listed</span>
+                                    <% } else { %>
+                                        <span class="status-unlisted">Unlisted</span>
+                                    <% } %>
+                                </td>
+                                <td>
+                                    <% if (!products.isListed) { %>
+                                        <a href="/unlistProduct/<%=products._id %>" class="btn btn-success">List</a>
+                                    <% } else { %>
+                                        <a href="/unlistProduct/<%= products._id %>" class="btn btn-danger">UnList</a>
+                                    <% } %>
+                                </td>
+                                    <td>
+                                    <div class="action-buttons">
+                                    <a href="/editproduct/<%= products._id %>" class="btn-edit1">Edit</a>
+                                <a href="/deleteproduct/<%= products._id %>" class="btn-edit2">Delete</a>
+                                </div>
+                            </td>
+                            </tr>
+                        <% }) %>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        <script>
+            document.getElementById('add-category-btn').addEventListener('click', function () {
+                // Redirect to the addcategory page
+                window.location.href = "/addProduct";
+            });
+            document.getElementById('logout-link').addEventListener('click', function (e) {
+                e.preventDefault(); // Prevent the default link behavior
+
+                Swal.fire({
+                    title: "Are you sure you want to logout?",
+                    icon: "question",
+                    showCancelButton: true,
+                    confirmButtonText: "Yes, logout",
+                    cancelButtonText: "Cancel",
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        // Redirect to the logout route
+                        window.location.href = "/admin/adminLogin";
+                    }
+                });
+            });
+        </script>
+    </body>
+    </html>

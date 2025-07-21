@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Coupens</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Arial', sans-serif;
+        }
+        
+        body {
+            background-color: #f5f5f5;
+            padding: 20px;
+        }
+        
+        .main-content {
+            max-width: 800px;
+            margin: 0 auto;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+        
+        .coupon-card {
+            background: linear-gradient(135deg, #ffffff, #f0f0f0);
+            border-radius: 15px;
+            padding: 20px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+            border-left: 5px solid #e6470d;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .coupon-card::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            right: 20px;
+            width: 50px;
+            height: 50px;
+            background-color: #e6470d;
+            border-radius: 50%;
+            transform: translateY(-50%);
+            opacity: 0.2;
+        }
+        
+        .logo {
+            width: 60px;
+            height: 60px;
+            object-fit: contain;
+            margin-bottom: 15px;
+            border-radius: 50%;
+            background-color: #e0e0e0;
+            padding: 5px;
+        }
+        
+        h4 {
+            color: #333;
+            font-size: 1.4rem;
+            margin-bottom: 10px;
+            line-height: 1.4;
+        }
+        
+        h5 {
+            color: #4CAF50;
+            font-size: 1.1rem;
+            margin-bottom: 15px;
+        }
+        
+        .coupen-code {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background-color: #f8f8f8;
+            padding: 10px 15px;
+            border-radius: 8px;
+            margin: 15px 0;
+            border: 1px dashed #ccc;
+        }
+        
+        .coupencode {
+            font-family: 'Courier New', monospace;
+            font-weight: bold;
+            font-size: 1.2rem;
+            color: #333;
+            letter-spacing: 1px;
+        }
+        
+        #copy-btn {
+            background-color: #eb710e;
+            color: white;
+            border: none;
+            padding: 8px 15px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: all 0.3s;
+        }
+        
+        #copy-btn:hover {
+            background-color: #3e8e41;
+            transform: translateY(-2px);
+        }
+        
+        p {
+            color: #666;
+            font-size: 0.9rem;
+        }
+        
+        #back-btn {
+            background-color: #e6470d;
+            color: white;
+            border: none;
+            padding: 12px 25px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 1rem;
+            margin-top: 20px;
+            align-self: flex-start;
+            transition: all 0.3s;
+        }
+        
+        #back-btn:hover {
+            background-color: #555;
+            transform: translateY(-2px);
+        }
+        
+        /* Responsive adjustments */
+        @media (max-width: 600px) {
+            .coupen-code {
+                flex-direction: column;
+                gap: 10px;
+            }
+            
+            h4 {
+                font-size: 1.2rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="main-content">
+      <% showCoupens.forEach((coupens,index) => { %>
+        <div class="coupon-card">
+            <!-- <img src="/public/images/coupen-image.png" class="logo" alt="Coupon Logo"> -->
+            <h4>₹<%= coupens.discount %> Flat off on all <br>Purchase Amount Above: ₹<%= coupens.purchaseamount %></h4>
+            <h5>Discount: ₹<%= coupens.discount %></h5>
+            <div class="coupen-code">
+                <span class="coupencode"><%= coupens.coupencode %></span>
+                <button id="copy-btn">Copy Code</button>
+            </div>
+            <p>Valid Till: <%= coupens.expiredate %></p>
+        </div>
+      <% }) %>
+      <button id="back-btn" onclick="goBack()">Back</button>
+    </div>
+    <script>
+        var copybtns = document.querySelectorAll('#copy-btn');
+        copybtns.forEach(function(copybtn) {
+            copybtn.addEventListener('click', function() {
+                var coupencode = this.parentElement.querySelector('.coupencode').innerText;
+                navigator.clipboard.writeText(coupencode)
+                    .then(() => {
+                        this.innerText = 'COPIED!';
+                        setTimeout(() => {
+                            copybtn.innerText = 'Copy Code';
+                        }, 3000);
+                    })
+                    .catch(err => {
+                        console.error('Failed to copy: ', err);
+                    });
+            });
+        });
+
+        function goBack() {
+            window.history.back();
+        }
+    </script>
+</body>
+</html>

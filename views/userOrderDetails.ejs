@@ -1,0 +1,740 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>User Order Details</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        /* Global Styles */
+        * {
+            padding: 0;
+            margin: 0;
+            font-family: 'Poppins', sans-serif;
+            box-sizing: border-box;
+        }
+        body {
+            width: 100%;
+            min-height: 100vh;
+            overflow-x: hidden;
+            background-color: white;
+            font-family: "Roboto", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", sans-serif;
+            display: flex;
+            flex-direction: column;
+            padding-top: 70px; /* Space for fixed header */
+        }
+        h1, h2, h3, h4, h5, h6 {
+            font-family: "Roboto", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", sans-serif;
+        }
+        a {
+            transition: .3s all ease;
+        }
+        a, a:hover {
+            text-decoration: none !important;
+        }
+
+        /* ===== Navigation Styles ===== */
+        nav {
+            width: 100%;
+            height: 70px;
+            background: white;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            position: fixed;
+            top: 0;
+            z-index: 1000;
+        }
+
+        .nav-container {
+            width: 100%;
+            height: 100%;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 20px;
+        }
+
+        .logo img {
+            width: 150px;
+        }
+
+        .nav-links {
+            display: flex;
+            align-items: center;
+        }
+
+        .nav-links a {
+            color: black;
+            text-decoration: none;
+            cursor: pointer;
+            position: relative;
+            margin: 0 20px;
+            transition: 0.3s linear;
+            font-weight: 600;
+        }
+
+        .nav-links a::before {
+            content: "";
+            position: absolute;
+            left: 0;
+            bottom: -4px;
+            width: 0;
+            background-color: #f74f10;
+            height: 3.5px;
+            transition: 0.3s linear;
+        }
+
+        .nav-links a:hover::before,
+        .nav-links a:hover {
+            color: #f74f10;
+            width: 100%;
+        }
+
+        .wishlist-link i {
+            font-size: 1.2rem;
+            color: #333;
+            transition: all 0.3s ease;
+            margin-left: 20px;
+        }
+        
+        .cart-link i {
+            font-size: 1.2rem;
+            color: #333;
+            transition: all 0.3s ease;
+            margin-left: 20px;
+        }
+        
+        .wishlist-link i:hover,
+        .cart-link i:hover {
+            color: #f74f10;
+            transform: scale(1.1);
+        }
+        
+        .logout-link {
+            padding: 8px 18px;
+            border-radius: 4px;
+            transition: all 0.3s ease;
+            font-weight: 600;
+            margin-left: 20px;
+        }
+
+        .mobile-menu-toggle {
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            cursor: pointer;
+            display: none;
+            color: #333;
+        }
+
+        /* Fixed Sidebar Styles */
+        #sidebar {
+            width: 200px;
+            height: calc(100vh - 70px); /* Full viewport height minus header */
+            background: #fff;
+            box-shadow: 2px 0 10px rgba(0,0,0,0.1);
+            position: fixed;
+            left: 0;
+            top: 70px; /* Below the header */
+            overflow-y: auto;
+            z-index: 999;
+        }
+        .sidebar-content {
+            padding: 20px 0;
+            height: 100%;
+        }
+        
+        .sidebar-menu {
+            list-style: none;
+            padding: 0;
+        }
+        
+        .sidebar-menu li {
+            margin: 0;
+        }
+        
+        .sidebar-menu a {
+            display: block;
+            padding: 12px 20px;
+            color: #333;
+            font-weight: 500;
+            border-left: 3px solid transparent;
+            transition: all 0.3s ease;
+        }
+        
+        .sidebar-menu a:hover {
+            background-color: #f8f9fa;
+            color: #f74f10;
+            border-left: 3px solid #f74f10;
+        }
+        
+        .sidebar-menu a.active {
+            background-color: #f8f9fa;
+            color: #f74f10;
+            border-left: 3px solid #f74f10;
+        }
+        
+        /* Main content area */
+        main {
+            margin-left: 200px; /* Same as sidebar width */
+            padding: 30px;
+            min-height: calc(100vh - 70px - 4rem); /* Viewport height minus header and footer */
+            position: relative;
+        }
+        
+        /* Order Details Styles */
+        #heading {
+            color: #333;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid #eee;
+        }
+        
+        .main-content {
+            background: #fff;
+            border-radius: 8px;
+            box-shadow: 0 2px 15px rgba(0,0,0,0.1);
+            padding: 30px;
+            margin-top: 20px;
+        }
+        
+        .checking {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 20px;
+        }
+        
+        .image {
+            width: 100%;
+            margin-bottom: 15px;
+        }
+        
+        .image img {
+            width: 100%;
+            max-width: 200px;
+            height: auto;
+            border-radius: 8px;
+            object-fit: cover;
+        }
+        
+        .product-name h4 {
+            color: #333;
+            margin-bottom: 10px;
+        }
+        
+        .price, .quantity, .status {
+            display: block;
+            margin-bottom: 10px;
+            color: #555;
+        }
+        
+        .price .productprice {
+            font-weight: bold;
+            color: #f74f10;
+        }
+        
+        .status span {
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-weight: 500;
+        }
+        
+        .status span[data-status="Delivered"] {
+            background-color: #d4edda;
+            color: #155724;
+        }
+        
+        .status span[data-status="Cancelled"] {
+            background-color: #f8d7da;
+            color: #721c24;
+        }
+        
+        .status span[data-status="Shipped"] {
+            background-color: #cce5ff;
+            color: #004085;
+        }
+        
+        .status span[data-status="Processing"] {
+            background-color: #fff3cd;
+            color: #856404;
+        }
+        
+        .status span[data-status="Returned"] {
+            background-color: #e2e3e5;
+            color: #383d41;
+        }
+        
+        .view {
+            margin-top: 15px;
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+        
+        .viewdetails, .cancelorder, .returnproducts, .orderdetails {
+            padding: 8px 16px;
+            border-radius: 4px;
+            font-weight: 600;
+            text-align: center;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+        
+        .viewdetails {
+            background-color: #f74f10;
+            color: white;
+            border: 2px solid #f74f10;
+        }
+        
+        .cancelorder {
+            background-color: #dc3545;
+            color: white;
+            border: 2px solid #dc3545;
+        }
+        
+        .cancelorder.cancelled {
+            background-color: #721c24;
+            border-color: #721c24;
+            cursor: not-allowed;
+        }
+        
+        .returnproducts {
+            background-color: #6c757d;
+            color: white;
+            border: 2px solid #6c757d;
+        }
+        
+        .returnproducts.returned {
+            background-color: #e2e3e5;
+            color: #383d41;
+            border-color: #e2e3e5;
+            cursor: not-allowed;
+        }
+        
+        .orderdetails {
+            background-color: #17a2b8;
+            color: white;
+            border: 2px solid #17a2b8;
+        }
+        
+        .viewdetails:hover {
+            background-color: #f8f9fa;
+            color: #e6470d;
+            border-color: #e6470d;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(247, 79, 16, 0.2);
+        }
+        
+        .cancelorder:hover:not(.cancelled) {
+            background-color: #f8f9fa;
+            color: #dc3545;
+            border-color: #dc3545;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(220, 53, 69, 0.2);
+        }
+        
+        .returnproducts:hover:not(.returned) {
+            background-color: #f8f9fa;
+            color: #6c757d;
+            border-color: #6c757d;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(108, 117, 125, 0.2);
+        }
+        
+        .orderdetails:hover {
+            background-color: #f8f9fa;
+            color: #17a2b8;
+            border-color: #17a2b8;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(23, 162, 184, 0.2);
+        }
+        
+        /* Order item card */
+        .order-item {
+            flex: 1 1 300px;
+            background: #fff;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+            padding: 20px;
+            transition: transform 0.3s ease;
+        }
+        
+        .order-item:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+        
+        /* Footer Styles */
+        .simple-footer {
+            background-color: #141d2a;
+            color: white;
+            padding: 4rem 0;
+            margin-left: 200px; /* Same as sidebar width */
+            width: calc(100% - 200px); /* Full width minus sidebar */
+        }
+        .footer-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-between;
+        }
+        .footer-section {
+            flex: 1;
+            min-width: 200px;
+            margin-bottom: 30px;
+            padding: 0 15px;
+        }
+        .footer-section h3 {
+            font-size: 18px;
+            margin-bottom: 20px;
+            color: white;
+            position: relative;
+            padding-bottom: 10px;
+        }
+        .footer-section h3::after {
+            content: "";
+            position: absolute;
+            left: 0;
+            bottom: 0;
+            width: 40px;
+            height: 2px;
+            background-color: #f74f10;
+        }
+        .footer-section ul {
+            list-style: none;
+            padding: 0;
+        }
+        .footer-section ul li {
+            margin-bottom: 10px;
+        }
+        .footer-section ul li a {
+            color: #aaa;
+            text-decoration: none;
+            transition: color 0.3s;
+        }
+        .footer-section ul li a:hover {
+            color: white;
+        }
+
+        /* Responsive styles */
+        @media (max-width: 992px) {
+            .order-item {
+                flex: 1 1 45%;
+            }
+            
+            .footer-section {
+                min-width: calc(50% - 30px);
+            }
+        }
+        
+        @media (max-width: 768px) {
+            /* Mobile menu styles */
+            .nav-links {
+                position: fixed;
+                top: 70px;
+                left: -100%;
+                width: 100%;
+                background: white;
+                flex-direction: column;
+                padding: 20px;
+                gap: 15px;
+                box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+                transition: 0.3s ease;
+            }
+            
+            .nav-links.active {
+                left: 0;
+            }
+            
+            .nav-links a {
+                margin: 10px 0;
+                padding: 8px 0;
+                font-size: 1.1rem;
+            }
+            
+            .wishlist-link i,
+            .cart-link i {
+                margin-left: 0;
+                margin-right: 10px;
+            }
+            
+            .logout-link {
+                margin-left: 0;
+                display: inline-block;
+                width: 100%;
+                text-align: left;
+                padding: 8px 0;
+            }
+            
+            .mobile-menu-toggle {
+                display: block;
+            }
+
+            /* Sidebar styles */
+            #sidebar {
+                transform: translateX(-100%);
+                height: calc(100vh - 70px);
+                top: 70px;
+                z-index: 1000;
+            }
+            
+            #sidebar.active {
+                transform: translateX(0);
+            }
+            
+            main {
+                margin-left: 0;
+                width: 100%;
+            }
+            
+            .simple-footer {
+                margin-left: 0;
+                width: 100%;
+            }
+            
+            .order-item {
+                flex: 1 1 100%;
+            }
+        }
+
+        @media (max-width: 576px) {
+            .footer-section {
+                min-width: 100%;
+                text-align: center;
+            }
+            
+            .footer-section h3::after {
+                left: 50%;
+                transform: translateX(-50%);
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Header Section -->
+    <nav>
+        <div class="nav-container">
+            <div class="logo">
+                <a href="/"><img src="/images/logo.png" alt="Logo"></a>
+            </div>
+            <div class="nav-links">
+                <a href="/Homepage">HOME</a>
+                <a href="/allproduct">PRODUCTS</a>
+                <a href="#footer-section">ABOUT</a>
+                <a href="#footer-section">CONTACT</a>
+                <a href="/userProfile">ACCOUNT</a>
+                <a href="/guesthomepage" id="logout-button" class="logout-link">LOGOUT</a>
+                <a href="/wishlist" class="wishlist-link">
+                    <i class="fas fa-heart"></i>
+                </a>
+                <a href="/cart" class="cart-link">
+                    <i class="fa fa-shopping-cart"></i>
+                </a>
+            </div>
+            <button class="mobile-menu-toggle">
+                <i class="fas fa-bars"></i>
+            </button>
+        </div>
+    </nav>
+
+    <!-- Sidebar Navigation -->
+    <div id="sidebar">
+        <div class="sidebar-content">
+            <ul class="sidebar-menu">
+                <li><a href="/userProfile">Profile</a></li>
+                <li><a href="/wallet">Wallet</a></li>
+                <li><a href="/userAddress">Address</a></li>
+                <li><a href="/cart">Cart</a></li>
+                <li><a href="/userOrderDetails" class="active">Orders</a></li>
+                <li><a href="/wishlist">Wishlist</a></li>
+            </ul>
+        </div>
+    </div>
+
+    <!-- Main Content -->
+    <main>
+        <h4 id="heading">Order Details</h4>
+        <div class="main-content">
+            <div class="checking">
+            <% if (orders.length === 0) { %>
+                <p style="color: red;">No orders are placed</p>
+            <% } else { %>
+                <% orders.forEach(order => { %>
+                    <% order.productCollection.forEach(product => { %>
+                        <div class="order-item">
+                            <div class="image">
+                                <img src="<%= product.image[0] %>" alt="<%= product.productname %>">
+                            </div>
+                            <span class="product-name">
+                                <h4><%= product.productname %></h4>
+                            </span>
+                            <span class="price">
+                                <label class="productprice">₹<%= product.finalPrice %></label>
+                            </span>
+                            <span class="quantity">
+                                <label class="quantity">Quantity: <%= product.quantity %></label>
+                            </span>
+                            <span class="status">
+                                <label class="status"><strong>Status:</strong> <span data-status="<%= product.status %>"><%= product.status %></span></label>
+                            </span>
+
+                         <div class="view">
+                   <a class="viewdetails" href="/productdetails/<%= product.productid %>">View</a>
+
+               <% if (product.status === 'pending' || product.status === 'shipped') { %>
+               <a class="cancelorder" href="/cancelOrder/<%=order._id%>/<%=product.productid %>" data-order-id="<%=order._id%>" data-product-id="<%=product.productid%>">Cancel Order</a>
+               <% } else if (product.status === 'cancelled') { %>
+               <a class="cancelorder cancelled" style="cursor: not-allowed;">Cancelled</a>
+                  <% } %>
+
+                   <% if (product.status === 'delivered') { %>
+                    <a class="returnproducts" href="/returnOrder/<%=order._id%>/<%=product.productid %>" data-order-id="<%=order._id%>" data-product-id="<%=product.productid%>">Return Products</a>
+                  <% } else if (product.status === 'returned') { %>
+                    <a class="returnproducts returned" style="cursor: not-allowed;">Returned</a>
+                   <% } %>
+
+                       <a class="orderdetails" href="/orderDetails/<%=order._id %>/<%= product.productid %>">Order Details</a>
+                       </div>
+
+                        </div>
+                    <% }) %>
+                <% }) %>
+            <% } %>
+            </div>
+        </div>
+    </main>
+  
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+    <script>
+        document.addEventListener('DOMContentLoaded',function(){
+            // Mobile menu toggle functionality
+            const mobileMenuToggle = document.querySelector('.mobile-menu-toggle');
+            const navLinks = document.querySelector('.nav-links');
+            
+            if (mobileMenuToggle) {
+                mobileMenuToggle.addEventListener('click', function() {
+                    navLinks.classList.toggle('active');
+                });
+            }
+
+            // Close mobile menu when clicking outside
+            document.addEventListener('click', function(event) {
+                if (!event.target.closest('.nav-container') && !event.target.closest('.nav-links')) {
+                    navLinks.classList.remove('active');
+                }
+            });
+
+            const cancelOrderLink = document.querySelectorAll('.cancelorder:not(.cancelled)')
+            cancelOrderLink.forEach(link=>{
+                link.addEventListener('click',function(e){
+                    e.preventDefault()
+                    const orderId = this.getAttribute('data-order-id')
+                    const productId = this.getAttribute('data-product-id')
+                    const predefinedReasons = ['item no longer needed','Found a better price elsewhere','changed mind','Duplicate order','order my mistake','delivery taking too long','others']
+                    
+
+                    Swal.fire({
+                        title: "Cancel Order",
+                        html: `
+                            <div style="margin-top: 1rem;">
+                                <label for="cancel-reason" style="display: block; margin-bottom: 0.5rem; font-weight: 500;">Select a reason:</label>
+                                <select id="cancel-reason" class="form-select" style="
+                                    width: 100%;
+                                    padding: 0.5rem;
+                                    border-radius: 0.375rem;
+                                    border: 1px solid #ced4da;
+                                    font-size: 1rem;
+                                    color: #495057;
+                                    background-color: #fff;">
+                                    <option value="">-- Please choose a reason --</option>
+                                    ${predefinedReasons.map(reason => `<option value="${reason}">${reason}</option>`).join("")}
+                                </select>
+                            </div>
+                        `,
+                        icon: "warning",
+                        confirmButtonText: "Yes, cancel",
+                        cancelButtonText: "No, keep it",
+                        showCancelButton: true,
+                        focusConfirm: false,
+                        preConfirm: () => {
+                            const selectedReason = document.getElementById("cancel-reason").value;
+                            if (!selectedReason) {
+                                Swal.showValidationMessage("You must select a reason to proceed.");
+                            }
+                            return selectedReason;
+                        }
+                    }).then((result) => {
+                        if (result.isConfirmed && result.value) {
+                            const selectedReason = result.value;
+                            window.location.href = "/cancelOrder/" + orderId + "/" + productId + "?reason=" + encodeURIComponent(selectedReason);
+                        }
+                    });
+                })   
+            })
+        }) 
+
+
+          document.getElementById('logout-button')?.addEventListener('click', function(e) {
+            e.preventDefault();
+            Swal.fire({
+                title: "Are you sure you want to logout?",
+                icon: "question",
+                showCancelButton: true,
+                confirmButtonText: "Yes, logout",
+                cancelButtonText: "Cancel",
+                confirmButtonColor: "#f74f10",
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    window.location.href = "/guesthomepage";
+                }
+            });
+        });
+
+    </script>
+   
+    <!-- Footer Section -->
+    <footer class="simple-footer" id="footer-section">
+        <div class="footer-container">
+            <div class="footer-section">
+                <h3>COLORLIB</h3>
+                <ul>
+                    <li><a href="#">Celebrate</a></li>
+                    <li><a href="#">Buyer</a></li>
+                    <li><a href="#">Supplier</a></li>
+                </ul>
+            </div>
+            
+            <div class="footer-section">
+                <h3>Charging</h3>
+                <ul>
+                    <li><a href="#">Abstract</a></li>
+                    <li><a href="#">Content</a></li>
+                    <li><a href="#">Comment</a></li>
+                </ul>
+            </div>
+            
+            <div class="footer-section">
+                <h3>Further Information</h3>
+                <ul>
+                    <li><a href="#">Terms & Conditions</a></li>
+                    <li><a href="#">Privacy Policy</a></li>
+                </ul>
+            </div>
+            
+            <div class="footer-section">
+                <h3>Contact Us</h3>
+                <ul>
+                    <li><a href="mailto:info@example.com">info@example.com</a></li>
+                    <li><a href="tel:+1234567890">+1 (234) 567-890</a></li>
+                </ul>
+            </div>
+        </div>
+    </footer>
+
+    <!-- JavaScript Libraries -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

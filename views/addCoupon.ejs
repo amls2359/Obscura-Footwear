@@ -1,0 +1,320 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Coupon Form</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            background: #f8f9fa;
+            color: #333;
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 600px;
+            margin: 40px auto;
+            padding: 0 20px;
+        }
+
+        .card {
+            background: #fff;
+            border-radius: 12px;
+            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.1);
+            border: none;
+            overflow: hidden;
+            transition: transform 0.3s ease;
+        }
+
+        .card:hover {
+            transform: translateY(-5px);
+        }
+
+        .card-body {
+            padding: 30px;
+        }
+
+        .text-center {
+            text-align: center;
+        }
+
+        .text-primary {
+            color: #4361ee !important;
+        }
+
+        h1 {
+            font-size: 28px;
+            font-weight: 600;
+            margin-bottom: 30px;
+            color: #4361ee;
+        }
+
+        .form-label {
+            font-weight: 500;
+            margin-bottom: 8px;
+            display: block;
+            color: #495057;
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 12px 15px;
+            margin-bottom: 5px;
+            border: 1px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 15px;
+            transition: border-color 0.3s, box-shadow 0.3s;
+        }
+
+        .form-control:focus {
+            border-color: #4361ee;
+            box-shadow: 0 0 0 3px rgba(67, 97, 238, 0.2);
+            outline: none;
+        }
+
+        .text-danger {
+            color: #dc3545;
+            font-size: 13px;
+            margin-bottom: 15px;
+            display: block;
+            min-height: 20px;
+        }
+
+        .buttons {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 25px;
+            gap: 15px;
+        }
+
+        .coupon-add, .coupon-back {
+            flex: 1;
+            padding: 12px;
+            border-radius: 8px;
+            font-weight: 500;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border: none;
+            font-size: 16px;
+        }
+
+        .coupon-add {
+            background-color: #4361ee;
+            color: white;
+        }
+
+        .coupon-add:hover {
+            background-color: #3a56d4;
+            transform: translateY(-2px);
+        }
+
+        .coupon-back {
+            background-color: #f8f9fa;
+            color: #495057;
+            text-decoration: none;
+            border: 1px solid #e0e0e0;
+        }
+
+        .coupon-back:hover {
+            background-color: #e9ecef;
+            transform: translateY(-2px);
+        }
+
+        .alert {
+            padding: 12px 15px;
+            margin-bottom: 20px;
+            border-radius: 8px;
+            font-size: 14px;
+        }
+
+        .alert-danger {
+            background-color: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+
+        /* Responsive adjustments */
+        @media (max-width: 576px) {
+            .container {
+                padding: 0 15px;
+            }
+            
+            .card-body {
+                padding: 25px 20px;
+            }
+            
+            .buttons {
+                flex-direction: column;
+            }
+            
+            .coupon-add, .coupon-back {
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <div class="card">
+            <div class="card-body">
+                <h1 class="text-center text-primary">Coupon Form</h1> 
+                <form id="couponForm" action="/addCouponPost" method="POST">
+                    <div class="mb-3">
+                        <label for="couponcode" class="form-label">Coupon Code:</label>
+                        <input type="text" class="form-control" id="couponcode" name="couponcode" placeholder="Enter coupon code (e.g.20)">
+                        <div id="couponcodeError" class="text-danger"></div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="discount" class="form-label">Discount (%):</label>
+                        <input type="number" class="form-control" id="discount" name="discount" placeholder="Enter discount percentage (1-100)">
+                        <div id="discountError" class="text-danger"></div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="expiredate" class="form-label">Expiry Date:</label>
+                        <input type="date" class="form-control" id="expiredate" name="expiredate">
+                        <div id="expireError" class="text-danger"></div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="purchaseamount" class="form-label">Minimum Purchase Amount:</label>
+                        <input type="number" class="form-control" id="purchaseamount" name="purchaseamount" placeholder="Enter minimum purchase amount">
+                        <div id="purchaseError" class="text-danger"></div>
+                    </div>
+
+                    <div class="buttons">
+                        <button type="submit" class="coupon-add">Add Coupon</button>
+                        <a href="/couponManagement" class="coupon-back">Go Back</a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const form = document.getElementById('couponForm');
+            
+            // Function to show error and hide it after timeout
+            function showError(elementId, message, timeout = 3000) {
+                const errorElement = document.getElementById(elementId);
+                if (errorElement) {
+                    errorElement.textContent = message;
+                    if (timeout > 0) {
+                        setTimeout(() => {
+                            errorElement.textContent = '';
+                        }, timeout);
+                    }
+                }
+            }
+            
+            // Function to validate coupon code
+            function validateCouponCode(code) {
+                if (!code) {
+                    return 'Coupon code is required';
+                }
+                if (code.length < 4 || code.length > 20) {
+                    return 'Coupon code must be between 4-20 characters';
+                }
+                if (!/^[A-Z0-9]+$/.test(code)) {
+                    return 'Coupon code can only contain uppercase letters and numbers';
+                }
+                return '';
+            }
+            
+            // Function to validate discount
+            function validateDiscount(discount) {
+                if (isNaN(discount) || discount === '') {
+                    return 'Discount percentage is required';
+                }
+                if (discount < 1 || discount > 100) {
+                    return 'Discount must be between 1% and 100%';
+                }
+                return '';
+            }
+            
+            // Function to validate expiry date
+            function validateExpiryDate(date) {
+                if (!date) {
+                    return 'Expiry date is required';
+                }
+                const today = new Date();
+                today.setHours(0, 0, 0, 0);
+                const selectedDate = new Date(date);
+                if (selectedDate < today) {
+                    return 'Expiry date must be in the future';
+                }
+                return '';
+            }
+            
+            // Function to validate purchase amount
+            function validatePurchaseAmount(amount) {
+                if (isNaN(amount) || amount === '') {
+                    return 'Purchase amount is required';
+                }
+                if (amount < 0) {
+                    return 'Purchase amount cannot be negative';
+                }
+                return '';
+            }
+            
+            // Form submission handler
+            form.addEventListener('submit', function(event) {
+                event.preventDefault();
+                
+                // Get form values
+                const couponCode = document.getElementById('couponcode').value.trim();
+                const discount = parseFloat(document.getElementById('discount').value);
+                const expireDate = document.getElementById('expiredate').value;
+                const purchaseAmount = parseFloat(document.getElementById('purchaseamount').value);
+                
+                // Validate fields
+                const couponCodeError = validateCouponCode(couponCode);
+                const discountError = validateDiscount(discount);
+                const expireError = validateExpiryDate(expireDate);
+                const purchaseError = validatePurchaseAmount(purchaseAmount);
+                
+                // Display errors
+                if (couponCodeError) {
+                    showError('couponcodeError', couponCodeError);
+                }
+                if (discountError) {
+                    showError('discountError', discountError);
+                }
+                if (expireError) {
+                    showError('expireError', expireError);
+                }
+                if (purchaseError) {
+                    showError('purchaseError', purchaseError);
+                }
+                
+                 if (!couponCodeError && !discountError && !expireError && !purchaseError) 
+                 {
+                    form.submit(); // This line is commented out in your version!
+                 }
+            });
+            
+            // Set minimum date for expiry date picker (today)
+            const today = new Date().toISOString().split('T')[0];
+            document.getElementById('expiredate').min = today;
+            
+            // Auto-format coupon code to uppercase
+            document.getElementById('couponcode').addEventListener('input', function(e) {
+                this.value = this.value.toUpperCase();
+            });
+        });
+    </script>
+</body>
+</html>
