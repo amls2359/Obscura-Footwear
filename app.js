@@ -55,6 +55,12 @@ app.use(express.static(path.join(__dirname, 'public')));
 app.use(express.static('public'));
 app.use('/images', express.static(path.join(__dirname, 'public/images')));
 
+
+app.get('/', (req, res) => {
+  res.redirect('/guesthomepage');
+});
+
+
 // Routes
 app.use('/', UserRouter);
 app.use('/', productRoute); 
