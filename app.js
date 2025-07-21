@@ -28,7 +28,7 @@ app.use(session({
   resave: false,
   saveUninitialized: false,
   store: MongoStore.create({
-    mongoUrl: 'mongodb://localhost:27017/mymvcproject',
+    mongoUrl: process.env.MONGODB_URI,
     ttl: 30 * 60 // ⏱ 30 minutes in seconds
   }),
   cookie: {
