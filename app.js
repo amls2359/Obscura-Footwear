@@ -21,14 +21,8 @@ require('dotenv').config();
 const passport = require('passport')
 
 const app = express();
-const port = 3001;
+const port = process.env.PORT || 3001;
 
-// MongoDB connection
-// mongoose.connect('mongodb://localhost:27017/mymvcproject')
-//     .then(() => console.log('MongoDB connected...'))
-//     .catch(err => console.log(err));
-
-// Session configuration with MongoStore
 app.use(session({
   secret: 'your-secret-key-should-be-long-and-complex',
   resave: false,
