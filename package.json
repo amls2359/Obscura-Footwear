@@ -1,4 +1,18 @@
 {
+  "name": "sample",
+  "version": "1.0.0",
+  "description": "",
+  "main": "app.js",
+  "scripts": {
+    "start": "node app.js",
+    "dev": "nodemon app.js"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "engines": {
+    "node": "20.x"
+  },
   "dependencies": {
     "animejs": "^3.2.2",
     "bcrypt": "^5.1.1",
@@ -30,16 +44,5 @@
     "razorpay": "^2.9.6",
     "session": "^0.1.0",
     "sweetalert2": "^11.17.2"
-  },
-  "name": "sample",
-  "version": "1.0.0",
-  "main": "app.js",
-  "scripts": {
-   "start": "node app.js",
-   "dev": "nodemon app.js"
-  },
-  "keywords": [],
-  "author": "",
-  "license": "ISC",
-  "description": ""
+  }
 }
