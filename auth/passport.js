@@ -28,7 +28,7 @@ passport.deserializeUser((id,done)=>{
 passport.use(
   new GoogleStrategy (
     {
-    callbackURL: 'http://localhost:3001/auth/google/callback',
+    callbackURL: process.env.GOOGLE_CALLBACK_URL,
     clientID:process.env.CLIENT_ID,
     clientSecret:process.env.CLIENT_SECRET,
   },
