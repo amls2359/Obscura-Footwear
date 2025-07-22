@@ -2,7 +2,7 @@ const { MongoClient } = require('mongodb');
 
 const uri = 'mongodb+srv://amalskumar20:EqtAscyTZmj0trPU@ecommerce-cluster.l3l9cyq.mongodb.net';
 
-const sourceDBName = 'mymvc';
+const sourceDBName = 'mymvcproject';
 const targetDBName = 'obscura_shop';
 
 async function migrateData() {
