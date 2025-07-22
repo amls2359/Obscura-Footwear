@@ -16,24 +16,27 @@ async function migrateData() {
     const targetDB = client.db(targetDBName);
 
     const collections = await sourceDB.listCollections().toArray();
+    console.log(`📦 Collections to migrate: ${collections.map(c => c.name).join(', ')}`);
 
     for (const { name: collectionName } of collections) {
+      console.log(`➡️ Processing "${collectionName}"...`);
       const sourceCollection = sourceDB.collection(collectionName);
       const targetCollection = targetDB.collection(collectionName);
 
       const docs = await sourceCollection.find({}).toArray();
+      console.log(`   🔍 Found ${docs.length} documents in "${collectionName}"`);
 
       if (docs.length > 0) {
-        await targetCollection.insertMany(docs);
-        console.log(`✅ Migrated ${docs.length} documents from "${collectionName}"`);
+        const insertResult = await targetCollection.insertMany(docs);
+        console.log(`   ✅ Inserted ${insertResult.insertedCount} into "${collectionName}"`);
       } else {
-        console.log(`ℹ️ No documents found in "${collectionName}"`);
+        console.log(`   ⚠️ No documents found in "${collectionName}", skipping`);
       }
     }
 
-    console.log('🎉 Data migration completed successfully!');
-  } catch (error) {
-    console.error('❌ Migration failed:', error);
+    console.log('🎉 Migration completed successfully!');
+  } catch (err) {
+    console.error('❌ Migration failed:', err);
   } finally {
     await client.close();
   }
