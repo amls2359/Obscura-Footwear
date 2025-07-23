@@ -403,7 +403,7 @@ const getproducts = async (req, res) => {
       priceRange,
       categories,
       queryString,
-      messages
+      messages:'',
     });
   } catch (error) {
     console.error('Error loading products:', error);
