@@ -717,7 +717,7 @@
     <div class="related">
         <% relatedProducts.slice(0,3).forEach(function(relatedProduct){ %>
             <div class="product-card">
-                <a href="/getproduct/<%= relatedProduct._id %>">
+                <a href="/productdetails/<%= relatedProduct._id %>">
                     <img src="/<%=relatedProduct.image[0] %>" class="card-img" alt="Related Product Image">
                 </a>
 
