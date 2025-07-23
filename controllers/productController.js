@@ -481,9 +481,7 @@ const productFilter = async (req, res) => {
   try {
     console.log('Entered into product filter');
 
-    // Get listed categories
     const categories = await Category.find({ islisted: true });
-    console.log(`categories: ${categories}`);
 
     const {
       category,
@@ -496,38 +494,29 @@ const productFilter = async (req, res) => {
     const query = buildQuery(category, priceRange);
     const PAGE_SIZE = 4;
     const currentPage = parseInt(page) || 1;
-    const skip = (currentPage - 1) * PAGE_SIZE;
 
     if (!req.session.userid) {
       return res.status(401).send('Unauthorized');
     }
 
-    // Fetch products with listed categories only
+    // ✅ Step 1: Fetch many more products than needed
     const rawProducts = await Product.find(query)
       .sort(buildSortOption(sortprice, sortAlphabetically))
-      .skip(skip)
-      .limit(PAGE_SIZE)
       .populate({
         path: 'category',
         match: { islisted: true }
-      });
+      })
+      .limit(PAGE_SIZE * 5); // To ensure we have enough valid ones
 
-    // Filter out products with null category (i.e., unlisted)
-    const products = rawProducts.filter(p => p.category);
+    // ✅ Step 2: Filter out those with blocked/unlisted categories
+    const filteredProducts = rawProducts.filter(p => p.category);
 
-    // Count total for pagination (with listed categories only)
-    const allMatchingProducts = await Product.find(query).populate({
-      path: 'category',
-      match: { islisted: true }
-    });
-
-    const totalCount = allMatchingProducts.filter(p => p.category).length;
+    // ✅ Step 3: Manual pagination using slice
+    const totalCount = filteredProducts.length;
     const totalPage = Math.ceil(totalCount / PAGE_SIZE);
+    const paginatedProducts = filteredProducts.slice((currentPage - 1) * PAGE_SIZE, currentPage * PAGE_SIZE);
 
-    console.log('Filtered product count:', totalCount);
-    console.log('Total page count:', totalPage);
-
-    // Build query string for pagination URLs
+    // ✅ Step 4: Build query string for pagination
     let queryString = '';
     if (category && category !== 'All Categories') {
       queryString += `&category=${category}`;
@@ -542,9 +531,9 @@ const productFilter = async (req, res) => {
       queryString += `&sortAlphabetically=${sortAlphabetically}`;
     }
 
-    // Render the view
+    // ✅ Step 5: Render the view
     res.render('allproduct', {
-      productcollection: products,
+      productcollection: paginatedProducts,
       currentPage,
       totalPage,
       sortprice,
