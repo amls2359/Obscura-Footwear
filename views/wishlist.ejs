@@ -550,16 +550,15 @@
                     <a href="/allproduct" class="btn">Browse Products</a>
                 </div>
             <% } else { %>
-         <% wishlist.forEach(item => { %>
-         <div class="wishlist-item" data-wishlistid="<%= item._id %>">
-          <div class="wishlist-remove">
-          <button type="button"
-              class="wishlist-remove-btn"
-              data-id="<%= item.productid %>">
-        <i class="fas fa-times"></i>
-      </button>
-    </div>
-  </div>
+                <% wishlist.forEach(item => { %>
+                    <div class="wishlist-item" data-wishlistid="<%= item._id %>">
+                        <div class="wishlist-remove">
+                            <button type="button"
+                                class="wishlist-remove-btn"
+                                data-id="<%= item.productid %>">
+                                <i class="fas fa-times"></i>
+                            </button>
+                        </div>
                         <div class="wishlist-image-container">
                             <a href="/getproducts/<%=item.productid%>">
                                 <img src="<%=item.imagePath%>" alt="<%= item.product %>">
@@ -689,37 +688,37 @@
         });
     </script>
 
-<script>
-  $(document).ready(function () {
-    $('.wishlist-remove-btn').on('click', function () {
-      const $btn = $(this);
-      const productId = $btn.data('id');
+    <script>
+        $(document).ready(function () {
+            $('.wishlist-remove-btn').on('click', function () {
+                const $btn = $(this);
+                const productId = $btn.data('id');
 
-      $.ajax({
-        url: `/removefromWishlist/${productId}`,
-        method: 'POST',
-        success: function (res) {
-          Swal.fire({
-            icon: 'success',
-            title: res.message,
-            timer: 1500,
-            showConfirmButton: false
-          });
+                $.ajax({
+                    url: `/removefromWishlist/${productId}`,
+                    method: 'POST',
+                    success: function (res) {
+                        Swal.fire({
+                            icon: 'success',
+                            title: res.message,
+                            timer: 1500,
+                            showConfirmButton: false
+                        });
 
-          // Optionally remove the item from DOM
-          $btn.closest('.wishlist-item').remove();
-        },
-        error: function (err) {
-          Swal.fire({
-            icon: 'error',
-            title: 'Error',
-            text: err.responseJSON?.message || 'Something went wrong!',
-          });
-        }
-      });
-    });
-  });
-</script>
+                        // Optionally remove the item from DOM
+                        $btn.closest('.wishlist-item').remove();
+                    },
+                    error: function (err) {
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Error',
+                            text: err.responseJSON?.message || 'Something went wrong!',
+                        });
+                    }
+                });
+            });
+        });
+    </script>
 
 </body>
 </html>
