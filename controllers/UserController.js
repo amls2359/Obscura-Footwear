@@ -674,19 +674,19 @@ const addToWishlist = async (req, res) => {
 
 const removeWishlist = async (req, res) => {
     try {
-        const wishlistItemId = req.params.id;
+        const productId = req.params.id;
         const userid = req.session.userid;
 
         if (!userid) {
             return res.status(401).json({ success: false, message: 'Please login to remove items from wishlist' });
         }
 
-        if (!mongoose.Types.ObjectId.isValid(wishlistItemId)) {
+        if (!mongoose.Types.ObjectId.isValid(productId)) {
             return res.status(400).json({ success: false, message: 'Invalid wishlist item ID' });
         }
 
         const item = await Wishlist.findOneAndDelete({
-            _id: wishlistItemId,
+            productid: productId,
             userid: userid
         });
 
