@@ -3,7 +3,6 @@ const router=express.Router()
 const UserController=require('../controllers/UserController')
 
 const {checkSessionBlocked} = require("../Middleware/user");
-const {logoutIfNeeded} = require('../Middleware/logout')
 const passport = require('passport');
 
 
