@@ -838,6 +838,14 @@ document.addEventListener('DOMContentLoaded', function () {
            const addressError = document.getElementById('addressError');
            const selectedAddress = document.querySelector('input[name="shippingOption"]:checked');
 
+             // Validate shipping address
+        if (!selectedAddress) {
+        addressError.innerText = 'Please add and select a shipping address before placing the order.';
+        setTimeout(() => addressError.innerText = '', 3000);
+         preventSubmission = true;
+         }
+
+
             // Auto clear after 3 seconds
             setTimeout(() => {
                paymentmessageContainer.innerText = '';
