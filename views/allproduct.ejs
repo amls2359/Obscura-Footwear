@@ -744,11 +744,12 @@
                 <% productcollection.forEach(product => { %>
                     <div class="product-item">
                         <!-- Wishlist Button -->
-                       <form class="wishlist-form" data-id="<%= product._id %>">
-                       <button type="submit" class="wishlist-icon">
-                      <i class="fa fa-heart"></i>
-                    </button>
-                 </form>
+                 <form class="wishlist-form" data-id="<%= product._id %>">
+                 <button type="submit" class="wishlist-icon <%= product.isInWishlist ? 'active' : '' %>">
+                 <i class="<%= product.isInWishlist ? 'fas' : 'fa' %> fa-heart"></i>
+               </button>
+           </form>
+
 
                         
                         <div class="product-image-container">
