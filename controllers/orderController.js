@@ -96,7 +96,7 @@ const checkoutPost= async(req,res)=>
       const address = await Address.findById(shippingOption)
       if(! address)
        {
-        return res.status(404).send('shipping address is not found')
+        return res.render('checkout').send('shipping address is not found')
        }
        const cartItem = await Cart.find({userid:userId})
        if(!cartItem.length)
