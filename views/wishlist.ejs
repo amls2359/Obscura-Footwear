@@ -689,39 +689,37 @@
         });
     </script>
 
-    <script>
-  document.querySelectorAll('.wishlist-remove-form').forEach(form => {
-    form.addEventListener('submit', async function (e) {
-      e.preventDefault();
+<script>
+  $(document).ready(function () {
+    $('.wishlist-remove-btn').on('click', function () {
+      const $btn = $(this);
+      const productId = $btn.data('id');
 
-      const wishlistId = this.dataset.id;
+      $.ajax({
+        url: `/removefromWishlist/${productId}`,
+        method: 'POST',
+        success: function (res) {
+          Swal.fire({
+            icon: 'success',
+            title: res.message,
+            timer: 1500,
+            showConfirmButton: false
+          });
 
-      try {
-        const response = await fetch(`/removefromWishlist/${wishlistId}`, {
-          method: 'DELETE',
-          headers: {
-            'Content-Type': 'application/json'
-          }
-        });
-
-        const result = await response.json();
-
-        if (result.success) {
-          // Remove the item from the DOM
-          const item = this.closest('.wishlist-item');
-          item.remove();
-
-          // Optional: show toast or success alert
-          alert('Removed from wishlist');
-        } else {
-          alert(result.message || 'Failed to remove');
+          // Optionally remove the item from DOM
+          $btn.closest('.wishlist-item').remove();
+        },
+        error: function (err) {
+          Swal.fire({
+            icon: 'error',
+            title: 'Error',
+            text: err.responseJSON?.message || 'Something went wrong!',
+          });
         }
-      } catch (err) {
-        console.error(err);
-        alert('Error removing from wishlist');
-      }
+      });
     });
   });
 </script>
+
 </body>
 </html>
