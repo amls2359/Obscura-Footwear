@@ -33,7 +33,7 @@ router.post('/resendOtpPost',UserController.resendOtpPost)
 router.post('/otpVerifyPost',UserController.otpVerifyPost)
 
 router.get('/guesthomepage',UserController.guesthomepage)
-router.get('/Homepage',checkSessionBlocked,UserController.Homepage)
+router.get('/Homepage',logoutIfNeeded,checkSessionBlocked,UserController.Homepage)
 
 router.get('/logout',UserController.logout)
 
