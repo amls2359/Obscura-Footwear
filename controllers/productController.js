@@ -477,12 +477,10 @@ const productdetails = async (req, res) => {
             productoffer,
             categoryoffer,
             discountAmount,
-            messages: req.flash()
         });
 
     } catch (err) {
         console.error('Error in productdetails:', err);
-        req.flash('error', 'Error loading product details');
         res.redirect('/allproducts');
     }
 };
