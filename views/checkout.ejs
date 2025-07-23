@@ -1053,6 +1053,18 @@ document.getElementById('logout-button').addEventListener('click', function (e) 
     });
 });
 </script>
-    <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+
+<% if (typeof errorMessage !== 'undefined' && errorMessage) { %>
+    <script>
+        Swal.fire({
+            icon: 'error',
+            title: 'Oops...',
+            text: "<%= errorMessage %>",
+            confirmButtonColor: '#f74f10'
+        });
+    </script>
+<% } %>
+
+<script src="https://checkout.razorpay.com/v1/checkout.js"></script>
 </body>
 </html>
