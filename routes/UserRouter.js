@@ -56,11 +56,4 @@ router.get('/auth/google/callback',
 );
 
 
-// Logout route
-router.get('/logout', (req, res) => {
-  req.logout(() => {
-    res.redirect('/UserLogin');
-  });
-});
-
 module.exports=router;
