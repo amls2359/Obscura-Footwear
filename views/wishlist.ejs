@@ -550,15 +550,16 @@
                     <a href="/allproduct" class="btn">Browse Products</a>
                 </div>
             <% } else { %>
-              <% wishlist.forEach(item => { %>
-                 <div class="wishlist-item" data-wishlistid="<%= item._id %>">
-                  <div class="wishlist-remove">
-                 <form class="wishlist-remove-form" data-id="<%= item._id %>">
-                 <button type="submit" class="wishlist-remove-btn">
-                 <i class="fas fa-times"></i>
-                 </button>
-                </form>
-              </div>
+         <% wishlist.forEach(item => { %>
+         <div class="wishlist-item" data-wishlistid="<%= item._id %>">
+          <div class="wishlist-remove">
+          <button type="button"
+              class="wishlist-remove-btn"
+              data-id="<%= item.productid %>">
+        <i class="fas fa-times"></i>
+      </button>
+    </div>
+  </div>
                         <div class="wishlist-image-container">
                             <a href="/getproducts/<%=item.productid%>">
                                 <img src="<%=item.imagePath%>" alt="<%= item.product %>">
