@@ -77,6 +77,8 @@ const Homepage = async (req, res) => {
     })
     .limit(15);
 
+      const filteredProducts = rawProducts.filter(p => p.category !== null);
+
  // Step 3: Select only the first 4 valid products
         const productCollection = filteredProducts.slice(0, 4);
 
