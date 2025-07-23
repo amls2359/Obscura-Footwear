@@ -841,6 +841,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
              // Validate shipping address
         if (!selectedAddress) {
+        e.preventDefault(); 
         addressError.innerText = 'Please add and select a shipping address before placing the order.';
         setTimeout(() => addressError.innerText = '', 3000);
          preventSubmission = true;
