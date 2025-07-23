@@ -717,6 +717,10 @@
 
                         // Optionally remove the item from DOM
                         $btn.closest('.wishlist-item').remove();
+
+                        if ($('.wishlist-item').length === 0) {
+                        $('#empty-message').show(); // Show the empty message
+                    }
                     },
                     error: function (err) {
                         Swal.fire({
