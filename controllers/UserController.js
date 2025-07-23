@@ -659,8 +659,7 @@ const addToWishlist = async (req, res) => {
       productid,
       product: product.productname,
       price: product.price,
-      image: product.image[0],
-      category: product.category._id || product.category    
+      image: product.image[0], 
     });
 
     return res.status(200).json({ success: true, message: 'Product added to wishlist' });
