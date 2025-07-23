@@ -920,19 +920,6 @@
                 document.getElementById('sortAlphabetically').value = urlParams.get('sortAlphabetically');
             }
         });
-
-       
-        document.querySelectorAll('.wishlist-icon').forEach(icon => {
-            icon.addEventListener('click', function() {
-                if(this.classList.contains('active')) {
-                    this.innerHTML = '<i class="far fa-heart"></i>';
-                    this.classList.remove('active');
-                } else {
-                    this.innerHTML = '<i class="fas fa-heart"></i>';
-                    this.classList.add('active');
-                }
-            });
-        });
     </script>
 
     <!-- Wishlist Script -->
