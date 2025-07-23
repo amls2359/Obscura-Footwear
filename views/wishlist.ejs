@@ -570,17 +570,15 @@
                     <a href="/allproduct" class="btn">Browse Products</a>
                 </div>
             <% } else { %>
-                <% wishlist.forEach(item => { %>
-                    <div class="wishlist-item">
-                        <div class="wishlist-remove">
-                            <form action="/removefromWishlist/<%= item._id %>" method="POST">
-                                <input type="hidden" name="_method" value="DELETE">
-                                <button type="submit" class="wishlist-remove-btn">
-                                    <i class="fas fa-times"></i>
-                                </button>
-                            </form>
-                        </div>
-                        
+              <% wishlist.forEach(item => { %>
+                 <div class="wishlist-item" data-wishlistid="<%= item._id %>">
+                  <div class="wishlist-remove">
+                 <form class="wishlist-remove-form" data-id="<%= item._id %>">
+                 <button type="submit" class="wishlist-remove-btn">
+                 <i class="fas fa-times"></i>
+                 </button>
+                </form>
+              </div>
                         <div class="wishlist-image-container">
                             <a href="/getproducts/<%=item.productid%>">
                                 <img src="<%=item.imagePath%>" alt="<%= item.product %>">
@@ -709,5 +707,41 @@
             });
         });
     </script>
+
+    <script>
+  document.querySelectorAll('.wishlist-remove-form').forEach(form => {
+    form.addEventListener('submit', async function (e) {
+      e.preventDefault();
+
+      const wishlistId = this.dataset.id;
+
+      try {
+        const response = await fetch(`/removefromWishlist/${wishlistId}`, {
+          method: 'DELETE',
+          headers: {
+            'Content-Type': 'application/json'
+          }
+        });
+
+        const result = await response.json();
+
+        if (result.success) {
+          // Remove the item from the DOM
+          const item = this.closest('.wishlist-item');
+          item.remove();
+
+          // Optional: show toast or success alert
+          alert('Removed from wishlist');
+        } else {
+          alert(result.message || 'Failed to remove');
+        }
+      } catch (err) {
+        console.error(err);
+        alert('Error removing from wishlist');
+      }
+    });
+  });
+</script>
+
 </body>
 </html>
