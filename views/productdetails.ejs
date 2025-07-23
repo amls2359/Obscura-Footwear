@@ -689,22 +689,23 @@
                         </form>
                     </div>
                     
-                    <div class="wishlist-section">
-                        <% if(product.isInWishlist) { %>
-                            <form action="/removefromWishlist/<%=product._id%>" method="POST">
-                                <!-- <input type="hidden" name="_method" value="DELETE"> -->
-                                <button type="submit" class="btn btn-outline">
-                                    <i class="fas fa-heart"></i> Remove from Wishlist
-                                </button>
-                            </form>
-                        <% } else { %>
-                            <form action="/addwishlist/<%=product._id%>" method="POST">
-                                <button type="submit" class="btn">
-                                    <i class="far fa-heart"></i> Add to Wishlist
-                                </button>
-                            </form>
-                        <% } %>
-                    </div>
+            <div class="wishlist-section">
+             <% if(product.isInWishlist) { %>
+                <button type="button"
+                class="btn btn-outline wishlist-toggle-btn"
+                data-id="<%= product._id %>"
+                data-action="remove">
+            <i class="fas fa-heart"></i> Remove from Wishlist
+             </button>
+              <% } else { %>
+                <button type="button"
+                class="btn wishlist-toggle-btn"
+                data-id="<%= product._id %>"
+                data-action="add">
+                 <i class="far fa-heart"></i> Add to Wishlist
+              </button>
+             <% } %>
+                </div>
                 </div>
             </div>
         </div>
