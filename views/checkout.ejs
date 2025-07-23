@@ -958,6 +958,16 @@ function deleteCoupon() {
 
 document.getElementById('razpybtn').addEventListener('click', function(e) {
     e.preventDefault();
+
+     const selectedAddress = document.querySelector('input[name="shippingOption"]:checked');
+    const addressError = document.getElementById('addressError');
+
+    if (!selectedAddress) {
+        addressError.innerText = 'Please add and select a shipping address before placing the order.';
+        setTimeout(() => addressError.innerText = '', 3000);
+        return; // Stop Razorpay from proceeding
+    }
+
     
     let price = document.getElementById('price');
     let orderPrice = price.getAttribute('data-totalPrice');
