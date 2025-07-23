@@ -14,6 +14,9 @@ const getCheckout = async (req, res) => {
     try {
         const userId = req.session.userid; // Make sure this matches your session setup
         console.log(`userid is ${userId}`);
+
+        const errorMessage = req.session.checkoutError || null;
+        req.session.checkoutError = null
         
         const checkout = await Cart.find({ userid: userId });
         const Tax_Rate = 0.03;
@@ -69,7 +72,7 @@ const getCheckout = async (req, res) => {
 
         const address = await Address.find({ userid: userId });
         console.log(`address is ${address}`);
-        res.render('checkout', { checkout, address, totalsum, totaltax, totalDiscount });
+        res.render('checkout', { checkout, address, totalsum, totaltax, totalDiscount,errorMessage });
     } catch (error) {
         console.log(error);
         res.status(500).send('error in product details');
@@ -90,18 +93,21 @@ const checkoutPost= async(req,res)=>
       const user = await UserCollection.findById( userId)
       if(!user)
       {
-        return res.status(404).send('User not found')
+          req.session.checkoutError = 'User not found.';
+          return res.redirect('/checkout');
       }
 
       const address = await Address.findById(shippingOption)
       if(! address)
        {
-        return res.render('checkout').send('shipping address is not found')
+            req.session.checkoutError = 'Shipping address not found.';
+            return res.redirect('/checkout');
        }
        const cartItem = await Cart.find({userid:userId})
        if(!cartItem.length)
        {
-         return res.status(404).send('shipping address not found')
+           req.session.checkoutError = 'Your cart is empty.';
+           return res.redirect('/checkout');
        }
        console.log(`cart item is ${cartItem}`);
 
