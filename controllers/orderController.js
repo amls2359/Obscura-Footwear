@@ -413,7 +413,7 @@ const cancelOrder = async(req,res)=>
     const order = await OrderCollection.findById(orderId)
     if(!order)
     {
-      return res.status(404).send(`irder with id ${orderId} not found`)
+      return res.status(404).send(`order with id ${orderId} not found`)
     }
     const productIndex = order.productCollection.findIndex(
       (product)=>product.productid.toString()===productId
