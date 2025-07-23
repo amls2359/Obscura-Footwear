@@ -2,6 +2,7 @@ const User = require('../models/user');
 
 const checkSessionBlocked = async (req, res, next) => {
     try {
+                console.log('Middleware - Session:', req.session);
         // Check for session existence
         if (!req.session.userid || !req.session.isAuthenticated) {
             console.log('Session invalid or unauthenticated');
