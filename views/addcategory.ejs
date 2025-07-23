@@ -85,16 +85,10 @@ body {
     background: #0056b3;
 }
 
-.alert {
-    padding: 10px;
-    margin-bottom: 15px;
-    border-radius: 5px;
-}
-
 .alert-danger {
-    background: #ffebee;
+    /* background: #ffebee; */
     color: #c62828;
-    border: 1px solid #ffcdd2;
+    /* border: 1px solid #ffcdd2; */
 }
 
 .login-button {
@@ -108,6 +102,15 @@ body {
 .mt-2 {
     margin-top: 10px;
 }
+
+#errorMessage.alert-danger {
+    background-color: transparent !important;
+    border: none !important;
+    color: #c62828; /* Keep the red text color */
+    padding-left: 0;
+}
+
+
 
     </style>
 </head>

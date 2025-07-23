@@ -16,6 +16,7 @@
         }
     </style>
 </head>
+<pre><%= JSON.stringify(product.image, null, 2) %></pre>
 
 <body style="background: #f0f0f0;">
 
@@ -23,18 +24,7 @@
         <div class="row justify-content-center">
 
             <div class="col-md-4">
-                <!-- <% if(typeof message !== 'undefined') { %>
-                <div class="alert alert-danger text-center">
-                    <%= message %>
-                </div>
-                <% } %>
-            <% if(typeof loginmessage !== 'undefined') { %>
-                <div class="alert alert-success text-center">
-                    <%= loginmessage %>
-                </div>
-                <% } %> -->
                 <div class="card">
-
                     <div class="card-body">
                         <h1 class="text-center text-primary">Edit Product</h1>
                         <form action="/editProduct/<%= product._id %>" method="POST" enctype="multipart/form-data">
@@ -99,10 +89,10 @@
                                     <div class="d-flex flex-wrap gap-2 mb-2">
                                         <% product.image.forEach((img, index) => { %>
                                             <div class="position-relative" style="width: 100px;">
-                                                <img src="/<%=img %>" alt="Product Image" 
+                                                <img src="/<%=img%>" alt="Product Image" 
                                                      class="img-thumbnail" style="width: 50px; height: 50px; object-fit: cover;">
                                                 <button class="remove-image btn btn-danger btn-sm position-absolute top-0 end-0" 
-                                                        data-image="<%= index %>" data-id="<%= product._id %>" type="button">Remove
+                                                        data-image="<%= index %>" data-id="<%= product._id %>" type="button" name="removeImage">Remove
                                                     
                                                 </button>
                                             </div>
@@ -115,6 +105,7 @@
                             <div class="mb-3">
                                 <label for="img" class="form-label">Product Image</label>
                                 <input type="file" class="form-control" id="img" name="image" accept="image/*" multiple  alt="no img">
+                                <div class="invalid-feedback" id="image-error"></div> 
                             </div>
                             <div class="text-center login-button mb-4">
                                 <button type="submit" class="btn btn-primary w-100" id="submit-button">Update</button>
@@ -249,7 +240,7 @@
             input.trigger('input');
         }
         
-        validateInputLength('productname', 30, 'Product name cannot exceed 30 characters and cannot be empty');
+        validateInputLength('productname', 50, 'Product name cannot exceed 30 characters and cannot be empty');
         validateInputLength('description', 400, 'Description cannot exceed 400 characters and cannot be empty');
         validateNumericInput('price');
         validateNumericInput('stock');
@@ -261,5 +252,52 @@
         }
     });
     </script>
+
+
+<script>
+  $(document).ready(function () {
+    $('form').on('submit', function (e) {
+      const totalImageBoxes = $('.position-relative').length; // existing images
+      const hasNewImages = $('#img')[0].files.length > 0;      // new uploads
+
+      if (totalImageBoxes === 0 && !hasNewImages) {
+        e.preventDefault();
+        $('#img').addClass('is-invalid');
+        $('#image-error').text('Please upload at least one image before submitting.');
+        $('#submit-button').prop('disabled', true);
+      } else {
+        $('#img').removeClass('is-invalid');
+        $('#image-error').text('');
+        $('#submit-button').prop('disabled', false);
+      }
+    });
+
+    // If user adds new images after error
+    $('#img').on('change', function () {
+      if (this.files.length > 0) {
+        $('#img').removeClass('is-invalid');
+        $('#image-error').text('');
+        $('#submit-button').prop('disabled', false);
+      }
+    });
+
+    // If user removes images
+    $('.remove-image').on('click', function () {
+      const button = $(this);
+      setTimeout(() => {
+        const totalImageBoxes = $('.position-relative').length;
+        const hasNewImages = $('#img')[0].files.length > 0;
+
+        if (totalImageBoxes === 0 && !hasNewImages) {
+          $('#img').addClass('is-invalid');
+          $('#image-error').text('Please upload at least one image before submitting.');
+          $('#submit-button').prop('disabled', true);
+        }
+      }, 200);
+    });
+  });
+</script>
+
+
 </body>
 </html>

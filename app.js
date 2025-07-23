@@ -62,6 +62,12 @@ app.get('/', (req, res) => {
   res.redirect('/guesthomepage');
 });
 
+app.use((req, res, next) => {
+  res.locals.messages = req.flash(); // ✅ sets `messages` for all views
+  next();
+});
+
+
 app.use('/', UserRouter);
 app.use('/', productRoute); 
 app.use('/admin', adminRoute);

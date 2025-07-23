@@ -96,13 +96,13 @@ const addproductpost = async (req, res) => {
       errors.category = 'Category is required';
     }
     if (!price || isNaN(price)) {
-      errors.price = 'Valid price is required';
+      errors.price = ' price is required';
     }
     if (!description || description.trim() === '') {
       errors.description = 'Description is required';
     }
     if (!stock || isNaN(stock)) {
-      errors.stock = 'Valid stock quantity is required';
+      errors.stock = ' stock quantity is required';
     }
 
     // Check if there are any validation errors
@@ -177,7 +177,7 @@ const unlistProduct = async (req, res) => {
 const getEditProduct = async (req, res) => {
   try {
     const product = await Product.findOne({ _id: req.params.id }).populate('category');
-    const categories = await Category.find();
+    const categories = await Category.find().lean();
     res.render('editProduct', { product, categories });
     console.log('Product images:', product.image);
   } catch (err) {
@@ -195,22 +195,35 @@ const getEditProduct = async (req, res) => {
 
 const postEditProduct = async (req, res) => {
   try {
-    console.log('enter into post');
-    
     const { productname, category, price, description, stock, isListed, brand } = req.body;
     const productId = req.params.id;
 
     const existingProduct = await Product.findById(productId);
-    
+
     let images = existingProduct.image || [];
+
+    // Handle image removal
+    const removeImages = req.body.removeImage;
+    if (removeImages) {
+      const removeArray = Array.isArray(removeImages) ? removeImages : [removeImages];
+      images = images.filter(img => !removeArray.includes(img));
+
+      // Optionally delete from filesystem
+      removeArray.forEach(img => {
+        const filePath = path.join(__dirname, '../public', img);
+        if (fs.existsSync(filePath)) {
+          fs.unlink(filePath, (err) => {
+            if (err) console.error('Failed to delete image:', err);
+          });
+        }
+      });
+    }
+
+    // Handle new image uploads
     if (req.files && req.files.length > 0) {
-      const newImages = req.files.map(file => 
-        'uploads/' + file.filename // Store with uploads/ prefix
-      );
+      const newImages = req.files.map(file => 'images/' + file.filename);
       images = [...images, ...newImages];
     }
-    console.log('images:',images);
-    
 
     const updatedProduct = await Product.findByIdAndUpdate(
       productId,
@@ -226,31 +239,21 @@ const postEditProduct = async (req, res) => {
       },
       { new: true }
     );
-    
+
     if (!updatedProduct) {
       return res.status(404).send("Product not found");
     }
 
-    // Update the isListed status of the old category if it's changed
-    if (updatedProduct.category) {
-      const oldCategory = await Category.findById(updatedProduct.category);
-      if (oldCategory) {
-        oldCategory.islisted = true; // Update based on your logic
-        await oldCategory.save();
-      }
+    // Update category listings if needed
+    const newCategory = await Category.findById(category);
+    if (newCategory) {
+      newCategory.islisted = true;
+      await newCategory.save();
     }
 
-    // Update the isListed status of the new category
-    if (category) {
-      const newCategory = await Category.findById(category);
-      if (newCategory) {
-        newCategory.islisted = true; // Update based on your logic
-        await newCategory.save();
-      }
-    }
     res.redirect('/productmanagement');
   } catch (err) {
-    console.error(err);
+    console.error("Update error:", err);
     const product = await Product.findById(req.params.id).populate('category');
     const categories = await Category.find();
     res.render('editProduct', { 
@@ -260,6 +263,7 @@ const postEditProduct = async (req, res) => {
     });
   }
 };
+
 
 const deleteImage=async(req,res)=>
 {

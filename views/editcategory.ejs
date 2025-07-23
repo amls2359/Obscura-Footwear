@@ -119,7 +119,7 @@
                         <form id="categoryForm" action="/admin/editcategory/<%= category._id %>" method="POST">
                             <div class="mb-3 mt-4">
                                 <label for="categoryname" class="form-label">Category Name</label>
-                                <input type="text" class="form-control" id="categoryname" name="categoryname" value="<%= category.category %>">
+                                <input type="text" class="form-control" id="categoryname" name="categoryname" value="<%= category.name %>">
                                 <div id="categorynameError" class="text-danger mt-2"></div>
                             </div>
                             <div class="text-center login-button mb-4">
@@ -155,7 +155,8 @@
     
         // Call the function when the page loads
         window.onload = hideErrorMessage;
-    
+
+        const originalCategoryName = document.getElementById('categoryname').value.trim().toLowerCase();
         document.getElementById('categoryForm').addEventListener('submit', function(event) {
             event.preventDefault();
             const categoryNameInput = document.getElementById('categoryname'); // Corrected ID
@@ -198,8 +199,14 @@
                 hideError('categorynameError'); // Hide the error message after 2 seconds
             } else if (hasNumbers) {
                 document.getElementById('categorynameError').textContent = 'Category name cannot contain numbers.';
-                hideError('categorynameError'); // Hide the error message after 2 seconds
-            } else if (categoryExists && firstLetterCapitalized) {
+                hideError('categorynameError');   
+            } 
+              else if (categoryName.toLowerCase() === originalCategoryName) {
+              document.getElementById('categorynameError').textContent = 'Category name is already existing.';
+              hideError('categorynameError');
+              }
+
+            else if (categoryExists && firstLetterCapitalized) {
                 document.getElementById('categorynameError').textContent = 'Category name cannot be entered again if only the first letter is capitalized.';
                 hideError('categorynameError'); // Hide the error message after 2 seconds
             } else {

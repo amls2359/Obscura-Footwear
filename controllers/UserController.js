@@ -634,92 +634,81 @@ const wishlist = async (req, res) => {
 
 
 const addToWishlist = async (req, res) => {
-    try {
-        const productid = req.params.id;
-        const userid = req.session.userid;
+  try {
+    const productid = req.params.id;
+    const userid = req.session.userid;
 
-        if (!userid) {
-            req.flash('error', 'Please login to add items to wishlist');
-            return res.redirect('/UserLogin');
-        }
-
-        const product = await Product.findById(productid);
-        if (!product) {
-            req.flash('error', 'Product not found');
-            return res.redirect('back');
-        }
-
-        // Check if already in wishlist
-        const existingItem = await Wishlist.findOne({ 
-            userid: userid, 
-            productid: productid 
-        });
-
-        if (existingItem) {
-            req.flash('info', 'This product is already in your wishlist');
-            return res.redirect('back');
-        }
-
-        // Add to wishlist
-        await Wishlist.create({
-            userid: userid,
-            productid: productid,
-            product: product.productname,
-            price: product.price,
-            image: product.image[0],
-            category: product.category
-        });
-
-        req.flash('success', 'Product added to wishlist');
-        res.redirect('/wishlist');
-    } catch(error) {
-        console.log(error);
-        req.flash('error', 'Failed to add to wishlist');
-        res.redirect('/wishlist');
+    if (!userid) {
+      return res.status(401).json({ success: false, message: 'Please login to add items to wishlist' });
     }
-}
+
+    const product = await Product.findById(productid);
+    if (!product) {
+      return res.status(404).json({ success: false, message: 'Product not found' });
+    }
+
+    const existingItem = await Wishlist.findOne({ userid, productid });
+    if (existingItem) {
+      return res.status(200).json({ success: false, message: 'Already in wishlist' });
+    }
+
+    await Wishlist.create({
+      userid,
+      productid,
+      product: product.productname,
+      price: product.price,
+      image: product.image[0],
+      category: product.category
+    });
+
+    return res.status(200).json({ success: true, message: 'Product added to wishlist' });
+
+  } catch (error) {
+    console.error('Add to Wishlist Error:', error);
+    return res.status(500).json({ success: false, message: 'Failed to add to wishlist' });
+  }
+};
+
+
 
 const removeWishlist = async (req, res) => {
     try {
         const wishlistItemId = req.params.id;
-        console.log('wishlistitem is:',wishlistItemId);
-        
+        const userid = req.session.userid;
 
-        if (!mongoose.Types.ObjectId.isValid(wishlistItemId)) {
-            req.flash('error', 'Invalid wishlist item ID');
-            return res.redirect('/wishlist');
+        if (!userid) {
+            return res.status(401).json({ success: false, message: 'Please login to remove items from wishlist' });
         }
 
-        const userId = req.session.userid;
-        console.log('userid is:',userId);
-        
+        if (!mongoose.Types.ObjectId.isValid(wishlistItemId)) {
+            return res.status(400).json({ success: false, message: 'Invalid wishlist item ID' });
+        }
 
         const item = await Wishlist.findOneAndDelete({
             _id: wishlistItemId,
-            userid: userId
+            userid: userid
         });
-        console.log('item is:',item);
-        res.redirect('/wishlist');
-        req.flash('success', 'Product removed from wishlist');
+
+        if (!item) {
+            return res.status(404).json({ success: false, message: 'Item not found in your wishlist' });
+        }
+
+        return res.status(200).json({ success: true, message: 'Product removed from wishlist' });
+
     } catch (err) {
-        console.log(err);
-        req.flash('error', 'Failed to remove from wishlist');
-        res.redirect('/wishlist');
+        console.error(err);
+        return res.status(500).json({ success: false, message: 'Failed to remove from wishlist' });
     }
 };
+
+
 
 const getWallet = async (req, res) => {
     console.log('entered into wallet details');
 
     try {
         const userId = req.session.userid;
-
-        // Incorrect: await UserCollection.findById({userId})
-        // Correct: findById expects a single ID, not an object
         const userData = await UserCollection.findById(userId);
-
-        // Incorrect: await Wallet.find({userid:userId}.sort({date:-1}))
-        // Correct: .sort() is called on the result of find, not on the object
         const Walletdetails = await Wallet.find({ userid: userId }).sort({ date: -1 });
 
         console.log(`userid is ${userId}`);

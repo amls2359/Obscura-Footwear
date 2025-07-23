@@ -25,16 +25,6 @@ const storage = multer.diskStorage({
 
 const upload = multer({ storage: storage }).array('image');  // No changes needed here
 
-// const checkSessionBlocked=async(req,res,next)=>{
-//     if(req.session.admin)
-//     {
-//         next()
-//     }
-//     else
-//     {
-//         res.redirect('/admin/adminLogin')
-//     }
-// }
 // admin side
 router.get('/productmanagement', productController.productmanagement)
 router.get('/addProduct', productController.addproductget)

@@ -262,49 +262,50 @@
 
         /* Alert Messages */
         .alert-message {
-    max-width: 1400px;
-    margin: 20px auto;
-    padding: 15px 20px;
-    text-align: center;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    gap: 10px;
-    animation: fadeIn 0.5s;
-    position: relative;
-}
+            max-width: 1400px;
+            margin: 20px auto;
+            padding: 15px 20px;
+            text-align: center;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 10px;
+            animation: fadeIn 0.5s;
+            position: relative;
+        }
         
-     @keyframes fadeIn {
-    from { opacity: 0; transform: translateY(-20px); }
-    to { opacity: 1; transform: translateY(0); }
-}
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
         
-       .alert-message.error {
-    color: #dc3545;
-}
-       .alert-message.success {
-    color: #28a745;
-}
+        .alert-message.error {
+            color: #dc3545;
+        }
+        
+        .alert-message.success {
+            color: #28a745;
+        }
+        
+        .alert-message.info {
+            color: #17a2b8;
+        }
 
+        .alert-close {
+            background: none;
+            border: none;
+            font-size: 1.2rem;
+            cursor: pointer;
+            color: inherit;
+            opacity: 0.7;
+            transition: opacity 0.3s;
+            position: absolute;
+            right: 20px;
+        }
         
-       .alert-message.info {
-    color: #17a2b8;
-}
-
-       .alert-close {
-    background: none;
-    border: none;
-    font-size: 1.2rem;
-    cursor: pointer;
-    color: inherit;
-    opacity: 0.7;
-    transition: opacity 0.3s;
-    position: absolute;
-    right: 20px;
-}
-      .alert-close:hover {
-    opacity: 1;
-}
+        .alert-close:hover {
+            opacity: 1;
+        }
         
         /* Product Grid */
         .product-grid {
@@ -738,45 +739,35 @@
             </form>
         </div>
 
- <% if (messages.error) { %>
-<div class="alert-message error">
-    <%= messages.error %>
-    <button class="alert-close">&times;</button>
-</div>
-<% } %>
-<% if (messages.success) { %>
-<div class="alert-message success">
-    <%= messages.success %>
-    <button class="alert-close">&times;</button>
-</div>
-<% } %>
-<% if (messages.info) { %>
-<div class="alert-message info">
-    <%= messages.info %>
-    <button class="alert-close">&times;</button>
-</div>
-<% } %>
+        <% if (messages.error) { %>
+        <div class="alert-message error">
+            <%= messages.error %>
+            <button class="alert-close">&times;</button>
+        </div>
+        <% } %>
+        <% if (messages.success) { %>
+        <div class="alert-message success">
+            <%= messages.success %>
+            <button class="alert-close">&times;</button>
+        </div>
+        <% } %>
+        <% if (messages.info) { %>
+        <div class="alert-message info">
+            <%= messages.info %>
+            <button class="alert-close">&times;</button>
+        </div>
+        <% } %>
 
         <div class="product-grid">
             <% if(productcollection && productcollection.length > 0) { %>
                 <% productcollection.forEach(product => { %>
                     <div class="product-item">
-                        <div class="wishlist-container">
-                            <% if(product.isInWishlist) { %>
-                                <form action="/removefromWishlist/<%=product._id%>" method="POST" id="wishlistForm_<%=product._id%>">
-                                    <input type="hidden" name="_method" value="DELETE">
-                                    <button type="submit" class="wishlist-icon active">
-                                        <i class="fa fa-heart"></i>
-                                    </button>
-                                </form>
-                            <% } else { %>
-                                <form action="/addwishlist/<%=product._id%>" method="POST" id="wishlistForm_<%=product._id%>">
-                                    <button type="submit" class="wishlist-icon">
-                                        <i class="fa fa-heart"></i>
-                                    </button>
-                                </form>
-                            <% } %>
-                        </div>
+                        <!-- Wishlist Button -->
+                        <form class="wishlist-form" data-id="<%= product._id %>" data-action="<%= product.isInWishlist ? 'remove' : 'add' %>">
+                            <button type="submit" class="wishlist-icon <%= product.isInWishlist ? 'active' : '' %>">
+                                <i class="fa fa-heart"></i>
+                            </button>
+                        </form>
                         
                         <div class="product-image-container">
                             <a href="/productdetails/<%=product._id%>">
@@ -948,7 +939,7 @@
             }
         });
 
-        // Add to wishlist animation
+       
         document.querySelectorAll('.wishlist-icon').forEach(icon => {
             icon.addEventListener('click', function() {
                 if(this.classList.contains('active')) {
@@ -961,5 +952,75 @@
             });
         });
     </script>
+
+    <!-- Wishlist Script -->
+<script>
+document.querySelectorAll('.wishlist-form').forEach(form => {
+    form.addEventListener('submit', async (e) => {
+        e.preventDefault();
+
+        const productId = form.dataset.id;
+        const action = form.dataset.action;
+        const url = action === 'add' 
+                    ? `/addwishlist/${productId}` 
+                    : `/removefromWishlist/${productId}`;
+
+        try {
+            const response = await fetch(url, {
+                method: 'POST',
+                headers: {
+                    'Accept': 'application/json',
+                    'X-Requested-With': 'XMLHttpRequest',
+                    'Content-Type': 'application/json'
+                }
+            });
+
+            const result = await response.json();
+
+            if (response.ok && result.success) {
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Success',
+                    text: result.message,
+                    timer: 1500,
+                    showConfirmButton: false
+                });
+
+                // Toggle button state
+                const btn = form.querySelector('.wishlist-icon');
+                if (action === 'add') {
+                    btn.classList.add('active');
+                    form.dataset.action = 'remove';
+                    form.setAttribute('action', `/removefromWishlist/${productId}`);
+                } else {
+                    btn.classList.remove('active');
+                    form.dataset.action = 'add';
+                    form.setAttribute('action', `/addwishlist/${productId}`);
+                }
+
+            } else {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Oops!',
+                    text: result.message || 'Something went wrong.',
+                    timer: 2000,
+                    showConfirmButton: false
+                });
+            }
+        } catch (err) {
+            console.error('Fetch error:', err);
+            Swal.fire({
+                icon: 'error',
+                title: 'Error',
+                text: 'Network error. Please try again.',
+                timer: 2000,
+                showConfirmButton: false
+            });
+        }
+    });
+});
+</script>
+
+
 </body>
 </html>

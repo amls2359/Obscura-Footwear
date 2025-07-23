@@ -296,7 +296,7 @@
                                 <td><%=products.price %></td>
                                 <td>
                                     <% if(products.image && products.image.length > 0) { %>
-                                        <img style="max-height: 50px; max-width: 50px;" src="<%= products.image[0] %>" alt="no img">
+                                        <img style="max-height: 50px; max-width: 50px;" src="/<%= products.image[0] %>" alt="no img">
                                     <% } else { %>
                                         <span>No Image</span>
                                     <% } %>
