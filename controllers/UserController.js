@@ -624,11 +624,9 @@ const wishlist = async (req, res) => {
         res.render('wishlist', {
             wishlist,
             isEmpty,
-            messages: req.flash()
         });
     } catch (error) {
         console.error('Error loading wishlist:', error);
-        req.flash('error', 'Error loading wishlist');
         res.redirect('/allproducts');
     }
 };
