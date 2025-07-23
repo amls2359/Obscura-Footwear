@@ -12,7 +12,6 @@ const salesRoute = require('./routes/salesRoute')
 const path = require('path');
 const methodOverride= require('method-override')
 const session = require('express-session');
-const cookieParser = require('cookie-parser');
 const MongoStore = require('connect-mongo'); // Add this package
 const flash= require('express-flash')
 process.removeAllListeners('warning');
@@ -42,9 +41,8 @@ app.use(session({
 // Body parser middleware
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
-app.use(flash())
 
-app.use(methodOverride('_method'))
+
 app.use(passport.initialize());
 app.use(passport.session());
 
@@ -60,11 +58,6 @@ app.use('/images', express.static(path.join(__dirname, 'public/images')));
 
 app.get('/', (req, res) => {
   res.redirect('/guesthomepage');
-});
-
-app.use((req, res, next) => {
-  res.locals.messages = req.flash(); // ✅ sets `messages` for all views
-  next();
 });
 
 

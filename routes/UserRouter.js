@@ -40,7 +40,7 @@ router.get('/logout',UserController.logout)
 router.post('/addwishlist/:id',checkSessionBlocked,UserController.addToWishlist)
 router.get('/Wishlist',UserController.wishlist)
 
-router.post('/removefromWishlist/:id',checkSessionBlocked,UserController.removeWishlist)
+router.delete('/removefromWishlist/:id',checkSessionBlocked,UserController.removeWishlist)
 router.get('/wallet',checkSessionBlocked,UserController.getWallet)
 
 
