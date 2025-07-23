@@ -403,11 +403,9 @@ const getproducts = async (req, res) => {
       priceRange,
       categories,
       queryString,
-      messages: req.flash()
     });
   } catch (error) {
     console.error('Error loading products:', error);
-    req.flash('error', 'Error loading products');
     return res.redirect('/error');
   }
 };
