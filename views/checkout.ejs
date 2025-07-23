@@ -883,7 +883,7 @@ async function applyCoupon(totalPrice) {
         });
 
         if (!response.ok) {
-            messageContainer.textContent = 'Invalid entry';
+            messageContainer.textContent = 'please select a coupon';
             setTimeout(() => messageContainer.textContent = '', 2000);
             return;
         }
