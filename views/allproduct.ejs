@@ -744,11 +744,12 @@
                 <% productcollection.forEach(product => { %>
                     <div class="product-item">
                         <!-- Wishlist Button -->
-                        <form class="wishlist-form" data-id="<%= product._id %>" data-action="<%= product.isInWishlist ? 'remove' : 'add' %>">
-                            <button type="submit" class="wishlist-icon <%= product.isInWishlist ? 'active' : '' %>">
-                                <i class="fa fa-heart"></i>
-                            </button>
-                        </form>
+                       <form class="wishlist-form" data-id="<%= product._id %>">
+                       <button type="submit" class="wishlist-icon">
+                      <i class="fa fa-heart"></i>
+                    </button>
+                 </form>
+
                         
                         <div class="product-image-container">
                             <a href="/productdetails/<%=product._id%>">
@@ -941,10 +942,7 @@ document.querySelectorAll('.wishlist-form').forEach(form => {
         e.preventDefault();
 
         const productId = form.dataset.id;
-        const action = form.dataset.action;
-        const url = action === 'add' 
-                    ? `/addwishlist/${productId}` 
-                    : `/removefromWishlist/${productId}`;
+        const url = `/addwishlist/${productId}`;
 
         try {
             const response = await fetch(url, {
@@ -961,24 +959,16 @@ document.querySelectorAll('.wishlist-form').forEach(form => {
             if (response.ok && result.success) {
                 Swal.fire({
                     icon: 'success',
-                    title: 'Success',
+                    title: 'Added to Wishlist!',
                     text: result.message,
                     timer: 1500,
                     showConfirmButton: false
                 });
 
-                // Toggle button state
+                // Make icon red to indicate it's added
                 const btn = form.querySelector('.wishlist-icon');
-                if (action === 'add') {
-                    btn.classList.add('active');
-                    form.dataset.action = 'remove';
-                    form.setAttribute('action', `/removefromWishlist/${productId}`);
-                } else {
-                    btn.classList.remove('active');
-                    form.dataset.action = 'add';
-                    form.setAttribute('action', `/addwishlist/${productId}`);
-                }
-
+                btn.classList.add('active');
+                btn.innerHTML = '<i class="fas fa-heart"></i>';
             } else {
                 Swal.fire({
                     icon: 'error',
@@ -1000,6 +990,7 @@ document.querySelectorAll('.wishlist-form').forEach(form => {
         }
     });
 });
+
 </script>
 </body>
 </html>
