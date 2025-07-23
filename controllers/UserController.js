@@ -617,6 +617,7 @@ const wishlist = async (req, res) => {
                 category: product.category?.name || 'Uncategorized'
             };
         });
+        
          console.log("Final Wishlist Data:");
          console.log(wishlist)
 
