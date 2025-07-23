@@ -340,61 +340,50 @@ const getproducts = async (req, res) => {
     category = category || 'All Categories';
     priceRange = priceRange || '';
     page = parseInt(page) || 1;
-    const skip = (page - 1) * PAGE_SIZE;
 
-    const query = buildQuery(category, priceRange); // your custom function
-    const sortOptions = buildSortOption(sortprice, sortAlphabetically); // your custom function
+    const query = buildQuery(category, priceRange);
+    const sortOptions = buildSortOption(sortprice, sortAlphabetically);
 
-    // Fetch listed categories for sidebar/filter
+    // Get listed categories for sidebar
     const categories = await Category.find({ islisted: true });
 
-    // Fetch total count of products matching query (before filtering out null categories)
-    const totalCount = await Product.countDocuments(query);
-    const totalPage = Math.ceil(totalCount / PAGE_SIZE);
-
-    // Fetch paginated and filtered products with category populated (islisted: true)
-    const products = await Product.find(query)
+    // Step 1: Fetch more products than needed
+    const rawProducts = await Product.find(query)
       .sort(sortOptions)
-      .skip(skip)
-      .limit(PAGE_SIZE)
       .populate({
         path: 'category',
-        match: { islisted: true }, // ✅ only populate listed categories
-      });
+        match: { islisted: true },
+      })
+      .limit(PAGE_SIZE * 5); // Fetch more to allow filtering
 
-    // ✅ Filter out products with null category (i.e., unlisted)
-    const filteredProducts = products.filter(p => p.category);
+    // Step 2: Filter out products with blocked categories
+    const validProducts = rawProducts.filter(p => p.category);
 
-    // ✅ Handle wishlist logic
+    // Step 3: Apply manual pagination after filtering
+    const totalPage = Math.ceil(validProducts.length / PAGE_SIZE);
+    const paginatedProducts = validProducts.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE);
+
+    // Step 4: Wishlist handling
     let wishlistProductIds = [];
     if (req.session.userid) {
       const wishlistItems = await Wishlist.find({ userid: req.session.userid });
       wishlistProductIds = wishlistItems.map(item => item.productid.toString());
     }
 
-    // ✅ Tag wishlist status only on filtered products
-    filteredProducts.forEach(product => {
+    paginatedProducts.forEach(product => {
       product.isInWishlist = wishlistProductIds.includes(product._id.toString());
     });
 
-    // ✅ Construct query string for pagination URLs
+    // Step 5: Build query string for pagination URLs
     let queryString = '';
-    if (category && category !== 'All Categories') {
-      queryString += `&category=${category}`;
-    }
-    if (sortprice && sortprice !== 'All Prices') {
-      queryString += `&sortprice=${sortprice}`;
-    }
-    if (priceRange) {
-      queryString += `&priceRange=${priceRange}`;
-    }
-    if (sortAlphabetically) {
-      queryString += `&sortAlphabetically=${sortAlphabetically}`;
-    }
+    if (category && category !== 'All Categories') queryString += `&category=${category}`;
+    if (sortprice && sortprice !== 'All Prices') queryString += `&sortprice=${sortprice}`;
+    if (priceRange) queryString += `&priceRange=${priceRange}`;
+    if (sortAlphabetically) queryString += `&sortAlphabetically=${sortAlphabetically}`;
 
-    // ✅ Render the view
+    // Step 6: Render the view
     res.render('allproduct', {
-      productcollection: filteredProducts,
+      productcollection: paginatedProducts,
       currentPage: page,
       totalPage,
       sortprice,
@@ -404,11 +393,13 @@ const getproducts = async (req, res) => {
       categories,
       queryString,
     });
+
   } catch (error) {
     console.error('Error loading products:', error);
     return res.redirect('/error');
   }
 };
+
 
 
 
