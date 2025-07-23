@@ -641,7 +641,7 @@
                 <% } else { %>
                     <p>No Shipping information available.</p>
                 <% } %>
-                
+
                 <div id="addressError" style="color:red; margin-top:10px;"></div>
 
                 <div class="add-addressbtn">
@@ -835,7 +835,8 @@ document.addEventListener('DOMContentLoaded', function () {
         if (!paymentMethod) {
             e.preventDefault(); // prevent form submission
            paymentmessageContainer.innerText = 'Please select a payment method before placing your order.';
-            // messageContainer.style.color = 'red';
+           const addressError = document.getElementById('addressError');
+           const selectedAddress = document.querySelector('input[name="shippingOption"]:checked');
 
             // Auto clear after 3 seconds
             setTimeout(() => {
