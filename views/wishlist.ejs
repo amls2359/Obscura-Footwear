@@ -542,25 +542,7 @@
 
     <main>
         <h2 class="page-title">Your Wishlist</h2>
-        
-        <% if (messages.error) { %>
-        <div class="alert alert-danger">
-            <%= messages.error %>
-            <button class="alert-close">&times;</button>
-        </div>
-        <% } %>
-        <% if (messages.success) { %>
-        <div class="alert alert-success">
-            <%= messages.success %>
-            <button class="alert-close">&times;</button>
-        </div>
-        <% } %>
-        <% if (messages.info) { %>
-        <div class="alert alert-info">
-            <%= messages.info %>
-            <button class="alert-close">&times;</button>
-        </div>
-        <% } %>
+
 
         <div class="wishlist-grid">
             <% if(isEmpty) { %>
