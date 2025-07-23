@@ -403,6 +403,8 @@ const userOrders = async (req, res) => {
 
 const cancelOrder = async(req,res)=>
 {
+  console.log('entered in to cancel order');
+  
   try
   {
     const {orderId,productId} = req.params
