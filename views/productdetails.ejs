@@ -868,15 +868,15 @@
             });
 
             // Toggle UI
-            if (action === 'add') {
-                $btn.removeClass('btn').addClass('btn-outline');
-                $btn.html('<i class="fas fa-heart"></i> Remove from Wishlist');
-                $btn.data('action', 'remove');
-            } else {
-                $btn.removeClass('btn-outline').addClass('btn');
-                $btn.html('<i class="far fa-heart"></i> Add to Wishlist');
-                $btn.data('action', 'add');
-            }
+           if (action === 'add') {
+    $btn.removeClass('btn').removeClass('btn-outline').addClass('btn-outline');
+    $btn.html('<i class="fas fa-heart"></i> Remove from Wishlist');
+    $btn.data('action', 'remove');
+} else {
+    $btn.removeClass('btn-outline').removeClass('btn').addClass('btn');
+    $btn.html('<i class="far fa-heart"></i> Add to Wishlist');
+    $btn.data('action', 'add');
+}
         },
         error: function (err) {
             Swal.fire({
