@@ -763,7 +763,7 @@
                 <% productcollection.forEach(product => { %>
                     <div class="product-item">
                         <!-- Wishlist Button -->
-                        <form class="wishlist-form" data-id="<%= product.id %>" data-action="<%= product.isInWishlist ? 'remove' : 'add' %>">
+                        <form class="wishlist-form" data-id="<%= product._id %>" data-action="<%= product.isInWishlist ? 'remove' : 'add' %>">
                             <button type="submit" class="wishlist-icon <%= product.isInWishlist ? 'active' : '' %>">
                                 <i class="fa fa-heart"></i>
                             </button>
