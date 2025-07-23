@@ -589,7 +589,14 @@ const wishlist = async (req, res) => {
         const userid = req.session.userid;
 
         // Fetch wishlist items and populate productid
-        const wishlistItems = await Wishlist.find({ userid }).populate('productid');
+        const wishlistItems = await Wishlist.find({ userid })
+        .populate({
+        path: 'productid',
+        populate: {
+        path: 'category', // this is from Product model
+        model: 'Category'
+        }
+        });
 
         // Check if wishlist is empty
         const isEmpty = wishlistItems.length === 0;
@@ -610,10 +617,10 @@ const wishlist = async (req, res) => {
             return {
                 _id: item._id, // Wishlist item ID (used for remove)
                 productid: product._id, // Actual product ID (used for view)
-                product: product.productname || product.product || 'Unnamed Product',
+                product: product.productname || 'Unnamed Product',
                 price: product.price || 0,
                 imagePath : imagePath ,
-                category: product.category || 'Uncategorized'
+                category: product.category?.name || 'Uncategorized'
             };
         });
          console.log("Final Wishlist Data:");
