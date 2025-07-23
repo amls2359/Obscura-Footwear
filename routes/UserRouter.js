@@ -37,7 +37,7 @@ router.get('/Homepage',checkSessionBlocked,UserController.Homepage)
 router.get('/logout',UserController.logout)
 
 router.post('/addwishlist/:id',checkSessionBlocked,UserController.addToWishlist)
-router.get('/Wishlist',UserController.wishlist)
+router.get('/Wishlist',checkSessionBlocked,UserController.wishlist)
 
 router.post('/removefromWishlist/:id',checkSessionBlocked,UserController.removeWishlist)
 router.get('/wallet',checkSessionBlocked,UserController.getWallet)
