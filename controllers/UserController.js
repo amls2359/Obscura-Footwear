@@ -75,7 +75,7 @@ const Homepage = async (req, res) => {
       match: { islisted: true },
       select: 'name'
     })
-    .limit(4);
+    .limit(15);
 
     // Step 2: Filter out products where the category is null
     const productCollection = rawProducts.filter(product => product.category !== null);
