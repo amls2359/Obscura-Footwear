@@ -540,46 +540,54 @@
         </div>
     </nav>
 
-    <main>
-        <h2 class="page-title">Your Wishlist</h2>
-        <div class="wishlist-grid">
-            <% if(isEmpty) { %>
-                <div class="no-products">
-                    <h3>Your wishlist is empty</h3>
-                    <p>Try adding some products you love!</p>
-                    <a href="/allproduct" class="btn">Browse Products</a>
-                </div>
-            <% } else { %>
-                <% wishlist.forEach(item => { %>
-                    <div class="wishlist-item" data-wishlistid="<%= item._id %>" id="empty-message">
-                        <div class="wishlist-remove">
-                            <button type="button"
-                                class="wishlist-remove-btn"
-                                data-id="<%= item.productid %>">
-                                <i class="fas fa-times"></i>
-                            </button>
-                        </div>
+<main>
+    <h2 class="page-title">Your Wishlist</h2>
+    <div class="wishlist-grid">
 
-                        
-                        <div class="wishlist-image-container">
-                            <a href="/getproducts/<%=item.productid%>">
-                                <img src="<%=item.imagePath%>" alt="<%= item.product %>">
-                            </a>
-                        </div>
-                        
-                        <h6 class="product-category"><%= item.category || 'Product' %></h6>
-                        <a href="/getproduct/<%= item.productid %>">
-                            <h4><%= item.product %></h4>
-                        </a>
-                        <p class="wishlist-price">₹<%= item.price.toLocaleString() %></p>
-                        <div class="wishlist-actions">
-                            <a href="/productdetails/<%= item.productid %>" class="btn btn-view">View Details</a>
-                        </div>
+        <!-- Always render the "empty message", hide it unless isEmpty is true -->
+        <% if (isEmpty) { %>
+            <div class="no-products" id="empty-message">
+        <% } else { %>
+            <div class="no-products" id="empty-message" style="display: none;">
+        <% } %>
+                <h3>Your wishlist is empty</h3>
+                <p>Try adding some products you love!</p>
+                <a href="/allproduct" class="btn">Browse Products</a>
+            </div>
+
+        <!-- Render wishlist items if not empty -->
+        <% if (!isEmpty) { %>
+            <% wishlist.forEach(item => { %>
+                <div class="wishlist-item" data-wishlistid="<%= item._id %>">
+                    <div class="wishlist-remove">
+                        <button type="button"
+                            class="wishlist-remove-btn"
+                            data-id="<%= item.productid %>">
+                            <i class="fas fa-times"></i>
+                        </button>
                     </div>
-                <% }) %>
-            <% } %>
-        </div>
-    </main>
+
+                    <div class="wishlist-image-container">
+                        <a href="/getproducts/<%= item.productid %>">
+                            <img src="<%= item.imagePath %>" alt="<%= item.product %>">
+                        </a>
+                    </div>
+
+                    <h6 class="product-category"><%= item.category || 'Product' %></h6>
+                    <a href="/getproduct/<%= item.productid %>">
+                        <h4><%= item.product %></h4>
+                    </a>
+                    <p class="wishlist-price">₹<%= item.price.toLocaleString() %></p>
+                    <div class="wishlist-actions">
+                        <a href="/productdetails/<%= item.productid %>" class="btn btn-view">View Details</a>
+                    </div>
+                </div>
+            <% }) %>
+        <% } %>
+
+    </div>
+</main>
+
 
     <footer class="site-footer">
         <div class="footer-container">
