@@ -9,7 +9,12 @@ const checkSessionBlocked = async (req, res, next) => {
             return res.redirect('/guesthomepage');
         }
 
+          console.log('--- SESSION DEBUG ---');
+          console.log('Session:', req.session);
+          console.log('User ID:', req.session.userid); 
+
         const userdetails = await User.findById(req.session.userid);
+        console.log('User details:', userdetails);
 
         // If user no longer exists
         if (!userdetails) {
