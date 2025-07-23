@@ -65,30 +65,29 @@ const resetPassword = (req, res) => res.render('ResetPassword');
 
 const Homepage = async (req, res) => {
   try {
-    // Step 1: Fetch products with listed = true and stock >= 1
-    const productCollection = await Product.find({
+    // Step 1: Fetch only listed products with stock >= 1
+    const rawProducts = await Product.find({
       isListed: true,
       stock: { $gte: 1 }
     })
     .populate({
       path: 'category',
-      match: { islisted: true }, // Only populate if category is listed
-      select: 'name' // Only get the category name
+      match: { islisted: true },
+      select: 'name'
     })
     .limit(4);
 
-    // Step 2: Filter out products where category is null (i.e., category is blocked)
-    const filteredProducts = productCollection.filter(product => product.category);
+    // Step 2: Filter out products where the category is null
+    const productCollection = rawProducts.filter(product => product.category !== null);
 
-    // Step 3: Render the homepage with filtered products
-    res.render('Homepage', { productCollection: filteredProducts });
-
+    // Step 3: Render homepage with only products with valid categories
+    res.render('Homepage', { productCollection });
   } catch (error) {
     console.error('Error rendering homepage:', error);
     res.status(500).send('Internal Server Error');
   }
 };
-   
+
 
 let otpStorage = {};
 let referral;
