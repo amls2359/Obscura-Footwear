@@ -455,6 +455,9 @@ const cancelOrder = async(req,res)=>
          creditordebit:'credit'
 
       })
+
+      console.log('wallet is ',Wallet);
+      
       console.log('refund processed successfully', totalRefund);
       
     }
