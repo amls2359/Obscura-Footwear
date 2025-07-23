@@ -592,12 +592,12 @@ const wishlist = async (req, res) => {
         const wishlistItems = await Wishlist.find({ userid })
         .populate({
         path: 'productid',
-        populate: {
-        path: 'category', // this is from Product model
-        model: 'Category'
+          populate: {
+          path: 'category',   // 👈 this will populate the category field inside productid
+          model: 'Category'
         }
-        });
-
+         })
+      .lean();
         // Check if wishlist is empty
         const isEmpty = wishlistItems.length === 0;
 
@@ -607,12 +607,6 @@ const wishlist = async (req, res) => {
 
             // Handle image path safely
             let imagePath = product.image // fallback image
-
-            // if (typeof product.image === 'string') {
-            //     imagePath = product.image.startsWith('images/')
-            //         ? '/' + product.image
-            //         : 'images/' + product.image;
-            // }
             
             return {
                 _id: item._id, // Wishlist item ID (used for remove)
