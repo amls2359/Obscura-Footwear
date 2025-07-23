@@ -848,5 +848,45 @@
       });
     });
     </script>
+    <script>
+
+     $('.wishlist-toggle-btn').on('click', function () {
+    const $btn = $(this);
+    const productId = $btn.data('id');
+    const action = $btn.data('action');
+
+    $.ajax({
+        url: action === 'add' ? `/addwishlist/${productId}` : `/removefromWishlist/${productId}`,
+        method: 'POST',
+        success: function (res) {
+            Swal.fire({
+                icon: 'success',
+                title: res.message,
+                timer: 1500,
+                showConfirmButton: false
+            });
+
+            // Toggle UI
+            if (action === 'add') {
+                $btn.removeClass('btn').addClass('btn-outline');
+                $btn.html('<i class="fas fa-heart"></i> Remove from Wishlist');
+                $btn.data('action', 'remove');
+            } else {
+                $btn.removeClass('btn-outline').addClass('btn');
+                $btn.html('<i class="far fa-heart"></i> Add to Wishlist');
+                $btn.data('action', 'add');
+            }
+        },
+        error: function (err) {
+            Swal.fire({
+                icon: 'error',
+                title: 'Error',
+                text: err.responseJSON?.message || 'Something went wrong!',
+            });
+        }
+    });
+});
+
+    </script>
 </body>
 </html>
