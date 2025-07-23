@@ -77,8 +77,8 @@ const Homepage = async (req, res) => {
     })
     .limit(15);
 
-    // Step 2: Filter out products where the category is null
-    const productCollection = rawProducts.filter(product => product.category !== null);
+ // Step 3: Select only the first 4 valid products
+        const productCollection = filteredProducts.slice(0, 4);
 
     // Step 3: Render homepage with only products with valid categories
     res.render('Homepage', { productCollection });
