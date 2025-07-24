@@ -536,11 +536,10 @@ const orderReturn = async (req, res) => {
       { _id: productId },
       { $inc: { stock: quantity } }
     );
-
+   const paymentMethod = order.paymentMethod?.trim().toLowerCase();
     // If payment method is eligible for refund
     if (
-      order.paymentMethod === 'Net Banking' ||
-      order.paymentMethod === 'Cash on Delivery'
+      order.paymentMethod === 'Net Banking' ||order.paymentMethod === 'Cash on Delivery'
     ) {
       console.log(`💳 Payment Method: ${order.paymentMethod}`);
 
