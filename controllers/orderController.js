@@ -567,12 +567,17 @@ const orderReturn = async (req, res) => {
       console.log('👛 Wallet updated for user:', user?.username || userSessionId);
 
       // Create wallet transaction record
-      await Wallet.create({
-        userid: userSessionId,
-        date: new Date(),
-        amount: totalRefund,
-        creditordebit: 'credit'
-      });
+     try {
+  const walletEntry = await Wallet.create({
+    userid: userSessionId,
+    date: new Date(),
+    amount: totalRefund,
+    creditordebit: 'credit'
+  });
+  console.log('📜 Wallet transaction recorded ✅', walletEntry);
+} catch (err) {
+  console.error('❌ Error creating wallet entry:', err.message);
+}
 
       console.log('📜 Wallet transaction recorded ✅');
     }
