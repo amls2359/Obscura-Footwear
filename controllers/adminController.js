@@ -520,7 +520,7 @@ const updateOrderPost = async (req, res) => {
     if ((status === 'cancelled' || status === 'returned') &&
         productInOrder.status !== 'cancelled' && productInOrder.status !== 'returned') {
 
-      const user = await User.findById(order.userid);
+      const user = await UserCollection.findById(order.userid);
       if (user) {
         const refundAmount = productInOrder.price * productInOrder.quantity;
         user.wallet += refundAmount;
