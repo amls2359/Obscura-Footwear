@@ -15,19 +15,23 @@
             font-family: 'Poppins', sans-serif;
             box-sizing: border-box;
         }
+        
         body {
-            width: 100%;
+            padding-top: 70px; /* Space for fixed header */
+            display: flex;
+            flex-direction: column;
             min-height: 100vh;
-            overflow-x: hidden;
-            background-color: white;
-            font-family: "Roboto", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", sans-serif;
+            margin: 0;
         }
+
         h1, h2, h3, h4, h5, h6 {
             font-family: "Roboto", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", sans-serif;
         }
+        
         a {
             transition: .3s all ease;
         }
+        
         a, a:hover {
             text-decoration: none !important;
         }
@@ -38,7 +42,7 @@
             height: 70px;
             background: white;
             box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-            position: sticky;
+            position: fixed;
             top: 0;
             z-index: 1000;
         }
@@ -110,10 +114,15 @@
         
         .logout-link {
             padding: 8px 18px;
-            border-radius: 4px;
             transition: all 0.3s ease;
             font-weight: 600;
             margin-left: 20px;
+            color: #333;
+        }
+        
+        .logout-link:hover {
+            color: white;
+            border-color: #f74f10;
         }
 
         .mobile-menu-toggle {
@@ -122,7 +131,6 @@
             font-size: 1.5rem;
             cursor: pointer;
             display: none;
-            color: #333;
         }
 
         /* Fixed Sidebar Styles */
@@ -136,7 +144,6 @@
             top: 70px;
             overflow-y: auto;
             z-index: 999;
-            transition: transform 0.3s ease;
         }
         
         .sidebar-content {
@@ -173,31 +180,22 @@
             color: #f74f10;
             border-left: 3px solid #f74f10;
         }
-        
-        /* Main content area */
-        main {
+
+        /* Main Content Styles */
+        .content-wrapper {
+            display: flex;
+            flex: 1;
             margin-left: 200px;
-            padding: 30px;
             min-height: calc(100vh - 70px - 4rem);
-            position: relative;
-            transition: margin-left 0.3s ease;
         }
         
-        /* User Content Styles */
-        .user-content {
-            background: #fff;
-            border-radius: 8px;
-            box-shadow: 0 2px 15px rgba(0,0,0,0.1);
-            padding: 30px;
-            margin-top: 20px;
+        .main-content {
+            flex: 1;
+            padding: 2rem;
+            background-color: #f8f9fa;
         }
-        
-        /* Wallet Styles */
-        .wallet-container {
-            margin-left: 200px;
-            padding: 30px;
-        }
-        
+
+        /* Wallet Balance Styles */
         .wallet-balance {
             background: #fff;
             border-radius: 8px;
@@ -223,6 +221,7 @@
             font-weight: 600;
         }
         
+        /* Wallet Table Styles */
         .wallet-table-container {
             background: #fff;
             border-radius: 8px;
@@ -267,20 +266,16 @@
             background-color: #f8f9fa;
         }
         
-        /* Status colors */
-        .walletT tbody td:nth-child(3) {
-            font-weight: 600;
-        }
-        
-        /* Footer Styles */
+        /* Footer styles */
         .simple-footer {
             background-color: #141d2a;
             color: white;
-            padding: 4rem 0;
-            margin-left: 200px;
+            padding: 2rem 0;
+            margin-top: auto;
             width: calc(100% - 200px);
-            transition: all 0.3s ease;
+            margin-left: 200px;
         }
+
         .footer-container {
             max-width: 1200px;
             margin: 0 auto;
@@ -289,12 +284,14 @@
             flex-wrap: wrap;
             justify-content: space-between;
         }
+        
         .footer-section {
             flex: 1;
             min-width: 200px;
             margin-bottom: 30px;
             padding: 0 15px;
         }
+        
         .footer-section h3 {
             font-size: 18px;
             margin-bottom: 20px;
@@ -302,6 +299,7 @@
             position: relative;
             padding-bottom: 10px;
         }
+        
         .footer-section h3::after {
             content: "";
             position: absolute;
@@ -311,31 +309,62 @@
             height: 2px;
             background-color: #f74f10;
         }
+        
         .footer-section ul {
             list-style: none;
             padding: 0;
         }
+        
         .footer-section ul li {
             margin-bottom: 10px;
         }
+        
         .footer-section ul li a {
             color: #aaa;
             text-decoration: none;
             transition: color 0.3s;
         }
+        
         .footer-section ul li a:hover {
             color: white;
         }
 
-        /* Responsive styles */
-        @media (max-width: 992px) {
-            .footer-section {
-                min-width: 50%;
-            }
-        }
-
+        /* Responsive Adjustments */
         @media (max-width: 768px) {
+            .content-wrapper {
+                flex-direction: column;
+                margin-left: 0;
+                min-height: auto;
+            }
+            
+            #sidebar {
+                width: 100%;
+                height: auto;
+                position: static;
+            }
+            
+            .main-content {
+                width: 100%;
+                margin-left: 0;
+                padding: 1.5rem;
+            }
+            
+            .simple-footer {
+                width: 100%;
+                margin-left: 0;
+            }
+            
+            .walletT {
+                min-width: 100%;
+            }
+
+            /* Mobile menu styles */
+            .mobile-menu-toggle {
+                display: block;
+            }
+            
             .nav-links {
+                display: none;
                 position: fixed;
                 top: 70px;
                 left: -100%;
@@ -345,10 +374,11 @@
                 padding: 20px;
                 gap: 15px;
                 box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
-                transition: 0.3s ease;
+                transition: 0.5s;
             }
             
             .nav-links.active {
+                display: flex;
                 left: 0;
             }
             
@@ -371,48 +401,12 @@
                 text-align: left;
                 padding: 8px 0;
             }
-            
-            .mobile-menu-toggle {
-                display: block;
-            }
-            
-            #sidebar {
-                transform: translateX(-100%);
-                width: 250px;
-            }
-            
-            #sidebar.active {
-                transform: translateX(0);
-                z-index: 1001;
-            }
-            
-            main, .wallet-container, .simple-footer {
-                margin-left: 0;
-                width: 100%;
-            }
-            
-            .user-content, .wallet-balance, .wallet-table-container {
-                padding: 20px;
-            }
         }
 
         @media (max-width: 576px) {
-            .footer-section {
-                min-width: 100%;
-                text-align: center;
-            }
-            
-            .footer-section h3::after {
-                left: 50%;
-                transform: translateX(-50%);
-            }
-            
-            .wallet-balance, .wallet-table-container {
-                padding: 15px;
-            }
-            
-            .walletT {
-                min-width: 100%;
+            .wallet-balance, 
+            .wallet-table-container {
+                padding: 20px;
             }
             
             .walletT thead th, 
@@ -465,8 +459,8 @@
     </div>
 
     <!-- Main Content -->
-    <main>
-        <div class="user-content">
+    <div class="content-wrapper">
+        <div class="main-content">
             <div class="wallet-balance">
                 <h3>Wallet Balance</h3>
                 <% let walletAmount = userData.wallet !== undefined ? userData.wallet : 0; %>
@@ -510,7 +504,7 @@
                 </table>
             </div>
         </div>
-    </main>
+    </div>
 
     <!-- Footer Section -->
     <footer class="simple-footer" id="footersection">
@@ -556,30 +550,8 @@
     <script>
         document.addEventListener('DOMContentLoaded', function() {
             // Mobile menu toggle functionality
-            const mobileMenuToggle = document.querySelector('.mobile-menu-toggle');
-            const navLinks = document.querySelector('.nav-links');
-            const sidebar = document.getElementById('sidebar');
-            
-            if (mobileMenuToggle) {
-                mobileMenuToggle.addEventListener('click', function() {
-                    navLinks.classList.toggle('active');
-                });
-            }
-
-            // Toggle sidebar on mobile
-            function toggleSidebar() {
-                sidebar.classList.toggle('active');
-            }
-
-            // Close sidebar when clicking outside on mobile
-            document.addEventListener('click', function(event) {
-                const isClickInsideSidebar = sidebar.contains(event.target);
-                const isClickInsideToggle = event.target === mobileMenuToggle || 
-                                          mobileMenuToggle.contains(event.target);
-                
-                if (!isClickInsideSidebar && !isClickInsideToggle && window.innerWidth <= 768) {
-                    sidebar.classList.remove('active');
-                }
+            document.querySelector('.mobile-menu-toggle').addEventListener('click', function() {
+                document.querySelector('.nav-links').classList.toggle('active');
             });
 
             // Logout confirmation
@@ -597,14 +569,6 @@
                         window.location.href = "/logout";
                     }
                 });
-            });
-
-            // Adjust layout on resize
-            window.addEventListener('resize', function() {
-                if (window.innerWidth > 768) {
-                    navLinks.classList.remove('active');
-                    sidebar.classList.remove('active');
-                }
             });
         });
     </script>

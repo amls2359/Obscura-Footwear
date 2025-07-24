@@ -11,7 +11,7 @@ router.post('/checkoutPost',checkSessionBlocked,orderController.checkoutPost)
 router.get('/placeOrder',checkSessionBlocked,orderController.placeOrder)
 router.get('/userOrderDetails',checkSessionBlocked,orderController.userOrders)
 router.get('/orderDetails/:orderid/:productid',checkSessionBlocked,orderController.orderDetailsGet)
-router.get('/returnOrder/:userId/:productId',orderController.orderReturn)
+router.get('/returnOrder/:orderId/:productId',orderController.orderReturn)
 router.get('/cancelOrder/:orderId/:productId',checkSessionBlocked,orderController.cancelOrder)
 router.get('/Invoice/:orderid',orderController.Invoice)
 

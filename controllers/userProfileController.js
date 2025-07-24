@@ -2,6 +2,7 @@ const UserCollection = require('../models/user')
 const Wishlist = require('../models/wishlist')
 const Category = require('../models/category');
 const AddressCollection= require('../models/address')
+const bcrypt = require('bcrypt')
 
 
 const userProfileget = async(req,res)=>
@@ -75,23 +76,21 @@ const changePasswordPost = async(req,res)=>
    {
      const user = await UserCollection.findById(userId)
       
-     const isMatch =currentPassword===user.password
+     const isMatch = await bcrypt.compare(currentPassword,user.password)
      console.log('password match result:',isMatch);
-     if(!isMatch)
-     {
-         return res.render('changepassword',{
-           errorMessage:
-           {
-             currentPassword:'Incorrect current Password',
-             newPassword:"",
-             confirmPassword:'',
-             general:"",
-
-           },
-          Category: await Category.find({})
-         })
-     }
-     user.password= newPassword
+     
+   if (!isMatch) {
+      return res.status(200).json({
+        success: false,
+        errors: {
+          currentPassword: "Incorrect current password",
+          newPassword: "",
+          confirmPassword: ""
+        }
+      });
+    }
+     const hashedPassword = await bcrypt.hash(newPassword,10)
+     user.password= hashedPassword 
      await user.save()
      res.redirect('/userProfile')
    }
@@ -135,7 +134,7 @@ const addAddress = async(req,res)=>
 
 const addAddressPost = async(req,res)=>
 {
-  console.log('netrerd into the post');
+  console.log('entered into the post');
   
   try
   {

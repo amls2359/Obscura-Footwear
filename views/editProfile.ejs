@@ -193,34 +193,53 @@
             </form>
         </div>
     </div>
-    <script>
-    function validateForm()
-    {
-        console.log('entered into validateform');
-        document.getElementById("username-error").innerHTML=''
-        document.getElementById("mobile-error").innerHTML=""
+<script>
+function validateForm() {
+    console.log('entered into validateform');
 
-        const username=  document.getElementById("username").value.trim()
-        const mobile = document.getElementById('number').value.trim()
+    document.getElementById("username-error").innerHTML = '';
+    document.getElementById("mobile-error").innerHTML = '';
 
-        if(username==='')
-        {
-          document.getElementById('username-error').innerHTML='Please enter a username';
-          return false
-        }
+    const username = document.getElementById("username").value.trim();
+    const mobile = document.getElementById('number').value.trim();
 
-        if(mobile==='')
-        {
-              document.getElementById("mobile-error").innerHTML="Please enter a mobile number";
-              return false
-        }
-        else if(!/^\d{10}$/.test(mobile))
-        {
-            document.getElementById("mobile-error").innerHTML="Please enter a 10 digit  mobile number";
-            return false
-        }
-        return true
+    // Username empty check
+    if (username === '') {
+        document.getElementById('username-error').innerHTML = 'Please enter a username';
+        return false;
     }
-    </script>
+
+    // Username format validation
+    const basicFormat = /^[a-zA-Z][a-zA-Z0-9._]{3,15}$/;
+    const consecutiveCheck = /(\.\.|__|_\.)|(\._)/;
+    const edgeCheck = /^[._]|[._]$/;
+
+    if (!basicFormat.test(username)) {
+        document.getElementById('username-error').innerHTML =
+            'Username must be 4–16 characters, start with a letter, and contain only letters, numbers, dot, or underscore.';
+        return false;
+    } else if (consecutiveCheck.test(username)) {
+        document.getElementById('username-error').innerHTML =
+            'Username cannot contain consecutive dots or underscores.';
+        return false;
+    } else if (edgeCheck.test(username)) {
+        document.getElementById('username-error').innerHTML =
+            'Username cannot start or end with dot or underscore.';
+        return false;
+    }
+
+    // Mobile number validation
+    if (mobile === '') {
+        document.getElementById("mobile-error").innerHTML = "Please enter a mobile number";
+        return false;
+    } else if (!/^\d{10}$/.test(mobile)) {
+        document.getElementById("mobile-error").innerHTML = "Please enter a 10-digit mobile number";
+        return false;
+    }
+
+    return true;
+}
+</script>
+
 </body>
 </html>

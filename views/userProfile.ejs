@@ -6,6 +6,7 @@
     <title>User Profile</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <style>
         /* Global Styles */
         * {
@@ -14,19 +15,24 @@
             font-family: 'Poppins', sans-serif;
             box-sizing: border-box;
         }
+        
         body {
-            width: 100%;
+            padding-top: 70px; /* Space for fixed header */
+            display: flex;
+            flex-direction: column;
             min-height: 100vh;
-            overflow-x: hidden;
-            background-color: white;
-            font-family: "Roboto", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", sans-serif;
+            margin: 0;
+            background-color: #f8f9fa;
         }
+
         h1, h2, h3, h4, h5, h6 {
             font-family: "Roboto", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", sans-serif;
         }
+        
         a {
             transition: .3s all ease;
         }
+        
         a, a:hover {
             text-decoration: none !important;
         }
@@ -34,10 +40,10 @@
         /* ===== Navigation Styles ===== */
         nav {
             width: 100%;
-            height: 10vh;
+            height: 70px;
             background: white;
             box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-            position: sticky;
+            position: fixed;
             top: 0;
             z-index: 1000;
         }
@@ -53,6 +59,11 @@
 
         .logo img {
             width: 150px;
+        }
+
+        .nav-links {
+            display: flex;
+            align-items: center;
         }
 
         .nav-links a {
@@ -96,32 +107,46 @@
             margin-left: 20px;
         }
         
-        .wishlist-link i:hover {
+        .wishlist-link i:hover,
+        .cart-link i:hover {
             color: #f74f10;
             transform: scale(1.1);
         }
         
-        /* Logout link in nav */
         .logout-link {
             padding: 8px 18px;
-            border-radius: 4px;
             transition: all 0.3s ease;
             font-weight: 600;
             margin-left: 20px;
+            color: #333;
+        }
+        
+        .logout-link:hover {
+            color: white;
+            border-color: #f74f10;
+        }
+
+        .mobile-menu-toggle {
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            cursor: pointer;
+            display: none;
         }
 
         /* Fixed Sidebar Styles */
         #sidebar {
             width: 200px;
-            height: calc(100vh - 10vh); /* Full viewport height minus header */
+            height: calc(100vh - 70px);
             background: #fff;
             box-shadow: 2px 0 10px rgba(0,0,0,0.1);
             position: fixed;
             left: 0;
-            top: 10vh; /* Below the header */
+            top: 70px;
             overflow-y: auto;
             z-index: 999;
-        }      
+        }
+        
         .sidebar-content {
             padding: 20px 0;
             height: 100%;
@@ -156,29 +181,31 @@
             color: #f74f10;
             border-left: 3px solid #f74f10;
         }
-        
-        /* Main content area */
-        main {
-            margin-left: 200px; /* Same as sidebar width */
-            padding: 30px;
-            min-height: calc(100vh - 10vh - 4rem); /* Viewport height minus header and footer */
-            position: relative;
+
+        /* Main Content Styles */
+        .content-wrapper {
+            display: flex;
+            flex: 1;
+            margin-left: 200px;
+            min-height: calc(100vh - 70px - 4rem);
         }
         
+        .main-content {
+            flex: 1;
+            padding: 2rem;
+            background-color: #f8f9fa;
+        }
+
         /* User Profile Styles */
         .user-content {
             background: #fff;
             border-radius: 8px;
             box-shadow: 0 2px 15px rgba(0,0,0,0.1);
             padding: 30px;
-            margin-top: 20px;
-        }
-        
-        .user-details {
             margin-bottom: 30px;
         }
         
-        .user-details h2 {
+        .user-content h3 {
             color: #333;
             margin-bottom: 20px;
             padding-bottom: 10px;
@@ -189,55 +216,48 @@
             font-size: 16px;
             margin-bottom: 16px;
             color: #555;
-            display: flex;          /* Use flexbox for better alignment */
-            align-items: baseline;  /* Align items on the baseline */
+            display: flex;
+            align-items: baseline;
         }
 
         .user-details p strong {
             color: #333;
             margin-right: 6px;
             display: inline-block;
-            width: 120px;          /* Increased width for better spacing */
-            flex-shrink: 0;        /* Prevent the label from shrinking */
-        }
-        
-        /* Button Styles */
-        .button {
-            margin-left: 200px; /* Same as sidebar width */
-            padding: 0 30px 30px; /* Match main content padding */
-            display: flex;
-            gap: 15px;
+            width: 120px;
+            flex-shrink: 0;
         }
 
-        .edit-profile, .chng-password {
+        #referral {
+            background-color: #f0f8ff;
+            padding: 10px 15px;
+            border-left: 4px solid #f74f10;
+            font-weight: bold;
+            border-radius: 6px;
+            color: #333;
+        }
+
+        /* Button Styles */
+        .button-container {
+            display: flex;
+            gap: 15px;
+            margin-top: 20px;
+        }
+
+        .edit-profile, 
+        .chng-password {
             display: inline-block;
             padding: 10px 20px;
             border-radius: 4px;
             font-weight: 600;
             text-align: center;
             transition: all 0.3s ease;
-        }
-
-        .edit-profile {
             background-color: #f74f10;
             color: white;
             border: 2px solid #f74f10;
         }
 
-        .chng-password {
-              background-color: #f74f10;
-            color: white;
-            border: 2px solid #f74f10;
-        }
-
-        .edit-profile:hover {
-             background-color: #f8f9fa;
-            color: #e6470d;
-            border-color: #e6470d;
-            transform: translateY(-2px);
-            box-shadow: 0 4px 8px rgba(247, 79, 16, 0.2);
-        }
-
+        .edit-profile:hover,
         .chng-password:hover {
             background-color: #f8f9fa;
             color: #e6470d;
@@ -245,15 +265,17 @@
             transform: translateY(-2px);
             box-shadow: 0 4px 8px rgba(247, 79, 16, 0.2);
         }
-
-        /* Footer Styles */
+        
+        /* Footer styles */
         .simple-footer {
             background-color: #141d2a;
             color: white;
-            padding: 4rem 0;
-            margin-left: 200px; /* Same as sidebar width */
-            width: calc(100% - 200px); /* Full width minus sidebar */
+            padding: 2rem 0;
+            margin-top: auto;
+            width: calc(100% - 200px);
+            margin-left: 200px;
         }
+
         .footer-container {
             max-width: 1200px;
             margin: 0 auto;
@@ -262,12 +284,14 @@
             flex-wrap: wrap;
             justify-content: space-between;
         }
+        
         .footer-section {
             flex: 1;
             min-width: 200px;
             margin-bottom: 30px;
             padding: 0 15px;
         }
+        
         .footer-section h3 {
             font-size: 18px;
             margin-bottom: 20px;
@@ -275,6 +299,7 @@
             position: relative;
             padding-bottom: 10px;
         }
+        
         .footer-section h3::after {
             content: "";
             position: absolute;
@@ -284,49 +309,122 @@
             height: 2px;
             background-color: #f74f10;
         }
+        
         .footer-section ul {
             list-style: none;
             padding: 0;
         }
+        
         .footer-section ul li {
             margin-bottom: 10px;
         }
+        
         .footer-section ul li a {
             color: #aaa;
             text-decoration: none;
             transition: color 0.3s;
         }
+        
         .footer-section ul li a:hover {
             color: white;
         }
 
-        /* Responsive styles */
+        /* Responsive Adjustments */
         @media (max-width: 768px) {
-            #sidebar {
-                transform: translateX(-100%);
-                height: calc(100vh - 10vh);
-                top: 10vh;
-                z-index: 1000;
-            }
-            
-            #sidebar.active {
-                transform: translateX(0);
-            }
-            
-            main {
+            .content-wrapper {
+                flex-direction: column;
                 margin-left: 0;
+                min-height: auto;
+            }
+            
+            #sidebar {
                 width: 100%;
+                height: auto;
+                position: static;
+            }
+            
+            .main-content {
+                width: 100%;
+                margin-left: 0;
+                padding: 1.5rem;
             }
             
             .simple-footer {
-                margin-left: 0;
                 width: 100%;
+                margin-left: 0;
+            }
+
+            /* Mobile menu styles */
+            .mobile-menu-toggle {
+                display: block;
+            }
+            
+            .nav-links {
+                display: none;
+                position: fixed;
+                top: 70px;
+                left: -100%;
+                width: 100%;
+                background: white;
+                flex-direction: column;
+                padding: 20px;
+                gap: 15px;
+                box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+                transition: 0.5s;
+            }
+            
+            .nav-links.active {
+                display: flex;
+                left: 0;
+            }
+            
+            .nav-links a {
+                margin: 10px 0;
+                padding: 8px 0;
+                font-size: 1.1rem;
+            }
+            
+            .wishlist-link i,
+            .cart-link i {
+                margin-left: 0;
+                margin-right: 10px;
+            }
+            
+            .logout-link {
+                margin-left: 0;
+                display: inline-block;
+                width: 100%;
+                text-align: left;
+                padding: 8px 0;
+            }
+
+            .user-details p {
+                flex-direction: column;
+            }
+            
+            .user-details p strong {
+                width: auto;
+                margin-bottom: 5px;
+            }
+
+            .button-container {
+                flex-direction: column;
+            }
+        }
+
+        @media (max-width: 576px) {
+            .user-content {
+                padding: 20px;
+            }
+            
+            .logo img {
+                width: 120px;
             }
         }
     </style>
 </head>
 <body>
-    <!-- Updated Header Section -->
+    <!-- Header Section -->
     <nav>
         <div class="nav-container">
             <div class="logo">
@@ -346,6 +444,9 @@
                     <i class="fa fa-shopping-cart"></i>
                 </a>
             </div>
+            <button class="mobile-menu-toggle">
+                <i class="fas fa-bars"></i>
+            </button>
         </div>
     </nav>
 
@@ -364,25 +465,26 @@
     </div>
 
     <!-- Main Content -->
-    <main>
-        <div class="user-content">
-            <div class="user-details">
-            <h2>User Details</h2>
-            <p><strong>Name:</strong> <%= user.username %></p>
-            <p><strong>Phone:</strong> <%= user.phone%></p>
-            <p id="referral" style="background-color:#f0f8ff; padding:10px 15px; border-left:4px solid #f74f10; font-weight:bold; border-radius:6px; color:#333;">
-           <strong>Referral Code:</strong> <%= user.referralcode %>
-        </p>
+    <div class="content-wrapper">
+        <div class="main-content">
+            <div class="user-content">
+                <h3>User Details</h3>
+                <div class="user-details">
+                    <p><strong>Name:</strong> <%= user.username %></p>
+                    <p><strong>Phone:</strong> <%= user.phone%></p>
+                    <p id="referral">
+                        <strong>Referral Code:</strong> <%= user.referralcode %>
+                    </p>
+                </div>
+                
+                <div class="button-container">
+                    <a class="edit-profile" href="/editProfile">Edit Profile</a>
+                    <a class="chng-password" href="/changepassword">Change Password</a>
+                </div>
+            </div>
         </div>
-        <br>
-   
-
-    <div class="button">
-    <a class="edit-profile" href="/editProfile">Edit Profile</a>
-    <a class="chng-password" href="/changepassword">Change Password</a>
     </div>
 
-    </main>
     <!-- Footer Section -->
     <footer class="simple-footer" id="footersection">
         <div class="footer-container">
@@ -416,7 +518,7 @@
                 <h3>Contact Us</h3>
                 <ul>
                     <li><a href="mailto:info@example.com">amalskumar20@gmail.com</a></li>
-                   <li><a href="tel:+919645342887">+91 9645342887</a></li>
+                    <li><a href="tel:+919645342887">+91 9645342887</a></li>
                 </ul>
             </div>
         </div>
@@ -424,24 +526,30 @@
 
     <!-- JavaScript Libraries -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Mobile menu toggle functionality
+            document.querySelector('.mobile-menu-toggle').addEventListener('click', function() {
+                document.querySelector('.nav-links').classList.toggle('active');
+            });
 
-        document.getElementById('logout-button')?.addEventListener('click', function(e) {
-        e.preventDefault();
-        Swal.fire({
-            title: "Are you sure you want to logout?",
-            icon: "question",
-            showCancelButton: true,
-            confirmButtonText: "Yes, logout",
-            cancelButtonText: "Cancel",
-            confirmButtonColor: "#f74f10",
-        }).then((result) => {
-            if (result.isConfirmed) {
-                window.location.href = "/logout";
-            }
+            // Logout confirmation
+            document.getElementById('logout-button')?.addEventListener('click', function(e) {
+                e.preventDefault();
+                Swal.fire({
+                    title: "Are you sure you want to logout?",
+                    icon: "question",
+                    showCancelButton: true,
+                    confirmButtonText: "Yes, logout",
+                    cancelButtonText: "Cancel",
+                    confirmButtonColor: "#f74f10",
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        window.location.href = "/logout";
+                    }
+                });
+            });
         });
-    });
     </script>
 </body>
 </html>

@@ -7,107 +7,171 @@
     <style>
         /* General Styles */
         body { 
-            font-family: Arial, sans-serif; 
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             margin: 0;
             padding: 0;
             display: flex;
+            flex-direction: column;
             min-height: 100vh;
             background-color: #f5f5f5;
         }
         
         /* Sidebar Styles */
         .sidebar {
-            width: 215px;
-            background-color: #333;
+            width: 100%;
+            background-color: #2c3e50;
             color: white;
-            padding: 20px;
-            height: 100vh;
-            position: fixed;
             box-shadow: 2px 0 5px rgba(0,0,0,0.1);
+            order: 1;
+            overflow-y: auto;
         }
         
-        .sidebar h2 {
-            text-align: center;
-            color: white;
-            margin-bottom: 30px;
-            padding-bottom: 10px;
-            border-bottom: 1px solid #444;
+        .sidebar-header {
+            padding: 20px 15px;
+            background-color: #1a252f;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
         }
-
-        .sidebar ul {
-            list-style-type: none;
+        
+        .sidebar-header h2 {
+            color: white;
+            margin: 0;
+            font-size: 1.3rem;
+            font-weight: 600;
+        }
+        
+        .sidebar-menu {
             padding: 0;
             margin: 0;
+            list-style: none;
         }
-
-        .sidebar ul li {
-            margin: 15px 0;
+        
+        .menu-title {
+            padding: 12px 15px;
+            color: #b8c7ce;
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            font-weight: 600;
+            margin-top: 10px;
         }
-
-        .sidebar ul li a {
-            color: #fff;
-            text-decoration: none;
+        
+        .menu-item {
+            position: relative;
+        }
+        
+        .menu-item.has-submenu > a::after {
+            content: "▸";
+            position: absolute;
+            right: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            transition: transform 0.3s;
+        }
+        
+        .menu-item.has-submenu.active > a::after {
+            transform: translateY(-50%) rotate(90deg);
+        }
+        
+        .menu-link {
             display: block;
-            padding: 8px 10px;
-            border-radius: 4px;
-            transition: background-color 0.3s;
+            padding: 12px 15px;
+            color: #b8c7ce;
+            text-decoration: none;
+            transition: all 0.3s;
+            position: relative;
+            font-size: 0.95rem;
         }
-
-        .sidebar ul li a:hover {
-            background-color: #444;
+        
+        .menu-link:hover,
+        .menu-link.active {
+            color: white;
+            background-color: #1a252f;
+        }
+        
+        .menu-link i {
+            margin-right: 10px;
+            width: 20px;
+            text-align: center;
+        }
+        
+        .submenu {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+            background-color: #1a252f;
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.3s ease-out;
+        }
+        
+        .submenu.active {
+            max-height: 500px;
+        }
+        
+        .submenu .menu-link {
+            padding-left: 45px;
+        }
+        
+        .menu-toggle {
+            display: none;
+            padding: 15px;
+            color: white;
+            font-size: 1.5rem;
+            cursor: pointer;
         }
         
         /* Main Content Styles */
         .main-content {
             flex: 1;
-            margin-left: 250px;
-            padding: 20px;
+            padding: 15px;
             background-color: white;
-            border-radius: 5px;
             box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            order: 2;
         }
         
         .header-container {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 20px;
+            margin-bottom: 15px;
+            flex-wrap: wrap;
         }
         
         .heading {
             flex-grow: 1;
             text-align: center;
             color: #333;
+            font-size: 1.4rem;
+            margin: 10px 0;
         }
         
         /* Table Styles */
-        .main-content {
-            margin-left: 270px;
-            padding: 20px;
-            flex-grow: 1;
-        }
-
-        button {
-            margin: 10px 0;
-        }
-
         #example {
             width: 100%;
-            border: 1px solid #ddd;
             border-collapse: collapse;
-            margin-top: 20px;
+            margin-top: 15px;
+            border: 1px solid #ebdcdc;
         }
 
         #example th, #example td {
-            padding: 12px;
+            padding: 10px;
             text-align: left;
-            border: 1px solid #ddd;
+            border-bottom: 1px solid #ddd;
+            border-right: 1px solid #ddd;
         }
 
         #example th {
             background-color: #333;
             color: #fff;
-            border: 1px solid #444;
+            border-right: 1px solid #555;
+            font-size: 0.9rem;
+        }
+
+        #example th:last-child,
+        #example td:last-child {
+            border-right: none;
         }
 
         #example tr:nth-child(even) {
@@ -121,10 +185,11 @@
         .btn-danger {
             background-color: #dc3545;
             color: white;
-            padding: 5px 10px;
+            padding: 5px 8px;
             border: none;
             border-radius: 4px;
             text-decoration: none;
+            font-size: 0.8rem;
         }
 
         .btn-danger:hover {
@@ -134,103 +199,252 @@
         .btn-success {
             background-color: #28a745;
             color: white;
-            padding: 5px 10px;
+            padding: 5px 8px;
             border: none;
             border-radius: 4px;
             text-decoration: none;
+            font-size: 0.8rem;
         }
 
         .btn-success:hover {
             background-color: #218838;
         }
+
         .btn-blue {
-            background-color: #007bfffb;
+            background-color: #007bff;
             color: white;
-            padding: 5px 10px;
+            padding: 5px 8px;
             border: none;
             border-radius: 4px;
             text-decoration: none;
+            font-size: 0.8rem;
         }
 
         .btn-blue:hover {
             background-color: #0056b3;
         }
+
         .btn-edit {
-            background-color: #007bfffb;
+            background-color: #007bff;
             color: white;
-            padding: 5px 10px;
+            padding: 5px 8px;
             border: none;
             border-radius: 4px;
             text-decoration: none;
+            font-size: 0.8rem;
+        }
+
+        .btn-edit:hover {
+            background-color: #0056b3;
+        }
+
+        /* Button Container */
+        .button-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            margin-bottom: 15px;
+        }
+
+        .add-category-btn {
+            background-color: #28a745;
+            color: white;
+            padding: 8px 15px;
+            border: none;
+            border-radius: 4px;
+            text-decoration: none;
+            font-size: 0.9rem;
+            font-weight: bold;
+            cursor: pointer;
+            margin: 5px 0;
+        }
+
+        .add-category-btn:hover {
+            background-color: #218838;
         }
 
         /* Responsive Adjustments */
-        @media (max-width: 768px) {
+        @media (min-width: 768px) {
+            body {
+                flex-direction: row;
+            }
+            
             .sidebar {
-                width: 100%;
-                height: auto;
+                width: 250px;
+                height: 100vh;
+                position: fixed;
+                order: 0;
+            }
+            
+            .main-content {
+                margin-left: 250px;
+                padding: 20px;
+            }
+            
+            .menu-toggle {
+                display: none;
+            }
+        }
+
+        @media (min-width: 992px) {
+            .heading {
+                font-size: 1.6rem;
+            }
+            
+            .sidebar-header h2 {
+                font-size: 1.5rem;
+            }
+            
+            .menu-link {
+                font-size: 1rem;
+            }
+            
+            #example th, #example td {
+                padding: 12px;
+            }
+        }
+
+        @media (max-width: 767px) {
+            .sidebar {
                 position: relative;
+                height: auto;
+            }
+            
+            .sidebar-menu {
+                display: none;
+            }
+            
+            .sidebar-menu.active {
+                display: block;
+            }
+            
+            .menu-toggle {
+                display: block;
+            }
+
+            .button-container {
+                flex-direction: column;
+                align-items: stretch;
+            }
+
+            .add-category-btn {
+                width: 100%;
+                margin: 5px 0;
+            }
+        }
+
+        /* Print Styles */
+        @media print {
+            .sidebar {
+                display: none;
             }
             
             .main-content {
                 margin-left: 0;
-            }
-            
-            #example {
-                width: 100%;
-                border: 1px solid #ddd !important;
-                border-collapse: collapse;
-                margin-top: 20px;
-            }
-
-            #example th, #example td {
-                border: 1px solid #ddd !important;
-                padding: 12px;
-                text-align: left;
-            }
-
-            #example th {
-                background-color: #333;
-                color: #fff;
-                border: 1px solid #444 !important;
+                padding: 0;
+                box-shadow: none;
             }
         }
     </style>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 </head>
 <body>
     <!-- Sidebar -->
     <div class="sidebar">
-        <h2>Admin Panel</h2>
-        <ul>
-            <li><a href="/admin/dashboard">Dashboard</a></li>
-            <li><a href="/admin/usermanagement">User Management</a></li>
-            <li><a href="/admin/categorymanagement">Category Management</a></li>
-            <li><a href="/productmanagement">Product Management</a></li>
-            <li><a href="/admin/orderManagement">Order Management</a></li>
-            <li><a href="/couponManagement">Coupon Management</a></li>
-            <li><a href="/salesReport">Sales</a></li>
-            <li><a href="/offerManagement">Offer Management</a></li>
-            <li><a href="/admin/adminLogin" id="logout-link">Logout</a></li>
+        <div class="sidebar-header">
+            <h2><i class="fas fa-tachometer-alt"></i> Admin Panel</h2>
+            <div class="menu-toggle">
+                <i class="fas fa-bars"></i>
+            </div>
+        </div>
+        <ul class="sidebar-menu">
+            <li class="menu-title">MAIN NAVIGATION</li>
+            <li class="menu-item">
+                <a href="/admin/dashboard" class="menu-link">
+                    <i class="fas fa-tachometer-alt"></i> Dashboard
+                </a>
+            </li>
+            <li class="menu-item has-submenu">
+                <a href="/admin/usermanagement" class="menu-link">
+                    <i class="fas fa-users"></i> User Management
+                </a>
+                <ul class="submenu">
+                    <li class="menu-item">
+                        <a href="/admin/usermanagement" class="menu-link">All Users</a>
+                    </li>
+                    <li class="menu-item">
+                        <a href="#" class="menu-link">Add User</a>
+                    </li>
+                </ul>
+            </li>
+            <li class="menu-item has-submenu">
+                <a href="/admin/categorymanagement" class="menu-link active">
+                    <i class="fas fa-tags"></i> Category Management
+                </a>
+                <ul class="submenu">
+                    <li class="menu-item">
+                        <a href="/admin/categorymanagement" class="menu-link">All Categories</a>
+                    </li>
+                    <li class="menu-item">
+                        <a href="/admin/addcategory" class="menu-link">Add Category</a>
+                    </li>
+                </ul>
+            </li>
+            <li class="menu-item has-submenu">
+                <a href="/productmanagement" class="menu-link">
+                    <i class="fas fa-box-open"></i> Product Management
+                </a>
+                <ul class="submenu">
+                    <li class="menu-item">
+                        <a href="/productmanagement" class="menu-link">All Products</a>
+                    </li>
+                    <li class="menu-item">
+                        <a href="#" class="menu-link">Add Product</a>
+                    </li>
+                </ul>
+            </li>
+            <li class="menu-item">
+                <a href="/admin/orderManagement" class="menu-link">
+                    <i class="fas fa-shopping-cart"></i> Order Management
+                </a>
+            </li>
+            <li class="menu-item">
+                <a href="/couponManagement" class="menu-link">
+                    <i class="fas fa-ticket-alt"></i> Coupon Management
+                </a>
+            </li>
+            <li class="menu-item">
+                <a href="/salesReport" class="menu-link">
+                    <i class="fas fa-chart-line"></i> Sales Report
+                </a>
+            </li>
+            <li class="menu-item">
+                <a href="/offerManagement" class="menu-link">
+                    <i class="fas fa-percentage"></i> Offer Management
+                </a>
+            </li>
+            <li class="menu-item">
+                <a href="/admin/adminLogin" class="menu-link" id="logout-link">
+                    <i class="fas fa-sign-out-alt"></i> Logout
+                </a>
+            </li>
         </ul>
     </div>
 
     <!-- Main Content -->
     <div class="main-content">
-        <div style="display: flex; justify-content: space-between; align-items: center;">
-            <h2 class="heading" style="flex-grow: 1; text-align: center;">Category Management</h2>
-            <button id="add-category-btn" class="btn-success" style="margin-right: 20px; padding: 8px 15px; font-weight: bold; cursor: pointer;">
-                + Add Category
+        <div class="button-container">
+            <h2 class="heading">Category Management</h2>
+            <button id="add-category-btn" class="add-category-btn">
+                <i class="fas fa-plus"></i> Add Category
             </button>
         </div>
         
-        <!-- Search and Filter Form -->
-        <form action="/admin/categorymanagement" method="GET">
-        </form>
-        
-        <!-- User Table -->
-        <table id="example" class="table-striped" style="width: 100%;">
+        <!-- Category Table -->
+        <table id="example" class="table-striped">
             <thead>
                 <tr>
                     <th>Id</th>
@@ -246,16 +460,16 @@
                         <td><%= category.name %></td>
                         <td>
                             <% if(category.islisted){ %>
-                                <span style="color: green;">listed</span>
+                                <span style="color: green;">Listed</span>
                             <% } else { %>
                                 <span style="color: red;">Unlisted</span>
                             <% } %>
                         </td>
                         <td>
                             <% if (!category.islisted) { %>
-                                <a href="/admin/unListcategory/<%= category._id %>" class="btn-success" style="background-color: red;">UnList</a>
+                                <a href="/admin/unListcategory/<%= category._id %>" class="btn-success">List</a>
                             <% } else { %>
-                                <a href="/admin/unListcategory/<%= category._id %>" class="btn btn-danger" style="background-color: green;">List</a>
+                                <a href="/admin/unListcategory/<%= category._id %>" class="btn-danger">Unlist</a>
                             <% } %>
                             <a href="/admin/editcategory/<%= category._id %>" class="btn-edit">Edit</a>
                         </td>
@@ -265,26 +479,52 @@
         </table>
     </div>
     <script>
-        // Add event listener to the "Add Category" button
-        document.getElementById('add-category-btn').addEventListener('click', function () {
-            // Redirect to the addcategory page
-            window.location.href = "/admin/addcategory";
-        });
-        
-        document.getElementById('logout-link').addEventListener('click', function (e) {
-            e.preventDefault(); // Prevent the default link behavior
+        document.addEventListener('DOMContentLoaded', function () {
+            // Toggle mobile menu
+            const menuToggle = document.querySelector('.menu-toggle');
+            const sidebarMenu = document.querySelector('.sidebar-menu');
+            
+            if (menuToggle && sidebarMenu) {
+                menuToggle.addEventListener('click', function() {
+                    sidebarMenu.classList.toggle('active');
+                });
+            }
 
-            Swal.fire({
-                title: "Are you sure you want to logout?",
-                icon: "question",
-                showCancelButton: true,
-                confirmButtonText: "Yes, logout",
-                cancelButtonText: "Cancel",
-            }).then((result) => {
-                if (result.isConfirmed) {
-                    // Redirect to the logout route
-                    window.location.href = "/admin/adminLogin";
-                }
+            // Handle submenu toggling
+            const hasSubmenuItems = document.querySelectorAll('.has-submenu');
+            
+            hasSubmenuItems.forEach(item => {
+                const link = item.querySelector('a');
+                const submenu = item.querySelector('.submenu');
+                
+                link.addEventListener('click', function(e) {
+                    if (window.innerWidth < 768) {
+                        e.preventDefault();
+                        item.classList.toggle('active');
+                        submenu.classList.toggle('active');
+                    }
+                });
+            });
+
+            // Add event listener to the "Add Category" button
+            document.getElementById('add-category-btn').addEventListener('click', function () {
+                window.location.href = "/admin/addcategory";
+            });
+            
+            document.getElementById('logout-link').addEventListener('click', function (e) {
+                e.preventDefault();
+                
+                Swal.fire({
+                    title: "Are you sure you want to logout?",
+                    icon: "question",
+                    showCancelButton: true,
+                    confirmButtonText: "Yes, logout",
+                    cancelButtonText: "Cancel",
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        window.location.href = "/admin/adminLogin";
+                    }
+                });
             });
         });
     </script>

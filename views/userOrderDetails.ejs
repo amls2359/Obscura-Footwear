@@ -112,10 +112,15 @@
         
         .logout-link {
             padding: 8px 18px;
-            border-radius: 4px;
             transition: all 0.3s ease;
             font-weight: 600;
             margin-left: 20px;
+            color: #333;
+        }
+        
+        .logout-link:hover {
+            color: white;
+            border-color: #f74f10;
         }
 
         .mobile-menu-toggle {
@@ -130,15 +135,16 @@
         /* Fixed Sidebar Styles */
         #sidebar {
             width: 200px;
-            height: calc(100vh - 70px); /* Full viewport height minus header */
+            height: calc(100vh - 70px);
             background: #fff;
             box-shadow: 2px 0 10px rgba(0,0,0,0.1);
             position: fixed;
             left: 0;
-            top: 70px; /* Below the header */
+            top: 70px;
             overflow-y: auto;
             z-index: 999;
         }
+        
         .sidebar-content {
             padding: 20px 0;
             height: 100%;
@@ -173,15 +179,21 @@
             color: #f74f10;
             border-left: 3px solid #f74f10;
         }
-        
-        /* Main content area */
-        main {
-            margin-left: 200px; /* Same as sidebar width */
-            padding: 30px;
-            min-height: calc(100vh - 70px - 4rem); /* Viewport height minus header and footer */
-            position: relative;
+
+        /* Main Content Styles */
+        .content-wrapper {
+            display: flex;
+            flex: 1;
+            margin-left: 200px;
+            min-height: calc(100vh - 70px - 4rem);
         }
         
+        .main-content {
+            flex: 1;
+            padding: 2rem;
+            background-color: #f8f9fa;
+        }
+
         /* Order Details Styles */
         #heading {
             color: #333;
@@ -190,7 +202,7 @@
             border-bottom: 1px solid #eee;
         }
         
-        .main-content {
+        .order-content {
             background: #fff;
             border-radius: 8px;
             box-shadow: 0 2px 15px rgba(0,0,0,0.1);
@@ -369,8 +381,8 @@
             background-color: #141d2a;
             color: white;
             padding: 4rem 0;
-            margin-left: 200px; /* Same as sidebar width */
-            width: calc(100% - 200px); /* Full width minus sidebar */
+            margin-left: 200px;
+            width: calc(100% - 200px);
         }
         .footer-container {
             max-width: 1200px;
@@ -430,8 +442,39 @@
         }
         
         @media (max-width: 768px) {
+            .content-wrapper {
+                flex-direction: column;
+                margin-left: 0;
+            }
+            
+            #sidebar {
+                width: 100%;
+                height: auto;
+                position: static;
+            }
+            
+            .main-content {
+                width: 100%;
+                margin-left: 0;
+                padding: 1.5rem;
+            }
+            
+            .simple-footer {
+                width: 100%;
+                margin-left: 0;
+            }
+            
+            .order-item {
+                flex: 1 1 100%;
+            }
+
             /* Mobile menu styles */
+            .mobile-menu-toggle {
+                display: block;
+            }
+            
             .nav-links {
+                display: none;
                 position: fixed;
                 top: 70px;
                 left: -100%;
@@ -441,10 +484,11 @@
                 padding: 20px;
                 gap: 15px;
                 box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
-                transition: 0.3s ease;
+                transition: 0.5s;
             }
             
             .nav-links.active {
+                display: flex;
                 left: 0;
             }
             
@@ -466,36 +510,6 @@
                 width: 100%;
                 text-align: left;
                 padding: 8px 0;
-            }
-            
-            .mobile-menu-toggle {
-                display: block;
-            }
-
-            /* Sidebar styles */
-            #sidebar {
-                transform: translateX(-100%);
-                height: calc(100vh - 70px);
-                top: 70px;
-                z-index: 1000;
-            }
-            
-            #sidebar.active {
-                transform: translateX(0);
-            }
-            
-            main {
-                margin-left: 0;
-                width: 100%;
-            }
-            
-            .simple-footer {
-                margin-left: 0;
-                width: 100%;
-            }
-            
-            .order-item {
-                flex: 1 1 100%;
             }
         }
 
@@ -554,57 +568,59 @@
     </div>
 
     <!-- Main Content -->
-    <main>
-        <h4 id="heading">Order Details</h4>
+    <div class="content-wrapper">
         <div class="main-content">
-            <div class="checking">
-            <% if (orders.length === 0) { %>
-                <p style="color: red;">No orders are placed</p>
-            <% } else { %>
-                <% orders.forEach(order => { %>
-                    <% order.productCollection.forEach(product => { %>
-                        <div class="order-item">
-                            <div class="image">
-                                <img src="<%= product.image[0] %>" alt="<%= product.productname %>">
+            <h4 id="heading">Order Details</h4>
+            <div class="order-content">
+                <div class="checking">
+                <% if (orders.length === 0) { %>
+                    <p style="color: red;">No orders are placed</p>
+                <% } else { %>
+                    <% orders.forEach(order => { %>
+                        <% order.productCollection.forEach(product => { %>
+                            <div class="order-item">
+                                <div class="image">
+                                    <img src="<%= product.image[0] %>" alt="<%= product.productname %>">
+                                </div>
+                                <span class="product-name">
+                                    <h4><%= product.productname %></h4>
+                                </span>
+                                <span class="price">
+                                    <label class="productprice">₹<%= product.finalPrice %></label>
+                                </span>
+                                <span class="quantity">
+                                    <label class="quantity">Quantity: <%= product.quantity %></label>
+                                </span>
+                                <span class="status">
+                                    <label class="status"><strong>Status:</strong> <span data-status="<%= product.status %>"><%= product.status %></span></label>
+                                </span>
+
+                             <div class="view">
+                       <a class="viewdetails" href="/productdetails/<%= product.productid %>">View</a>
+
+                   <% if (product.status === 'pending' || product.status === 'shipped') { %>
+                   <a class="cancelorder" href="/cancelOrder/<%=order._id%>/<%=product.productid %>" data-order-id="<%=order._id%>" data-product-id="<%=product.productid%>">Cancel Order</a>
+                   <% } else if (product.status === 'cancelled') { %>
+                   <a class="cancelorder cancelled" style="cursor: not-allowed;">Cancelled</a>
+                      <% } %>
+
+                       <% if (product.status === 'delivered') { %>
+                        <a class="returnproducts" href="/returnOrder/<%=order._id%>/<%=product.productid %>" data-order-id="<%=order._id%>" data-product-id="<%=product.productid%>">Return Products</a>
+                      <% } else if (product.status === 'returned') { %>
+                        <a class="returnproducts returned" style="cursor: not-allowed;">Returned</a>
+                       <% } %>
+
+                           <a class="orderdetails" href="/orderDetails/<%=order._id %>/<%= product.productid %>">Order Details</a>
+                           </div>
+
                             </div>
-                            <span class="product-name">
-                                <h4><%= product.productname %></h4>
-                            </span>
-                            <span class="price">
-                                <label class="productprice">₹<%= product.finalPrice %></label>
-                            </span>
-                            <span class="quantity">
-                                <label class="quantity">Quantity: <%= product.quantity %></label>
-                            </span>
-                            <span class="status">
-                                <label class="status"><strong>Status:</strong> <span data-status="<%= product.status %>"><%= product.status %></span></label>
-                            </span>
-
-                         <div class="view">
-                   <a class="viewdetails" href="/productdetails/<%= product.productid %>">View</a>
-
-               <% if (product.status === 'pending' || product.status === 'shipped') { %>
-               <a class="cancelorder" href="/cancelOrder/<%=order._id%>/<%=product.productid %>" data-order-id="<%=order._id%>" data-product-id="<%=product.productid%>">Cancel Order</a>
-               <% } else if (product.status === 'cancelled') { %>
-               <a class="cancelorder cancelled" style="cursor: not-allowed;">Cancelled</a>
-                  <% } %>
-
-                   <% if (product.status === 'delivered') { %>
-                    <a class="returnproducts" href="/returnOrder/<%=order._id%>/<%=product.productid %>" data-order-id="<%=order._id%>" data-product-id="<%=product.productid%>">Return Products</a>
-                  <% } else if (product.status === 'returned') { %>
-                    <a class="returnproducts returned" style="cursor: not-allowed;">Returned</a>
-                   <% } %>
-
-                       <a class="orderdetails" href="/orderDetails/<%=order._id %>/<%= product.productid %>">Order Details</a>
-                       </div>
-
-                        </div>
+                        <% }) %>
                     <% }) %>
-                <% }) %>
-            <% } %>
+                <% } %>
+                </div>
             </div>
         </div>
-    </main>
+    </div>
   
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 

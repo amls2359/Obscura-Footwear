@@ -5,15 +5,15 @@ const profileController = require('../controllers/userProfileController')
 
 
 router.get('/userProfile',checkSessionBlocked ,profileController.userProfileget)
-router.get('/editProfile',profileController.editProfileGet)
-router.post('/updateProfile',profileController.editProfilePost)
-router.get('/changepassword',profileController.changePasswordGet)
-router.post('/updatedPassword',profileController.changePasswordPost)
+router.get('/editProfile',checkSessionBlocked,profileController.editProfileGet)
+router.post('/updateProfile',checkSessionBlocked,profileController.editProfilePost)
+router.get('/changepassword',checkSessionBlocked,profileController.changePasswordGet)
+router.post('/updatedPassword',checkSessionBlocked,profileController.changePasswordPost)
 router.get('/userAddress',checkSessionBlocked,profileController.showUserAddress)
 router.get('/addAddress',checkSessionBlocked,profileController.addAddress)
-router.post('/addAddressPost',profileController.addAddressPost)
-router.get('/editAddress/:id',profileController.editAddressGet)
-router.post('/editAddressPost/:id',profileController.editAddresspost)
-router.get('/deleteAddress/:id',profileController.deleteAddress)
+router.post('/addAddressPost',checkSessionBlocked,profileController.addAddressPost)
+router.get('/editAddress/:id',checkSessionBlocked,profileController.editAddressGet)
+router.post('/editAddressPost/:id',checkSessionBlocked,profileController.editAddresspost)
+router.get('/deleteAddress/:id',checkSessionBlocked,profileController.deleteAddress)
 
 module.exports=router

@@ -7,80 +7,144 @@
     <style>
         /* General Styles */
         body { 
-            font-family: Arial, sans-serif; 
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             margin: 0;
             padding: 0;
             display: flex;
+            flex-direction: column;
             min-height: 100vh;
             background-color: #f5f5f5;
         }
         
         /* Sidebar Styles */
         .sidebar {
-            width: 215px;
-            background-color: #333;
+            width: 100%;
+            background-color: #2c3e50;
             color: white;
-            padding: 20px;
-            height: 100vh;
-            position: fixed;
             box-shadow: 2px 0 5px rgba(0,0,0,0.1);
-            z-index: 10;
+            order: 1;
+            overflow-y: auto;
         }
         
-        .sidebar h2 {
-            text-align: center;
-            color: white;
-            margin-bottom: 30px;
-            padding-bottom: 10px;
-            border-bottom: 1px solid #444;
+        .sidebar-header {
+            padding: 20px 15px;
+            background-color: #1a252f;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
         }
-
-        .sidebar ul {
-            list-style-type: none;
+        
+        .sidebar-header h2 {
+            color: white;
+            margin: 0;
+            font-size: 1.3rem;
+            font-weight: 600;
+        }
+        
+        .sidebar-menu {
             padding: 0;
             margin: 0;
+            list-style: none;
         }
-
-        .sidebar ul li {
-            margin: 15px 0;
+        
+        .menu-title {
+            padding: 12px 15px;
+            color: #b8c7ce;
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            font-weight: 600;
+            margin-top: 10px;
         }
-
-        .sidebar ul li a {
-            color: #fff;
-            text-decoration: none;
+        
+        .menu-item {
+            position: relative;
+        }
+        
+        .menu-item.has-submenu > a::after {
+            content: "▸";
+            position: absolute;
+            right: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            transition: transform 0.3s;
+        }
+        
+        .menu-item.has-submenu.active > a::after {
+            transform: translateY(-50%) rotate(90deg);
+        }
+        
+        .menu-link {
             display: block;
-            padding: 8px 10px;
-            border-radius: 4px;
-            transition: background-color 0.3s;
+            padding: 12px 15px;
+            color: #b8c7ce;
+            text-decoration: none;
+            transition: all 0.3s;
+            position: relative;
+            font-size: 0.95rem;
         }
-
-        .sidebar ul li a:hover {
-            background-color: #444;
+        
+        .menu-link:hover,
+        .menu-link.active {
+            color: white;
+            background-color: #1a252f;
+        }
+        
+        .menu-link i {
+            margin-right: 10px;
+            width: 20px;
+            text-align: center;
+        }
+        
+        .submenu {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+            background-color: #1a252f;
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.3s ease-out;
+        }
+        
+        .submenu.active {
+            max-height: 500px;
+        }
+        
+        .submenu .menu-link {
+            padding-left: 45px;
+        }
+        
+        .menu-toggle {
+            display: none;
+            padding: 15px;
+            color: white;
+            font-size: 1.5rem;
+            cursor: pointer;
         }
         
         /* Main Content Styles */
-        .main_content {
+        .main-content {
             flex: 1;
-            margin-left: 250px;
-            padding: 20px 20px 20px 30px;
+            padding: 15px;
             background-color: white;
-            border-radius: 5px;
             box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-            position: relative;
-            z-index: 1;
+            order: 2;
         }
         
         .header-container {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 20px;
+            margin-bottom: 15px;
+            flex-wrap: wrap;
         }
         
         .heading {
             flex-grow: 1;
             text-align: center;
             color: #333;
+            font-size: 1.4rem;
+            margin: 10px 0;
         }
         
         /* Table Container Styles */
@@ -88,39 +152,45 @@
             max-height: 500px;
             overflow-y: auto;
             margin-top: 20px;
-            border: 1px solid #ddd;
+            border: 1px solid #ebdcdc;
             border-radius: 5px;
-            position: relative;
-            z-index: 1;
         }
         
         /* Table Styles */
         table {
             width: 100%;
             border-collapse: collapse;
+            margin-top: 15px;
+            border: 1px solid #ebdcdc;
         }
-        
-        th, td {
-            padding: 12px;
+
+        table th, table td {
+            padding: 10px;
             text-align: left;
-            border: 1px solid #ddd;
+            border-bottom: 1px solid #ddd;
+            border-right: 1px solid #ddd;
         }
-        
-        th {
+
+        table th {
             background-color: #333;
             color: #fff;
-            font-weight: bold;
-            border: 1px solid #444;
+            border-right: 1px solid #555;
+            font-size: 0.9rem;
             position: sticky;
             top: 0;
-            z-index: 5;
+            z-index: 10;
         }
-        
-        tr:nth-child(even) {
+
+        table th:last-child,
+        table td:last-child {
+            border-right: none;
+        }
+
+        table tr:nth-child(even) {
             background-color: #f9f9f9;
         }
-        
-        tr:hover {
+
+        table tr:hover {
             background-color: #f1f1f1;
         }
         
@@ -138,18 +208,26 @@
         }
         
         .btn-success {
-            background-color: #4CAF50;
+            background-color: #28a745;
             color: white;
         }
         
         .btn-danger {
-            background-color: #f44336;
+            background-color: #dc3545;
             color: white;
         }
         
-        .btn-edit {
-            background-color: #2196F3;
+        .btn-primary {
+            background-color: #007bff;
             color: white;
+            padding: 8px 15px;
+            border-radius: 4px;
+            font-weight: bold;
+            text-decoration: none;
+        }
+        
+        .btn-primary:hover {
+            background-color: #0069d9;
         }
         
         /* Dropdown Styles */
@@ -159,21 +237,24 @@
             border: 1px solid #ddd;
             background-color: white;
             cursor: pointer;
+            width: 100%;
+            max-width: 150px;
         }
         
         /* Update Button */
         .update {
-            background-color: #4CAF50;
+            background-color: #28a745;
             color: white;
             padding: 6px 12px;
             border: none;
             border-radius: 4px;
             cursor: pointer;
             transition: background-color 0.3s;
+            font-size: 0.8rem;
         }
         
         .update:hover {
-            background-color: #45a049;
+            background-color: #218838;
         }
         
         /* Status Styles */
@@ -188,12 +269,12 @@
         }
         
         .status-cancelled {
-            color: #f44336;
+            color: #dc3545;
             font-weight: bold;
         }
         
         .status-delivered {
-            color: #4CAF50;
+            color: #28a745;
             font-weight: bold;
         }
         
@@ -208,58 +289,195 @@
             gap: 5px;
         }
         
+        /* Form Styles */
+        .status-form {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+        }
+
         /* Responsive Adjustments */
-        @media (max-width: 768px) {
+        @media (min-width: 768px) {
+            body {
+                flex-direction: row;
+            }
+            
             .sidebar {
-                width: 100%;
-                height: auto;
+                width: 250px;
+                height: 100vh;
+                position: fixed;
+                order: 0;
+            }
+            
+            .main-content {
+                margin-left: 250px;
+                padding: 20px;
+            }
+            
+            .menu-toggle {
+                display: none;
+            }
+            
+            .status-form {
+                flex-direction: row;
+                align-items: center;
+            }
+        }
+
+        @media (min-width: 992px) {
+            .heading {
+                font-size: 1.6rem;
+            }
+            
+            .sidebar-header h2 {
+                font-size: 1.5rem;
+            }
+            
+            .menu-link {
+                font-size: 1rem;
+            }
+            
+            table th, table td {
+                padding: 12px;
+            }
+        }
+
+        @media (max-width: 767px) {
+            .sidebar {
                 position: relative;
-                padding: 10px;
+                height: auto;
             }
             
-            .main_content {
-                margin-left: 0;
-                padding: 15px;
+            .sidebar-menu {
+                display: none;
             }
             
-            .table-container {
-                max-height: none;
-                overflow-y: visible;
+            .sidebar-menu.active {
+                display: block;
+            }
+            
+            .menu-toggle {
+                display: block;
+            }
+            
+            /* Adjust table for mobile */
+            table {
+                display: block;
+                overflow-x: auto;
+                white-space: nowrap;
+            }
+            
+            .dropdown select {
+                max-width: 100%;
             }
             
             .action-buttons {
                 flex-direction: column;
-                gap: 3px;
+            }
+        }
+
+        /* Print Styles */
+        @media print {
+            .sidebar {
+                display: none;
             }
             
-            th, td {
-                padding: 8px;
-                font-size: 14px;
+            .main-content {
+                margin-left: 0;
+                padding: 0;
+                box-shadow: none;
             }
         }
     </style>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 </head>
 <body>
     <!-- Sidebar -->
     <div class="sidebar">
-        <h2>Admin Panel</h2>
-        <ul>
-            <li><a href="/admin/dashboard">Dashboard</a></li>
-            <li><a href="/admin/usermanagement">User Management</a></li>
-            <li><a href="/admin/categorymanagement">Category Management</a></li>
-            <li><a href="/productmanagement">Product Management</a></li>
-            <li><a href="/admin/orderManagement">Order Management</a></li>
-            <li><a href="/couponManagement">Coupon Management</a></li>
-            <li><a href="/salesReport">Sales</a></li>
-            <li><a href="/offerManagement">Offer Management</a></li>
-            <li><a href="/admin/adminLogin" id="logout-link">Logout</a></li>
+        <div class="sidebar-header">
+            <h2><i class="fas fa-tachometer-alt"></i> Admin Panel</h2>
+            <div class="menu-toggle">
+                <i class="fas fa-bars"></i>
+            </div>
+        </div>
+        <ul class="sidebar-menu">
+            <li class="menu-title">MAIN NAVIGATION</li>
+            <li class="menu-item">
+                <a href="/admin/dashboard" class="menu-link">
+                    <i class="fas fa-tachometer-alt"></i> Dashboard
+                </a>
+            </li>
+            <li class="menu-item has-submenu">
+                <a href="/admin/usermanagement" class="menu-link">
+                    <i class="fas fa-users"></i> User Management
+                </a>
+                <ul class="submenu">
+                    <li class="menu-item">
+                        <a href="/admin/usermanagement" class="menu-link">All Users</a>
+                    </li>
+                    <li class="menu-item">
+                        <a href="#" class="menu-link">Add User</a>
+                    </li>
+                </ul>
+            </li>
+            <li class="menu-item has-submenu">
+                <a href="/admin/categorymanagement" class="menu-link">
+                    <i class="fas fa-tags"></i> Category Management
+                </a>
+                <ul class="submenu">
+                    <li class="menu-item">
+                        <a href="/admin/categorymanagement" class="menu-link">All Categories</a>
+                    </li>
+                    <li class="menu-item">
+                        <a href="#" class="menu-link">Add Category</a>
+                    </li>
+                </ul>
+            </li>
+            <li class="menu-item has-submenu">
+                <a href="/productmanagement" class="menu-link">
+                    <i class="fas fa-box-open"></i> Product Management
+                </a>
+                <ul class="submenu">
+                    <li class="menu-item">
+                        <a href="/productmanagement" class="menu-link">All Products</a>
+                    </li>
+                    <li class="menu-item">
+                        <a href="#" class="menu-link">Add Product</a>
+                    </li>
+                </ul>
+            </li>
+            <li class="menu-item">
+                <a href="/admin/orderManagement" class="menu-link active">
+                    <i class="fas fa-shopping-cart"></i> Order Management
+                </a>
+            </li>
+            <li class="menu-item">
+                <a href="/couponManagement" class="menu-link">
+                    <i class="fas fa-ticket-alt"></i> Coupon Management
+                </a>
+            </li>
+            <li class="menu-item">
+                <a href="/salesReport" class="menu-link">
+                    <i class="fas fa-chart-line"></i> Sales Report
+                </a>
+            </li>
+            <li class="menu-item">
+                <a href="/offerManagement" class="menu-link">
+                    <i class="fas fa-percentage"></i> Offer Management
+                </a>
+            </li>
+            <li class="menu-item">
+                <a href="/admin/adminLogin" class="menu-link" id="logout-link">
+                    <i class="fas fa-sign-out-alt"></i> Logout
+                </a>
+            </li>
         </ul>
     </div>
 
     <!-- Main Content -->
-    <div class="main_content">
+    <div class="main-content">
         <div class="header-container">
             <h2 class="heading">Order Management</h2>
         </div>
@@ -298,7 +516,7 @@
                                             </span>
                                         </td>
                                         <td>
-                                            <form action="/admin/updateOrder/<%=order._id%>/<%=product.productid %>" method="post">
+                                            <form action="/admin/updateOrder/<%=order._id%>/<%=product.productid %>" method="post" class="status-form">
                                                 <div class="dropdown">
                                                     <select name="status" class="form-select" aria-label="Select Status">
                                                         <option value="pending" <%= product.status === 'pending' ? 'selected' : '' %>>Pending</option>
@@ -310,7 +528,7 @@
                                                 </div>
                                                 <input type="hidden" name="orderId" value="<%= order._id %>">
                                                 <input type="hidden" name="productId" value="<%= product.productid %>">
-                                                <div class="action-buttons" style="margin-top: 5px;">
+                                                <div class="action-buttons">
                                                     <% if(product.status !== 'cancelled' && product.status !== 'delivered' && product.status !== 'returned'){ %>
                                                         <button type="submit" class="update">Update</button>
                                                     <% } %>
@@ -327,22 +545,63 @@
             </table>
         </div>
     </div>
+    
     <script>
-        document.getElementById('logout-link').addEventListener('click', function (e) {
-            e.preventDefault(); // Prevent the default link behavior
+        document.addEventListener('DOMContentLoaded', function () {
+            // Toggle mobile menu
+            const menuToggle = document.querySelector('.menu-toggle');
+            const sidebarMenu = document.querySelector('.sidebar-menu');
+            
+            if (menuToggle && sidebarMenu) {
+                menuToggle.addEventListener('click', function() {
+                    sidebarMenu.classList.toggle('active');
+                });
+            }
 
-            Swal.fire({
-                title: "Are you sure you want to logout?",
-                icon: "question",
-                showCancelButton: true,
-                confirmButtonText: "Yes, logout",
-                cancelButtonText: "Cancel",
-            }).then((result) => {
-                if (result.isConfirmed) {
-                    // Redirect to the logout route
-                    window.location.href = "/admin/adminLogin";
-                }
+            // Handle submenu toggling
+            const hasSubmenuItems = document.querySelectorAll('.has-submenu');
+            
+            hasSubmenuItems.forEach(item => {
+                const link = item.querySelector('a');
+                const submenu = item.querySelector('.submenu');
+                
+                link.addEventListener('click', function(e) {
+                    if (window.innerWidth < 768) {
+                        e.preventDefault();
+                        item.classList.toggle('active');
+                        submenu.classList.toggle('active');
+                    }
+                });
             });
+
+            // Logout confirmation
+            document.getElementById('logout-link').addEventListener('click', function (e) {
+                e.preventDefault();
+                
+                Swal.fire({
+                    title: "Are you sure you want to logout?",
+                    icon: "question",
+                    showCancelButton: true,
+                    confirmButtonText: "Yes, logout",
+                    cancelButtonText: "Cancel",
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        window.location.href = "/admin/adminLogin";
+                    }
+                });
+            });
+
+            // Handle window resize for sidebar
+            function handleResize() {
+                if (window.innerWidth >= 768) {
+                    sidebarMenu.classList.add('active');
+                } else {
+                    sidebarMenu.classList.remove('active');
+                }
+            }
+
+            window.addEventListener('resize', handleResize);
+            handleResize(); // Initialize on load
         });
     </script>
 </body>

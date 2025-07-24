@@ -29,7 +29,7 @@ passport.use(
   new GoogleStrategy (
     {
     callbackURL: process.env.GOOGLE_CALLBACK_URL,
-    clientID:process.env.CLIENT_ID,
+    clientID :  process.env.CLIENT_ID,
     clientSecret:process.env.CLIENT_SECRET,
   },
   (accessToken,refreshToken,profile,done)=>{

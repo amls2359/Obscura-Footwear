@@ -476,7 +476,7 @@ const cancelOrder = async(req,res)=>
 const orderReturn = async (req, res) => {
   console.log('🚀 Entered in product return');
   try {
-    const orderId = req.params.userId; // Should be the order ID
+    const orderId = req.params.orderId; // Should be the order ID
     const productId = req.params.productId;
     const selectedStatus = 'returned';
     const userSessionId = req.session.userid;
