@@ -476,7 +476,7 @@ const cancelOrder = async(req,res)=>
 const orderReturn = async (req, res) => {
   console.log('🚀 Entered in product return');
   try {
-    const orderId = req.params.userId; // Should be the order ID, rename accordingly if needed
+    const orderId = req.params.userId; // Should be the order ID
     const productId = req.params.productId;
     const selectedStatus = 'returned';
     const userSessionId = req.session.userid;
@@ -513,17 +513,20 @@ const orderReturn = async (req, res) => {
     console.log(`📦 Quantity: ${quantity}`);
     console.log(`🎁 Product Offer: ${productoffer}`);
 
-    // Calculate refund
+    // Calculate refund amount
     const offerPerUnit = productoffer / quantity;
     const pricePerUnitWithOffer = price + offerPerUnit;
     const grossRefund = pricePerUnitWithOffer * quantity;
 
-    let totalRefund = grossRefund - productoffer;
+    let totalRefund = grossRefund;
 
-    if (order.Discount && order.Discount > 0) {
-      totalRefund -= order.Discount;
-      console.log(`🏷️ Discount applied: ${order.Discount}`);
+    // Apply proportional discount if applicable
+    if (order.Discount && order.intDiscount) {
+      totalRefund -= order.intDiscount * quantity;
+      console.log(`🏷️ Discount applied per item: ${order.intDiscount}`);
     }
+
+    console.log(`💰 Gross Refund before tax: ${totalRefund}`);
 
     // Update product status inside the productCollection array
     await OrderCollection.updateOne(
@@ -536,12 +539,14 @@ const orderReturn = async (req, res) => {
       { _id: productId },
       { $inc: { stock: quantity } }
     );
-   const paymentMethod = order.paymentMethod?.trim().toLowerCase();
-    // If payment method is eligible for refund
+
+    const paymentMethod = order.paymentMethod?.trim().toLowerCase();
+
     if (
-      order.paymentMethod === 'Net Banking' ||order.paymentMethod === 'Cash on Delivery'
+      paymentMethod === 'net banking' ||
+      paymentMethod === 'cash on delivery'
     ) {
-      console.log(`💳 Payment Method: ${order.paymentMethod}`);
+      console.log(`💳 Payment Method (normalized): ${paymentMethod}`);
 
       const taxAmount = totalRefund * TAX_RATE;
       totalRefund += taxAmount;
@@ -551,10 +556,11 @@ const orderReturn = async (req, res) => {
 
       const user = await UserCollection.findOneAndUpdate(
         { _id: userSessionId },
-        { $inc: { wallet: totalRefund } }
+        { $inc: { wallet: totalRefund } },
+        { new: true }
       );
 
-      console.log('👛 Wallet updated for user:', user);
+      console.log('👛 Wallet updated for user:', user?.username || userSessionId);
 
       // Create wallet transaction record
       await Wallet.create({
@@ -567,7 +573,7 @@ const orderReturn = async (req, res) => {
       console.log('📜 Wallet transaction recorded ✅');
     }
 
-    // Update local product status and save
+    // Update local product status and save the updated order
     product.status = selectedStatus;
     await order.save();
 
