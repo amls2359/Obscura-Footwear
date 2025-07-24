@@ -540,6 +540,8 @@ const orderReturn = async (req, res) => {
       order.paymentMethod === 'Net Banking' ||
       order.paymentMethod === 'Cash on Delivery'
     ) {
+      console.log('paymentmethod:',order.paymentMethod);
+      
       const taxAmount = totalRefund * TAX_RATE;
       totalRefund += taxAmount;
 
