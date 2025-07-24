@@ -491,36 +491,51 @@ const orderManagementGet = async(req,res)=>
   }
 }
 
-const updateOrderPost = async(req,res)=>
-{
-    try
-    {
-      const {orderId,productId} = req.params
-      const{status}= req.body
-      console.log(orderId,productId,status);
+const updateOrderPost = async (req, res) => {
+  try {
+    const { orderId, productId } = req.params;
+    const { status } = req.body;
+    console.log('Update Request:', { orderId, productId, status });
 
-      const orders = await OrderCollection.findById(orderId)
-      if(!orders)
-       {
-        return res.status(404).send('cannot find the product')
-       }
-       await OrderCollection.findOneAndUpdate({_id:orderId,'productCollection.productid':productId},{$set:{'productCollection.$.status':status}},{new:true})
-       .then((success)=>{
-        console.log('updated',success);
-        res.redirect('/admin/orderManagement')
-       })
-       .catch((err)=>{
-        console.log('error',err);
-        res.status(500).send('Internal server error')
-       })
+    const order = await OrderCollection.findById(orderId);
+    if (!order) {
+      return res.status(404).send('Cannot find the order');
     }
-    catch(error)
-    {
-      console.log(error);
-      res.status(500).send('Internal server error')
-      
+
+    // Find the product inside the order
+    const productInOrder = order.productCollection.find(p => p.productid.toString() === productId);
+
+    if (!productInOrder) {
+      return res.status(404).send('Product not found in order');
     }
-}
+
+    // Proceed with status update
+    await OrderCollection.findOneAndUpdate(
+      { _id: orderId, 'productCollection.productid': productId },
+      { $set: { 'productCollection.$.status': status } },
+      { new: true }
+    );
+
+    // Wallet refund logic
+    if ((status === 'cancelled' || status === 'returned') &&
+        productInOrder.status !== 'cancelled' && productInOrder.status !== 'returned') {
+
+      const user = await User.findById(order.userid);
+      if (user) {
+        const refundAmount = productInOrder.price * productInOrder.quantity;
+        user.wallet += refundAmount;
+        await user.save();
+        console.log(`Refunded ₹${refundAmount} to ${user.username}'s wallet`);
+      }
+    }
+
+    res.redirect('/admin/orderManagement');
+  } catch (error) {
+    console.error('Error updating order status:', error);
+    res.status(500).send('Internal server error');
+  }
+};
+
 
 module.exports={
     adminLogin,
