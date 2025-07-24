@@ -540,15 +540,17 @@ const orderReturn = async (req, res) => {
       { $inc: { stock: quantity } }
     );
 
-   const rawPayment = order.paymentMethod || '';
-const paymentMethod = rawPayment.trim().toLowerCase();
+    const rawPayment = order.paymentMethod || '';
+    const paymentMethod = rawPayment.trim().toLowerCase();
+
+    console.log(`💳 Payment Method (normalized): [${paymentMethod}]`);
 
     if (
-      paymentMethod === 'net banking' ||
-      paymentMethod === 'cash on delivery'
+      paymentMethod.includes === 'net banking' ||
+      paymentMethod.includes === 'cash on delivery'
     ) 
     {
-      console.log(`💳 Payment Method (normalized): ${paymentMethod}`);
+      
 
       const taxAmount = totalRefund * TAX_RATE;
       totalRefund += taxAmount;
