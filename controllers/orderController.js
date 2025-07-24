@@ -474,16 +474,16 @@ const cancelOrder = async(req,res)=>
 }
 
 const orderReturn = async (req, res) => {
-  console.log('Entered in product return');
+  console.log('🚀 Entered in product return');
   try {
     const orderId = req.params.userId; // Should be the order ID, rename accordingly if needed
     const productId = req.params.productId;
     const selectedStatus = 'returned';
     const userSessionId = req.session.userid;
 
-    console.log(`Order ID is: ${orderId}`);
-    console.log(`Product ID is: ${productId}`);
-    console.log(`User session ID is: ${userSessionId}`);
+    console.log(`📦 Order ID: ${orderId}`);
+    console.log(`🛒 Product ID: ${productId}`);
+    console.log(`👤 User Session ID: ${userSessionId}`);
 
     const TAX_RATE = 0.03;
 
@@ -494,6 +494,7 @@ const orderReturn = async (req, res) => {
     });
 
     if (!order) {
+      console.log('❌ Order not found');
       return res.status(404).send('Order not found');
     }
 
@@ -502,14 +503,15 @@ const orderReturn = async (req, res) => {
     );
 
     if (!product) {
+      console.log('❌ Product not found in the order');
       return res.status(404).send('Product not found in the order');
     }
 
     const { price, quantity, productoffer = 0 } = product;
 
-    console.log('Price:', price);
-    console.log('Quantity:', quantity);
-    console.log('Product Offer:', productoffer);
+    console.log(`💰 Price: ${price}`);
+    console.log(`📦 Quantity: ${quantity}`);
+    console.log(`🎁 Product Offer: ${productoffer}`);
 
     // Calculate refund
     const offerPerUnit = productoffer / quantity;
@@ -520,7 +522,7 @@ const orderReturn = async (req, res) => {
 
     if (order.Discount && order.Discount > 0) {
       totalRefund -= order.Discount;
-      console.log('Discount applied:', order.Discount);
+      console.log(`🏷️ Discount applied: ${order.Discount}`);
     }
 
     // Update product status inside the productCollection array
@@ -540,20 +542,20 @@ const orderReturn = async (req, res) => {
       order.paymentMethod === 'Net Banking' ||
       order.paymentMethod === 'Cash on Delivery'
     ) {
-      console.log('paymentmethod:',order.paymentMethod);
-      
+      console.log(`💳 Payment Method: ${order.paymentMethod}`);
+
       const taxAmount = totalRefund * TAX_RATE;
       totalRefund += taxAmount;
 
-      console.log('Tax amount:', taxAmount);
-      console.log('Total refund including tax:', totalRefund);
+      console.log(`🧾 Tax Amount: ${taxAmount}`);
+      console.log(`💸 Total Refund (with tax): ${totalRefund}`);
 
       const user = await UserCollection.findOneAndUpdate(
         { _id: userSessionId },
         { $inc: { wallet: totalRefund } }
       );
 
-      console.log('Updated user:', user);
+      console.log('👛 Wallet updated for user:', user);
 
       // Create wallet transaction record
       await Wallet.create({
@@ -562,19 +564,23 @@ const orderReturn = async (req, res) => {
         amount: totalRefund,
         creditordebit: 'credit'
       });
+
+      console.log('📜 Wallet transaction recorded ✅');
     }
 
     // Update local product status and save
     product.status = selectedStatus;
     await order.save();
 
-    console.log('Product status updated to:', product.status);
+    console.log(`🔄 Product status updated to: ${product.status}`);
+    console.log('✅ Return process completed. Redirecting...');
     res.redirect('/userOrderDetails');
   } catch (error) {
-    console.error('Error in orderReturn:', error);
+    console.error('🛑 Error in orderReturn:', error);
     res.status(500).json({ success: false, message: 'Error returning order' });
   }
 };
+
 
 const Invoice = async (req, res) => {
   try {
