@@ -546,8 +546,8 @@ const orderReturn = async (req, res) => {
     console.log(`💳 Payment Method (normalized): [${paymentMethod}]`);
 
     if (
-      paymentMethod.includes === 'net banking' ||
-      paymentMethod.includes === 'cash on delivery'
+      paymentMethod.includes('net banking') ||
+      paymentMethod.includes ( 'cash on delivery')
     ) 
     {
       
