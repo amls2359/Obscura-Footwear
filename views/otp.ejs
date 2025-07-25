@@ -229,6 +229,8 @@
     </div>
   </div>
 
+  <% const _timeLeft = typeof timeLeft !== 'undefined' ? timeLeft : 60; %>
+
 <script>
     // Auto-focus first OTP input on page load
     document.querySelector('.otp-input').focus();
@@ -284,7 +286,11 @@
         }
     }
 
-    let timeLeft = 60;
+
+    let timeLeft = <%- JSON.stringify(_timeLeft) %>;
+
+
+
     let timerInterval; // Define as a global variable
     const timerElement = document.getElementById('time');
     const resendBtn = document.getElementById('resendBtn');

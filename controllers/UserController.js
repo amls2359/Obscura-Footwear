@@ -65,7 +65,19 @@ const userSignup = (req, res) => res.render('UserSignup', {
   });
 const guesthomepage = (req, res) => res.render('guesthomepage')
 const forgetPassword = (req, res) => res.render('forgetPassword');
-const otp = (req, res) => res.render('otp');
+
+const otp = (req, res) => {
+    const remainingTime = 60; //  Set default value
+    res.render('otp', {
+        timeLeft: remainingTime,
+        errorMessage: null,
+        successMessage: null,
+        userEmail: req.query.email || null,
+        showResendButton: false,
+        isInitialLoad: true
+    });
+};
+
 const resetPassword = (req, res) => res.render('ResetPassword');
 
 
@@ -180,6 +192,15 @@ const userLoginPost = async (req, res) => {
             });
         }
 
+    if (!user.password) {
+    return res.render('UserLogin', {
+        ...templateData,
+        email,
+        passwordError: 'This account was registered using Google. Please login with Google.'
+    });
+    }
+
+    
         const validPassword = bcrypt.compareSync(password, user.password);
         if (!validPassword) {
             return res.render('UserLogin', {
@@ -351,7 +372,8 @@ const forgetPasswordPost = async (req, res) => {
             errorMessage: null, 
             userEmail: email,
             showResendButton: false ,// Default value
-            isInitialLoad: true
+            isInitialLoad: true,
+            timeLeft:60
         });
 
     } catch (error) {
@@ -427,7 +449,9 @@ const otpVerifyPost = async (req, res) => {
         return res.render('ResetPassword', {
             email: email,
             errorMessage: null,
-            successMessage: null
+            successMessage: null,
+           timeLeft:remainingTime,
+
         });
 
     } catch (error) {
@@ -437,7 +461,7 @@ const otpVerifyPost = async (req, res) => {
             successMessage: null,
             userEmail: email,
             showResendButton: true,
-            // timeLeft:remainingTime,
+            timeLeft:remainingTime,
             isInitialLoad: false
         });
     }
@@ -555,12 +579,15 @@ const   resendOtpPost = async (req, res) => {
             });
         }
 
-        // Generate new OTP
         const otp = generateRandomOtp();
-        otpStorage[email] = {
-            otp,
-            timestamp: Date.now()
-        };
+
+        // Generate new OTP
+      await otpModel.findOneAndUpdate(
+      { email },
+     { otp, timestamp: Date.now() },
+     { upsert: true, new: true }
+      );
+
 
         // Send new OTP via email
         await sendOtpEmail(email, otp);
