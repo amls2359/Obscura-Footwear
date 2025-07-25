@@ -238,7 +238,7 @@
         }
         
         // Initialize validations
-        validateInputLength('productname', 50, 'Product name cannot exceed 50 characters and cannot be empty');
+        validateInputLength('productname', 30, 'Product name cannot exceed 30 characters and cannot be empty');
         validateInputLength('description', 400, 'Description cannot exceed 400 characters and cannot be empty');
         validateNumericInput('price');
         validateNumericInput('stock');
@@ -295,7 +295,6 @@ $('form').on('submit', function(e) {
         $('#submit-button').prop('disabled', true);
     }
 });
-
 </script>
 </body>
 </html>

@@ -7,125 +7,191 @@
     <style>
         /* General Styles */
         body { 
-            font-family: Arial, sans-serif; 
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             margin: 0;
             padding: 0;
             display: flex;
+            flex-direction: column;
             min-height: 100vh;
             background-color: #f5f5f5;
         }
         
         /* Sidebar Styles */
         .sidebar {
-            width: 215px;
-            background-color: #333;
+            width: 100%;
+            background-color: #2c3e50;
             color: white;
-            padding: 20px;
-            height: 100vh;
-            position: fixed;
             box-shadow: 2px 0 5px rgba(0,0,0,0.1);
-            z-index: 10;
+            order: 1;
+            overflow-y: auto;
         }
         
-        .sidebar h2 {
-            text-align: center;
-            color: white;
-            margin-bottom: 30px;
-            padding-bottom: 10px;
-            border-bottom: 1px solid #444;
+        .sidebar-header {
+            padding: 20px 15px;
+            background-color: #1a252f;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
         }
-
-        .sidebar ul {
-            list-style-type: none;
+        
+        .sidebar-header h2 {
+            color: white;
+            margin: 0;
+            font-size: 1.3rem;
+            font-weight: 600;
+        }
+        
+        .sidebar-menu {
             padding: 0;
             margin: 0;
+            list-style: none;
         }
-
-        .sidebar ul li {
-            margin: 15px 0;
+        
+        .menu-title {
+            padding: 12px 15px;
+            color: #b8c7ce;
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            font-weight: 600;
+            margin-top: 10px;
         }
-
-        .sidebar ul li a {
-            color: #fff;
-            text-decoration: none;
+        
+        .menu-item {
+            position: relative;
+        }
+        
+        .menu-item.has-submenu > a::after {
+            content: "▸";
+            position: absolute;
+            right: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            transition: transform 0.3s;
+        }
+        
+        .menu-item.has-submenu.active > a::after {
+            transform: translateY(-50%) rotate(90deg);
+        }
+        
+        .menu-link {
             display: block;
-            padding: 8px 10px;
-            border-radius: 4px;
-            transition: background-color 0.3s;
+            padding: 12px 15px;
+            color: #b8c7ce;
+            text-decoration: none;
+            transition: all 0.3s;
+            position: relative;
+            font-size: 0.95rem;
         }
-
-        .sidebar ul li a:hover {
-            background-color: #444;
+        
+        .menu-link:hover,
+        .menu-link.active {
+            color: white;
+            background-color: #1a252f;
+        }
+        
+        .menu-link i {
+            margin-right: 10px;
+            width: 20px;
+            text-align: center;
+        }
+        
+        .submenu {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+            background-color: #1a252f;
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.3s ease-out;
+        }
+        
+        .submenu.active {
+            max-height: 500px;
+        }
+        
+        .submenu .menu-link {
+            padding-left: 45px;
+        }
+        
+        .menu-toggle {
+            display: none;
+            padding: 15px;
+            color: white;
+            font-size: 1.5rem;
+            cursor: pointer;
         }
         
         /* Main Content Styles */
         .main-content {
             flex: 1;
-            margin-left: 250px;
-            padding: 20px 20px 20px 30px;
+            padding: 15px;
             background-color: white;
-            border-radius: 5px;
             box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-            position: relative;
-            z-index: 1;
+            order: 2;
         }
         
         .header-container {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 20px;
+            margin-bottom: 15px;
+            flex-wrap: wrap;
         }
         
         .heading {
             flex-grow: 1;
             text-align: center;
             color: #333;
+            font-size: 1.4rem;
+            margin: 10px 0;
         }
         
         /* Filter Section Styles */
         .filter {
             background-color: #f9f9f9;
-            padding: 20px;
+            padding: 15px;
             border-radius: 5px;
-            margin-bottom: 20px;
+            margin-bottom: 15px;
             box-shadow: 0 1px 3px rgba(0,0,0,0.1);
         }
         
         .filter h1 {
             margin-top: 0;
             color: #333;
-            font-size: 24px;
+            font-size: 1.2rem;
         }
         
         .filter form {
             display: flex;
             flex-wrap: wrap;
-            gap: 15px;
+            gap: 10px;
             align-items: center;
         }
         
         .filter label {
             font-weight: bold;
             margin-right: 5px;
+            font-size: 0.9rem;
         }
         
         .filter input[type="date"],
         .filter select {
-            padding: 8px 12px;
+            padding: 6px 10px;
             border: 1px solid #ddd;
             border-radius: 4px;
-            font-size: 14px;
+            font-size: 0.9rem;
         }
         
         .filter button.submit {
-            padding: 8px 15px;
+            padding: 6px 12px;
             background-color: #4CAF50;
             color: white;
             border: none;
             border-radius: 4px;
             cursor: pointer;
             font-weight: bold;
+            font-size: 0.9rem;
         }
         
         .filter button.submit:hover {
@@ -136,39 +202,45 @@
         .table-container {
             max-height: 500px;
             overflow-y: auto;
-            margin-top: 20px;
-            border: 1px solid #ddd;
+            margin-top: 15px;
+            border: 1px solid #ebdcdc;
             border-radius: 5px;
-            position: relative;
-            z-index: 1;
         }
         
         /* Table Styles */
         table {
             width: 100%;
             border-collapse: collapse;
+            margin-top: 15px;
+            border: 1px solid #ebdcdc;
         }
-        
-        th, td {
-            padding: 12px;
+
+        table th, table td {
+            padding: 10px;
             text-align: left;
-            border: 1px solid #ddd;
+            border-bottom: 1px solid #ddd;
+            border-right: 1px solid #ddd;
+            font-size: 0.9rem;
         }
-        
-        th {
+
+        table th {
             background-color: #333;
             color: #fff;
-            font-weight: bold;
-            border: 1px solid #444;
+            border-right: 1px solid #555;
             position: sticky;
             top: 0;
-            z-index: 5;
+            z-index: 10;
         }
-        
+
+        table th:last-child,
+        table td:last-child {
+            border-right: none;
+        }
+
         tr:nth-child(even) {
             background-color: #f9f9f9;
         }
-        
+
         tr:hover {
             background-color: #f1f1f1;
         }
@@ -201,18 +273,20 @@
         
         /* Download Buttons */
         .download-btns {
-            margin-top: 20px;
+            margin-top: 15px;
             display: flex;
-            gap: 15px;
+            gap: 10px;
+            flex-wrap: wrap;
         }
         
         .download-btns button {
-            padding: 10px 20px;
+            padding: 8px 15px;
             border: none;
             border-radius: 4px;
             font-weight: bold;
             cursor: pointer;
             transition: background-color 0.3s;
+            font-size: 0.9rem;
         }
         
         #excel {
@@ -232,83 +306,245 @@
         #downloadpdf:hover {
             background-color: #d32f2f;
         }
+        
+        /* Status Styles */
+        .Status-pending {
+            color: #FFA500;
+            font-weight: bold;
+        }
+
+        .Status-shipped {
+            color: #2196F3;
+            font-weight: bold;
+        }
+
+        .Status-cancelled {
+            color: #f44336;
+            font-weight: bold;
+        }
+
+        .Status-delivered {
+            color: #4CAF50;
+            font-weight: bold;
+        }
+
+        .Status-returned {
+            color: #9C27B0;
+            font-weight: bold;
+        }
+        
         #error-message {
-  color: red;
-  text-align: center;
-  font-weight: 500;
-  margin-top: 10px;
-  font-size: 16px;
-}
+            color: red;
+            text-align: center;
+            font-weight: 500;
+            margin-top: 10px;
+            font-size: 0.9rem;
+        }
         
         /* Responsive Adjustments */
-        @media (max-width: 768px) {
+        @media (min-width: 768px) {
+            body {
+                flex-direction: row;
+            }
+            
             .sidebar {
-                width: 100%;
-                height: auto;
-                position: relative;
+                width: 250px;
+                height: 100vh;
+                position: fixed;
+                order: 0;
             }
             
             .main-content {
-                margin-left: 0;
-                padding: 15px;
+                margin-left: 250px;
+                padding: 20px;
+            }
+            
+            .menu-toggle {
+                display: none;
+            }
+            
+            .filter {
+                padding: 20px;
+            }
+            
+            .filter h1 {
+                font-size: 1.5rem;
+            }
+            
+            .filter form {
+                gap: 15px;
+            }
+            
+            .filter input[type="date"],
+            .filter select {
+                padding: 8px 12px;
+                font-size: 1rem;
+            }
+            
+            .filter button.submit {
+                padding: 8px 15px;
+                font-size: 1rem;
+            }
+            
+            .heading {
+                font-size: 1.6rem;
+            }
+            
+            table th, table td {
+                padding: 12px;
+                font-size: 1rem;
+            }
+            
+            .download-btns button {
+                padding: 10px 20px;
+                font-size: 1rem;
+            }
+            
+            #error-message {
+                font-size: 1rem;
+            }
+        }
+
+        @media (max-width: 767px) {
+            .sidebar {
+                position: relative;
+                height: auto;
+            }
+            
+            .sidebar-menu {
+                display: none;
+            }
+            
+            .sidebar-menu.active {
+                display: block;
+            }
+            
+            .menu-toggle {
+                display: block;
+            }
+            
+            /* Adjust table for mobile */
+            table {
+                display: block;
+                overflow-x: auto;
+                white-space: nowrap;
             }
             
             .filter form {
                 flex-direction: column;
-                align-items: flex-start;
+                align-items: stretch;
             }
             
-            .table-container {
-                max-height: none;
-                overflow-x: auto;
+            .download-btns {
+                flex-direction: column;
             }
-            /* Status Styles */
-.Status-pending {
-    color: #FFA500;
-    font-weight: bold;
-}
+            
+            .download-btns button {
+                width: 100%;
+            }
+        }
 
-.Status-shipped {
-    color: #2196F3;
-    font-weight: bold;
-}
-
-.Status-cancelled {
-    color: #f44336;
-    font-weight: bold;
-}
-
-.Status-delivered {
-    color: #4CAF50;
-    font-weight: bold;
-}
-
-.Status-returned {
-    color: #9C27B0;
-    font-weight: bold;
-}
-
+        /* Print Styles */
+        @media print {
+            .sidebar {
+                display: none;
+            }
+            
+            .main-content {
+                margin-left: 0;
+                padding: 0;
+                box-shadow: none;
+            }
+            
+            .filter, .download-btns {
+                display: none;
+            }
         }
     </style>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 </head>
 <body>
-
-
     <!-- Sidebar -->
     <div class="sidebar">
-        <h2>Admin Panel</h2>
-        <ul>
-            <li><a href="/admin/dashboard">Dashboard</a></li>
-            <li><a href="/admin/usermanagement">User Management</a></li>
-            <li><a href="/admin/categorymanagement">Category Management</a></li>
-            <li><a href="/productmanagement">Product Management</a></li>
-            <li><a href="/admin/orderManagement">Order Management</a></li>
-            <li><a href="/couponManagement">Coupon Management</a></li>
-            <li><a href="/salesReport">Sales</a></li>
-            <li><a href="/offerManagement">Offer Management</a></li>
-            <li><a href="/admin/adminLogin" id="logout-link">Logout</a></li>
+        <div class="sidebar-header">
+            <h2><i class="fas fa-tachometer-alt"></i> Admin Panel</h2>
+            <div class="menu-toggle">
+                <i class="fas fa-bars"></i>
+            </div>
+        </div>
+        <ul class="sidebar-menu">
+            <li class="menu-title">MAIN NAVIGATION</li>
+            <li class="menu-item">
+                <a href="/admin/dashboard" class="menu-link">
+                    <i class="fas fa-tachometer-alt"></i> Dashboard
+                </a>
+            </li>
+            <li class="menu-item has-submenu">
+                <a href="/admin/usermanagement" class="menu-link">
+                    <i class="fas fa-users"></i> User Management
+                </a>
+                <ul class="submenu">
+                    <li class="menu-item">
+                        <a href="/admin/usermanagement" class="menu-link">All Users</a>
+                    </li>
+                    <li class="menu-item">
+                        <a href="#" class="menu-link">Add User</a>
+                    </li>
+                </ul>
+            </li>
+            <li class="menu-item has-submenu">
+                <a href="/admin/categorymanagement" class="menu-link">
+                    <i class="fas fa-tags"></i> Category Management
+                </a>
+                <ul class="submenu">
+                    <li class="menu-item">
+                        <a href="/admin/categorymanagement" class="menu-link">All Categories</a>
+                    </li>
+                    <li class="menu-item">
+                        <a href="#" class="menu-link">Add Category</a>
+                    </li>
+                </ul>
+            </li>
+            <li class="menu-item has-submenu">
+                <a href="/productmanagement" class="menu-link">
+                    <i class="fas fa-box-open"></i> Product Management
+                </a>
+                <ul class="submenu">
+                    <li class="menu-item">
+                        <a href="/productmanagement" class="menu-link">All Products</a>
+                    </li>
+                    <li class="menu-item">
+                        <a href="#" class="menu-link">Add Product</a>
+                    </li>
+                </ul>
+            </li>
+            <li class="menu-item">
+                <a href="/admin/orderManagement" class="menu-link">
+                    <i class="fas fa-shopping-cart"></i> Order Management
+                </a>
+            </li>
+            <li class="menu-item">
+                <a href="/couponManagement" class="menu-link">
+                    <i class="fas fa-ticket-alt"></i> Coupon Management
+                </a>
+            </li>
+            <li class="menu-item">
+                <a href="/salesReport" class="menu-link active">
+                    <i class="fas fa-chart-line"></i> Sales Report
+                </a>
+            </li>
+            <li class="menu-item">
+                <a href="/offerManagement" class="menu-link">
+                    <i class="fas fa-percentage"></i> Offer Management
+                </a>
+            </li>
+            <li class="menu-item">
+                <a href="/admin/adminLogin" class="menu-link" id="logout-link">
+                    <i class="fas fa-sign-out-alt"></i> Logout
+                </a>
+            </li>
         </ul>
     </div>
 
@@ -318,6 +554,7 @@
             <h2 class="heading">Sales Report</h2>
         </div>
         <div id="error-message"></div>
+        
         <!-- Filter Section -->
         <div class="filter">
             <form action="/costomSales" method="post" onsubmit="return validateDates()">
@@ -376,7 +613,7 @@
                            <td data-label="Order Date"><%= formatted %></td>
 
                             <td data-label="Payment Method"><%=order.paymentMethod %></td>
-                            <td data-label="Status" class="Status"><%=product.status %></td>
+                            <td data-label="Status" class="Status-<%=product.status.toLowerCase()%>"><%=product.status %></td>
                             <td>
                                 <a class="view-btn" href="/orderDetails/<%=order._id%>/<%=product.productid%>">View</a>
                             </td>
@@ -396,156 +633,181 @@
     </div>
 
     <script>
-        document.getElementById('logout-link').addEventListener('click', function (e) {
-            e.preventDefault();
+        document.addEventListener('DOMContentLoaded', function () {
+            // Toggle mobile menu
+            const menuToggle = document.querySelector('.menu-toggle');
+            const sidebarMenu = document.querySelector('.sidebar-menu');
+            
+            if (menuToggle && sidebarMenu) {
+                menuToggle.addEventListener('click', function() {
+                    sidebarMenu.classList.toggle('active');
+                });
+            }
 
-            Swal.fire({
-                title: "Are you sure you want to logout?",
-                icon: "question",
-                showCancelButton: true,
-                confirmButtonText: "Yes, logout",
-                cancelButtonText: "Cancel",
-            }).then((result) => {
-                if (result.isConfirmed) {
-                    window.location.href = "/admin/adminLogin";
-                }
+            // Handle submenu toggling
+            const hasSubmenuItems = document.querySelectorAll('.has-submenu');
+            
+            hasSubmenuItems.forEach(item => {
+                const link = item.querySelector('a');
+                const submenu = item.querySelector('.submenu');
+                
+                link.addEventListener('click', function(e) {
+                    if (window.innerWidth < 768) {
+                        e.preventDefault();
+                        item.classList.toggle('active');
+                        submenu.classList.toggle('active');
+                    }
+                });
             });
+
+            // Logout confirmation
+            document.getElementById('logout-link').addEventListener('click', function (e) {
+                e.preventDefault();
+                
+                Swal.fire({
+                    title: "Are you sure you want to logout?",
+                    icon: "question",
+                    showCancelButton: true,
+                    confirmButtonText: "Yes, logout",
+                    cancelButtonText: "Cancel",
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        window.location.href = "/admin/adminLogin";
+                    }
+                });
+            });
+
+            // Handle window resize for sidebar
+            function handleResize() {
+                if (window.innerWidth >= 768) {
+                    sidebarMenu.classList.add('active');
+                } else {
+                    sidebarMenu.classList.remove('active');
+                }
+            }
+
+            window.addEventListener('resize', handleResize);
+            handleResize(); // Initialize on load
+        });
+
+        function validateDates() {
+            var startDateInput = document.getElementById('start_date');
+            var endDateInput = document.getElementById('end_date');
+            var startDateError = startDateInput.nextElementSibling;
+            var endDateInputError = endDateInput.nextElementSibling;
+
+            var startDate = new Date(startDateInput.value);
+            var endDate = new Date(endDateInput.value);
+            var currentDate = new Date();
+
+            let isValid = true;
+
+            // Start Date Validation
+            if (!startDateInput.value) {
+                startDateError.textContent = 'Start date is required';
+                startDateError.style.color = 'red';
+                isValid = false;
+                setTimeout(() => {
+                    startDateError.textContent = '';
+                }, 3000);
+            } else if (startDate > currentDate) {
+                startDateError.textContent = 'Start date cannot be in the future';
+                startDateError.style.color = 'red';
+                isValid = false;
+                setTimeout(() => {
+                    startDateError.textContent = '';
+                }, 3000);
+            }
+
+            // End Date Validation
+            if (!endDateInput.value) {
+                endDateInputError.textContent = 'End date is required';
+                endDateInputError.style.color = 'red';
+                isValid = false;
+                setTimeout(() => {
+                    endDateInputError.textContent = '';
+                }, 3000);
+            } else if (endDate < startDate) {
+                endDateInputError.textContent = 'End date cannot be before start date';
+                endDateInputError.style.color = 'red';
+                isValid = false;
+                setTimeout(() => {
+                    endDateInputError.textContent = '';
+                }, 3000);
+            }
+
+            return isValid;
+        }
+
+        function filterOrders() {
+            const reportType = document.getElementById('reportType').value
+            const xhr = new XMLHttpRequest()
+            xhr.open('GET',`/salesFilter?type=${reportType}`,true) 
+            xhr.send()
+            xhr.onload = function() {
+                if (xhr.status !== 200) {
+                    alert(`Error ${xhr.status}:${xhr.statusText}`)
+                } else {
+                    const orders = JSON.parse(xhr.responseText)
+                    updateTable(orders)
+                }
+            }
+        }
+
+        function updateTable(orders) {
+            const tbody = document.querySelector('#example tbody')
+            tbody.innerHTML =''
+            orders.forEach(order=>{
+                order.productCollection.forEach(product=>{
+                    const date = new Date(order.orderDate);
+                    const day = String(date.getDate()).padStart(2, '0');
+                    const month = String(date.getMonth() + 1).padStart(2, '0');
+                    const year = String(date.getFullYear()).slice(-2);
+                    const formatted = `${day}-${month}-${year}`;
+
+                    const tr = document.createElement('tr')
+                    tr.innerHTML=`
+                        <td data-label="User Name">${order.Username}</td>
+                        <td data-label="Product Name">${product.productname}</td>
+                        <td data-label="Quantity">${product.quantity}</td>
+                        <td data-label="Prices">${product.price}</td>
+                        <td data-label="Total Prices">${product.price * product.quantity}</td>
+                        <td data-label="Order Date">${formatted}</td>
+                        <td data-label="Payment Method">${order.paymentMethod}</td>
+                        <td data-label="Status" class="Status-${product.status.toLowerCase()}">${product.status}</td>
+                        <td><a class="view-btn" href="/orderDetails/${order._id}/${product.productid}">View</a></td>
+                    `
+                    tbody.appendChild(tr)
+                })
+            })
+        }
+
+        document.getElementById('excel').addEventListener('click', function () {
+            const startDate = document.getElementById('start_date').value;
+            const endDate = document.getElementById('end_date').value;
+            let errorMessage = document.getElementById('error-message')
+
+            if (!startDate || !endDate) {
+                errorMessage.textContent='Please select both start and end dates before downloading Excel.';
+                return;
+            }
+
+            const url = `/reportExcel?startingdate=${startDate}&endingdate=${endDate}`;
+            window.open(url, '_blank');
+        });
+
+        document.getElementById('downloadpdf').addEventListener('click',function(){
+            const startDate = document.getElementById('start_date').value;
+            const endDate = document.getElementById('end_date').value;
+            let errorMessage = document.getElementById('error-message')
+
+            if (!startDate || !endDate) {
+                errorMessage.textContent='Please select both start and end dates before downloading PDF.';
+                return;
+            }
+            const url= `/reportPDF?startingdate=${startDate}&endingdate=${endDate}`
+            window.open(url,'_blank')
         });
     </script>
-    <script>
-function validateDates() {
-    var startDateInput = document.getElementById('start_date');
-    var endDateInput = document.getElementById('end_date');
-    var startDateError = startDateInput.nextElementSibling;
-    var endDateInputError = endDateInput.nextElementSibling;
-
-    var startDate = new Date(startDateInput.value);
-    var endDate = new Date(endDateInput.value);
-    var currentDate = new Date();
-
-    let isValid = true;
-
-    // Start Date Validation
-    if (!startDateInput.value) {
-        startDateError.textContent = 'Start date is required';
-        startDateError.style.color = 'red';
-        isValid = false;
-        setTimeout(() => {
-            startDateError.textContent = '';
-        }, 3000);
-    } else if (startDate > currentDate) {
-        startDateError.textContent = 'Start date cannot be in the future';
-        startDateError.style.color = 'red';
-        isValid = false;
-        setTimeout(() => {
-            startDateError.textContent = '';
-        }, 3000);
-    }
-
-    // End Date Validation
-    if (!endDateInput.value) {
-        endDateInputError.textContent = 'End date is required';
-        endDateInputError.style.color = 'red';
-        isValid = false;
-        setTimeout(() => {
-            endDateInputError.textContent = '';
-        }, 3000);
-    } else if (endDate < startDate) {
-        endDateInputError.textContent = 'End date cannot be before start date';
-        endDateInputError.style.color = 'red';
-        isValid = false;
-        setTimeout(() => {
-            endDateInputError.textContent = '';
-        }, 3000);
-    }
-
-    return isValid;
-}
-</script>
-<script>
-    function filterOrders()
-    {
-        const reportType = document.getElementById('reportType').value
-        const xhr = new XMLHttpRequest()
-        xhr.open('GET',`/salesFilter?type=${reportType}`,true) 
-        xhr.send()
-        xhr.onload = function()
-        {
-            if(xhr.status !== 200)
-         {
-            alert(`Error ${xhr.status}:${xhr.statusText}`)
-         }
-         else
-         {
-            const orders = JSON.parse(xhr.responseText)
-            updateTable(orders)
-         }
-        }
-    }
-      function  updateTable(orders)
-      {
-        const tbody = document.querySelector('#example tbody')
-        tbody.innerHTML =''
-        orders.forEach(order=>{
-            order.productCollection.forEach(product=>{
-
-            const date = new Date(order.orderDate);
-            const day = String(date.getDate()).padStart(2, '0');
-            const month = String(date.getMonth() + 1).padStart(2, '0');
-            const year = String(date.getFullYear()).slice(-2);
-            const formatted = `${day}-${month}-${year}`;
-
-                const tr = document.createElement('tr')
-                tr.innerHTML=`
-                     <td data-label="User Name">${order.Username}</td>
-                     <td data-label="Product Name">${product.productname}</td>
-                     <td data-label="Quantity">${product.quantity }</td>
-                     <td data-label="Prices">${product.price}</td>
-                     <td data-label="Total Prices">${product.price * product.quantity}</td>
-                     <td data-label="Order Date">${formatted}</td>
-                     <td data-label="Payment Method">${order.paymentMethod}</td>
-                     <td data-label="Status" class="Status-${product.status.toLowerCase()}">${product.status}</td>
-
-                `
-                tbody.appendChild(tr)
-            })
-        })
-          //   to download exce
-      } 
-
-     document.getElementById('excel').addEventListener('click', function () {
-    const startDate = document.getElementById('start_date').value;
-    const endDate = document.getElementById('end_date').value;
-    let errorMessage = document.getElementById('error-message')
-
-    if (!startDate || !endDate) {
-        errorMessage.textContent='Please select both start and end dates before downloading Excel.';
-        return;
-    }
-    //   if (tableBody.children.length === 0) {
-    //     alert('No data available to export.');
-    //     return;
-    // }
-
-    const url = `/reportExcel?startingdate=${startDate}&endingdate=${endDate}`;
-    window.open(url, '_blank');
-
-});
-
-document.getElementById('downloadpdf').addEventListener('click',function(){
-     const startDate = document.getElementById('start_date').value;
-     const endDate = document.getElementById('end_date').value;
-     let errorMessage = document.getElementById('error-message')
-
-   
-    if (!startDate || !endDate) {
-        errorMessage.textContent='Please select both start and end dates before downloading Excel.';
-        return;
-    }
-    const url= `/reportPDF?startingdate=${startDate}&endingdate=${endDate}`
-    window.open(url,'_blank')
-})
-  
-</script>
 </body>
 </html>
