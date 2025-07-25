@@ -330,10 +330,11 @@ const forgetPasswordPost = async (req, res) => {
 
         // Generate and store OTP with timestamp
         const otp = generateRandomOtp();
-        otpStorage[email] = {
-            otp,
-            timestamp: Date.now()
-        };
+        await otpModel.findOneAndUpdate(
+            {email},
+            {otp,timestamp:Date.now()},
+            {upsert:true,new:true}
+        )
 
         // Send OTP via email
         await sendOtpEmail(email, otp);
@@ -733,7 +734,6 @@ module.exports =
     sendOtpEmail,
     resendOtpPost,
     Homepage,
-    logout,
     wishlist,
     addToWishlist,
     removeWishlist,
