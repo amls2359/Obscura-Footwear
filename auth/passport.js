@@ -25,6 +25,11 @@ passport.deserializeUser((id,done)=>{
    })
 })
 
+console.log('✅ CLIENT_ID:', process.env.CLIENT_ID);
+console.log('✅ CLIENT_SECRET:', process.env.CLIENT_SECRET);
+console.log('✅ CALLBACK_URL:', process.env.GOOGLE_CALLBACK_URL);
+
+
 passport.use(
   new GoogleStrategy (
     {
