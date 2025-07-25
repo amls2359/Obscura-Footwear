@@ -391,7 +391,7 @@ const otpVerifyPost = async (req, res) => {
         const isExpired = (Date.now() - storedOtpData.timestamp) > 300000;
         
         if (isExpired) {
-            delete otpStorage[email];
+            await otpModel.deleteOne({email}); ;
             return res.render('otp', {
                 errorMessage: 'OTP has expired. Please request a new OTP.',
                 successMessage: null,
