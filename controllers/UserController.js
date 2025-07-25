@@ -6,6 +6,7 @@ const Product = require('../models/product');
 const Wishlist = require('../models/wishlist');
 const Wallet = require('../models/wallet')
 const bcrypt= require('bcrypt')
+const otpModel = require('../models/otpModel')
 
 
 
