@@ -416,7 +416,7 @@ const otpVerifyPost = async (req, res) => {
         // OTP is valid - proceed to password reset page
         await otpModel.deleteOne({email});
         
-        return res.render('resetPassword', {
+        return res.render('ResetPassword', {
             email: email,
             errorMessage: null,
             successMessage: null
@@ -450,7 +450,7 @@ const resetPasswordPost = async (req, res) => {
     if (!newPassword || !confirmPassword || !email) {
         console.log('entered into empty validation');
         
-        return res.render('resetPassword', { 
+        return res.render('ResetPassword', { 
             success: false, 
             errorMessage: 'Please fill in all fields.',
             email,
@@ -461,7 +461,7 @@ const resetPasswordPost = async (req, res) => {
     if (newPassword !== confirmPassword) {
         console.log('entered into comparing password');
         
-        return res.render('resetPassword', { 
+        return res.render('ResetPassword', { 
             success: false, 
             errorMessage: 'Passwords do not match.',
             email,
@@ -472,7 +472,7 @@ const resetPasswordPost = async (req, res) => {
  const strongPasswordRegex = /^(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[@#$%^&*()_+\-=[\]{};':"\\|,.<>/?]).{7,}$/;
 
 if (!strongPasswordRegex.test(newPassword)) {
-    return res.render('resetPassword', {
+    return res.render('ResetPassword', {
         success: false,
         errorMessage: 'Password must be at least 7 characters long and include uppercase letters, numbers, and special characters.',
         email,
@@ -485,7 +485,7 @@ if (!strongPasswordRegex.test(newPassword)) {
         const user = await UserCollection.findOne({ email });
 
         if (!user) {
-            return res.render('resetPassword', { 
+            return res.render('ResetPassword', { 
                 success: false, 
                 errorMessage: 'User not found.',
                 email,
@@ -502,7 +502,7 @@ if (!strongPasswordRegex.test(newPassword)) {
         user.password =  hashedPassword; // Hash this password in a real app!
         await user.save();
 
-        return res.render('resetPassword', { 
+        return res.render('ResetPassword', { 
             success: true, 
             message: 'Password reset successful! Redirecting to login...',
             errorMessage:'',
@@ -512,7 +512,7 @@ if (!strongPasswordRegex.test(newPassword)) {
 
     } catch (error) {
         console.error('Error resetting password:', error);
-        return res.render('resetPassword', { 
+        return res.render('ResetPassword', { 
             success: false, 
             errorMessage: 'Something went wrong. Please try again.',
             email,
