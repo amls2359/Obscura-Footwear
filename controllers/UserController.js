@@ -366,7 +366,9 @@ const otpVerifyPost = async (req, res) => {
     const { email, otp1, otp2, otp3, otp4, otp5, otp6 ,timeLeft} = req.body;
     const otp = `${otp1}${otp2}${otp3}${otp4}${otp5}${otp6}`;
 
-    let remainingTime = parseInt(timeLeft)||60
+    let remainingTime = parseInt(timeLeft);
+  if (isNaN(remainingTime) || remainingTime <= 0 || remainingTime > 300) remainingTime = 60;
+
 
     if (!email || !otp1 || !otp2 || !otp3 || !otp4 || !otp5 || !otp6) {
         return res.render('otp', {
