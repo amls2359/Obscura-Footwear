@@ -1,6 +1,6 @@
 const checkSession =async(req,res,next)=>
 {
-    console.log('Reached session');
+    console.log('Reached admin session');
     if(req.session && req.session.admin)
     {
         console.log('session found');
