@@ -78,7 +78,6 @@ const getCheckout = async (req, res) => {
         res.status(500).send('error in product details');
     }
 };
-
 const checkoutPost= async(req,res)=>
 {
     try
