@@ -9,20 +9,26 @@ const bcrypt= require('bcrypt')
 const otpModel = require('../models/otpModel')
 
 
-
 const googleUser = async (req, res) => {
     try {
-        console.log('Google user:', req.user);
+        console.log('✅ Reached googleUser controller');
+
+        if (!req.user) {
+            console.log('❌ No user found in req.user');
+            return res.redirect('/guesthomepage'); // or some safe fallback
+        }
+
+        console.log('👤 Google user:', req.user);
 
         // Save user ID in session
         req.session.userid = req.user._id;
         req.session.isAuthenticated = true; 
-        console.log(`Session set: ${req.session.userid}`);
+        console.log(`💾 Session set: ${req.session.userid}`);
 
         // Redirect to Homepage
         res.redirect('/Homepage');
     } catch (error) {
-        console.error('Google login error:', error);
+        console.error('❌ Google login error:', error);
         return res.status(500).json({ error: 'Failed to log in with Google' });
     }
 };
