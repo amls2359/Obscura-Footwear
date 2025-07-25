@@ -374,7 +374,7 @@ const otpVerifyPost = async (req, res) => {
     }
 
     try {
-        const storedOtpData = otpStorage[email];
+        const storedOtpData = await otpModel.findOne({email});
         
         if (!storedOtpData) {
             return res.render('otp', {
@@ -414,7 +414,8 @@ const otpVerifyPost = async (req, res) => {
         }
 
         // OTP is valid - proceed to password reset page
-        delete otpStorage[email];
+        await otpModel.deleteOne({email});
+        
         return res.render('resetPassword', {
             email: email,
             errorMessage: null,
