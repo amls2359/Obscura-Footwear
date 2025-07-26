@@ -820,6 +820,22 @@
         window.location.href = '/checkout';
     });
 }
+
+    document.getElementById('logout-button')?.addEventListener('click', function(e) {
+        e.preventDefault();
+        Swal.fire({
+            title: "Are you sure you want to logout?",
+            icon: "question",
+            showCancelButton: true,
+            confirmButtonText: "Yes, logout",
+            cancelButtonText: "Cancel",
+            confirmButtonColor: "#f74f10",
+        }).then((result) => {
+            if (result.isConfirmed) {
+                window.location.href = "/logout";
+            }
+        });
+    });
 </script>
 </body>
 </html>
