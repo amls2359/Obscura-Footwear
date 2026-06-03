@@ -12,6 +12,7 @@ const salesRoute = require('./routes/salesRoute')
 const path = require('path');
 const methodOverride= require('method-override')
 const session = require('express-session');
+const cookieParser = require('cookie-parser');
 const MongoStore = require('connect-mongo'); // Add this package
 const flash= require('express-flash')
 process.removeAllListeners('warning');
@@ -19,7 +20,8 @@ require('./auth/passport')
 require('dotenv').config();
 const passport = require('passport')
 const { MongoClient } = require('mongodb');
-
+const createSuperAdmin = require('./seeds/superAdminSeeds');
+// const {forceJsonResponse} = require('./Middleware/forceJson');
 
 const app = express();
 const port = process.env.PORT || 3001;
@@ -33,12 +35,13 @@ app.use(session({
     ttl: 30 * 60 // ⏱ 30 minutes in seconds
   }),
   cookie: {
-    maxAge: 1000 * 60 * 30, // ⏱ 30 minutes in milliseconds
-    secure: false, // set to true in production with HTTPS
+    maxAge: 1000 * 60 * 30, 
+        secure: false, 
   }
 }));
 
 // Body parser middleware
+app.use(cookieParser());
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 
@@ -93,16 +96,13 @@ app.use((err, req, res, next) => {
 });
 
 
-mongoose.connect(process.env.MONGODB_URI, {
-  useNewUrlParser: true,
-  useUnifiedTopology: true
-})
-.then(() => {
-  console.log('✅ Connected to MongoDB Atlas');
-  
-  // Start the server only after DB is connected
-  app.listen(port, () => {
-    console.log(`🚀 Server running on port ${port}`);
-  });
-})
-.catch((err) => console.error('❌ MongoDB connection error:', err));
+mongoose.connect(process.env.MONGODB_URI)
+  .then(async () => {
+    console.log('MongoDB connected');
+    await createSuperAdmin();
+    
+    app.listen(3000, () => {
+      console.log('Server running on port 3000');
+    });
+  })
+  .catch(err => console.error('Database connection error:', err));

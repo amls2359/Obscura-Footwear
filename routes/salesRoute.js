@@ -1,13 +1,14 @@
 const SalesController = require('../controllers/salesController')
 const express = require('express')
 const router = express.Router()
-const{checkSession} = require('../Middleware/admin')
+const {jwtAuth} = require('../Middleware/jwtAuth')
+const {isUser} = require('../Middleware/roleMiddleware')
 
-router.get('/salesReport',checkSession,SalesController.sales)
-router.post('/costomSales',SalesController.costomSales)
-router.get('/salesFilter',SalesController.salesFilter)
+router.get('/salesReport', jwtAuth, isUser, SalesController.sales)
+router.post('/costomSales', jwtAuth, isUser, SalesController.costomSales)
+router.get('/salesFilter', jwtAuth, isUser, SalesController.salesFilter)
 
-router.get('/reportPDF',checkSession,SalesController.PDFReport)
-router.get('/reportExcel',checkSession,SalesController.ExcelReport)
+router.get('/reportPDF', jwtAuth, isUser, SalesController.PDFReport)
+router.get('/reportExcel', jwtAuth, isUser, SalesController.ExcelReport)
 
 module.exports = router

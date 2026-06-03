@@ -3,13 +3,28 @@ const mongoose = require('mongoose');
 
 const adminloginschema = new mongoose.Schema({ 
   
-    username:{
+    email:{
         type:String,
-        required:true
+        required:true,
+        unique:true
     },
     password: {
         type: String,
         required: true
+    },
+    role: {
+        type: String,
+        enum: [ 'superAdmin'],
+        default: 'superAdmin'
+    },
+    isSuperAdmin: {
+        type: Boolean,
+        default: false
+    },
+    refreshToken: String,
+    isblocked: {
+        type: Boolean,
+        default: false
     }
 })
 

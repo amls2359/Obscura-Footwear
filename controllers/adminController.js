@@ -5,7 +5,17 @@ const Category=require('../models/category')
 const CategoryOffer = require('../models/categoryOffer')
 const ProductOffer = require('../models/productOffer')
 const OrderCollection = require('../models/order')
-
+const SuperAdmin = require('../models/admin');
+const bcrypt = require('bcrypt');
+const {
+  generateSuperAdminTokens,
+  verifyAdminAccessToken,
+} = require('../config/jwtConfig');
+const {
+  successResponse,
+  errorResponse,
+  wantsJsonResponse,
+} = require('../utils/reposnseHandler');
 
 const adminLogin=(req,res)=>res.render('adminLogin')
 
@@ -13,7 +23,7 @@ const adminLogin=(req,res)=>res.render('adminLogin')
 const dashboard = async (req, res) => {
     console.log('entered into dashboard');
 
-    if (req.session.admin) {
+    if (req.user?.isSuperAdmin || req.session.isSuperAdmin || req.session.admin) {
         try {
             const dailyOrders = await OrderCollection.aggregate([
                 {
@@ -187,54 +197,246 @@ const dashboard = async (req, res) => {
 };
 
   
-
-//adminlogin post
-const adminloginpost = async (req, res) => {
+const adminLoginPost = async (req, res) => {
     try {
         console.log('entered into admin login');
         
-        const admin = {
-            username: "admin",
-            password: "12345"
-        };
-        if (req.body.username === admin.username && req.body.password === admin.password) {
-            req.session.admin=admin.username;
-            res.redirect("/admin/dashboard"); 
-        } else {
+        const { email, password } = req.body;
+        
+        const wantsJson = req.headers['accept']?.includes('application/json') || 
+                          req.headers['content-type']?.includes('application/json') ||
+                          req.xhr;
+        
+        // Find user by email
+        const user = await SuperAdmin.findOne({ email });
+        
+        // Check if user exists
+        if (!user) {
+            if (wantsJson) {
+                return res.status(401).json({
+                    success: false,
+                    message: 'Invalid email or password'
+                });
+            }
             return res.render('adminLogin', { 
-                errorMessage: 'Invalid username or password', 
+                errorMessage: 'Invalid email or password', 
                 successMessage: null 
             });
         }
+        
+        // Only allow SuperAdmin to access admin portal
+        if (user.role !== 'superAdmin' || !user.isSuperAdmin) {
+            if (wantsJson) {
+                return res.status(403).json({
+                    success: false,
+                    message: 'Access denied. Only Super Admin can access this portal.'
+                });
+            }
+            return res.render('adminLogin', { 
+                errorMessage: 'Access denied. Only Super Admin can access this portal.', 
+                successMessage: null 
+            });
+        }
+        
+        // Check if account is blocked
+        if (user.isblocked) {
+            if (wantsJson) {
+                return res.status(403).json({
+                    success: false,
+                    message: 'Your account has been blocked.'
+                });
+            }
+            return res.render('adminLogin', { 
+                errorMessage: 'Your account has been blocked.', 
+                successMessage: null 
+            });
+        }
+        
+        // Verify password
+        const validPassword = await bcrypt.compare(password, user.password);
+        console.log(`Valid password: ${validPassword}`);
+        
+        if (!validPassword) {
+            if (wantsJson) {
+                return res.status(401).json({
+                    success: false,
+                    message: 'Invalid email or password'
+                });
+            }
+            return res.render('adminLogin', { 
+                errorMessage: 'Invalid email or password', 
+                successMessage: null 
+            });
+        }
+        
+        const { accessToken, refreshToken } = generateSuperAdminTokens(user);
+        user.refreshToken = refreshToken;
+        await user.save();
+        
+        // Set session
+        req.session.userid = user._id;
+        req.session.email = user.email;
+        req.session.admin = user.email;
+        req.session.isAuthenticated = true;
+        req.session.role = 'superAdmin';
+        req.session.isSuperAdmin = true;
+
+        const setTokenCookies = () => {
+            res.cookie('accessToken', accessToken, {
+                httpOnly: true,
+                secure: process.env.NODE_ENV === 'production',
+                maxAge: 2 * 60 * 60 * 1000,
+                sameSite: 'lax',
+            });
+            res.cookie('refreshToken', refreshToken, {
+                httpOnly: true,
+                secure: process.env.NODE_ENV === 'production',
+                maxAge: 30 * 24 * 60 * 60 * 1000,
+                sameSite: 'lax',
+            });
+        };
+
+        req.session.save((err) => {
+            if (err) {
+                console.error('Session save error:', err);
+                if (wantsJson) {
+                    return res.status(500).json({
+                        success: false,
+                        message: 'Error creating session',
+                    });
+                }
+                return res.render('adminLogin', {
+                    errorMessage: 'Error during login. Please try again.',
+                    successMessage: null,
+                });
+            }
+
+            setTokenCookies();
+
+            if (wantsJson) {
+                return res.json({
+                    success: true,
+                    message: 'Super Admin login successful',
+                    data: {
+                        user: {
+                            id: user._id,
+                            email: user.email,
+                            username: user.username,
+                            role: 'superAdmin',
+                            isSuperAdmin: true,
+                        },
+                        accessToken,
+                        refreshToken,
+                        tokenExpiry: {
+                            accessTokenExpiry:
+                                process.env.JWT_SUPERADMIN_ACCESS_EXPIRY || '2h',
+                            refreshTokenExpiry:
+                                process.env.JWT_SUPERADMIN_REFRESH_EXPIRY || '30d',
+                        },
+                    },
+                });
+            }
+
+            return res.redirect('/admin/dashboard');
+        });
+        
     } catch (error) {
-        console.log("Error:", error);
-        res.status(500).send("Internal Server Error");
+        console.error("Admin login error:", error);
+        
+        if (req.headers['accept']?.includes('application/json')) {
+            return res.status(500).json({
+                success: false,
+                message: 'Internal Server Error'
+            });
+        }
+        
+        res.render('adminLogin', { 
+            errorMessage: 'Internal Server Error', 
+            successMessage: null 
+        });
     }
 };
 
+
+const formatUserForJson = (user) => ({
+  _id: user._id,
+  email: user.email,
+  username: user.username,
+  phone: user.phone,
+  wallet: user.wallet,
+  referralcode: user.referralcode,
+  isblocked: user.isblocked,
+  isDeleted: user.isDeleted,
+  googleId: user.googleId ? true : false,
+});
+
 const usermanagement = async (req, res) => {
-    try {
-        const searchQuery = req.query.search || ''; // Get search query from URL
+  const json = wantsJsonResponse(req);
 
-        // Build the query object
-        const query = {};
+  try {
+    const searchQuery = req.query.search || '';
+    const page = parseInt(req.query.page, 10) || 1;
+    const limit = parseInt(req.query.limit, 10) || 10;
+    const skip = (page - 1) * limit;
 
-        if (searchQuery) {
-            query.$or = [
-                { username: { $regex: searchQuery, $options: 'i' } }, // Case-insensitive username search
-                { email: { $regex: searchQuery, $options: 'i' } }, // Case-insensitive email search
-            ];
-        }
-
-        // Fetch users based on the query
-        const userdata = await UserCollection.find(query);
-
-        // Render the view with user data and search query
-        res.render('usermanagement', { userdata, searchQuery });
-    } catch (error) {
-        console.log("Error:", error);
-        res.status(500).send("Internal Server Error");
+    const query = {};
+    if (searchQuery) {
+      query.$or = [
+        { username: { $regex: searchQuery, $options: 'i' } },
+        { email: { $regex: searchQuery, $options: 'i' } },
+      ];
     }
+
+    const [userdata, totalUsers] = await Promise.all([
+      UserCollection.find(query)
+        .select('-password')
+        .skip(skip)
+        .limit(limit)
+        .sort({ _id: -1 })
+        .lean(),
+      UserCollection.countDocuments(query),
+    ]);
+
+    const totalPages = Math.ceil(totalUsers / limit) || 1;
+    const pagination = {
+      currentPage: page,
+      totalPages,
+      totalUsers,
+      limit,
+      hasNextPage: page < totalPages,
+      hasPrevPage: page > 1,
+    };
+
+    const responseData = {
+      users: userdata.map(formatUserForJson),
+      pagination,
+      searchQuery,
+    };
+
+    // Postman / fetch: pure JSON on the same route (no extra API path)
+    if (json) {
+      return successResponse(res, 'Users fetched successfully', responseData);
+    }
+
+    // Browser: render HTML and embed the same JSON for client-side use
+    return res.render('usermanagement', {
+      userdata,
+      searchQuery,
+      pagination,
+      responseData: JSON.stringify({
+        success: true,
+        message: 'Users fetched successfully',
+        data: responseData,
+      }),
+    });
+  } catch (error) {
+    console.error('User management error:', error);
+    if (json) return errorResponse(res, 'Failed to fetch users', 500);
+    return res.status(500).render('error', {
+      message: 'Internal Server Error',
+      error: process.env.NODE_ENV === 'development' ? error : {},
+    });
+  }
 };
 
 const block = async (req, res) => {
@@ -536,16 +738,12 @@ const updateOrderPost = async (req, res) => {
   }
 };
 
-
 module.exports={
     adminLogin,
-    adminloginpost,
+    adminLoginPost,
     dashboard,
     usermanagement,block,unblock,
     categoryManagement,addcategoryget,addCategoryPost,UnList,editCategoryget,editCategorypost,
     orderManagementGet,
     updateOrderPost
-
-
-
 }

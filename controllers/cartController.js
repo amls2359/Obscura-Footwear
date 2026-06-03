@@ -4,35 +4,40 @@ const Product=require('../models/product')
 const Category=require('../models/category')
 const UserCollection=require('../models/user')
 
-const getcart=async(req,res)=>{
-    try
-    {
-          const sessionId=req.session.userid
-          console.log('session id is',sessionId);
-          
-          const cartfind= await Cart.find({userid: sessionId})
-            console.log('cart find is',cartfind);
-            
-          if(!sessionId)
-          {
-            return res.status(400).send('Session not found')
-          }
-          let overallTotalSum=0
-          cartfind.forEach((cartItem)=>{
-            const itemTotal=cartItem.price* cartItem.quantity
-            overallTotalSum+=itemTotal
-          })
-          const cartItems= await Cart.find({userid:sessionId})
-          console.log('cart items:',cartItems);
-          
-          res.render('cart',{cartfind,cartItems,overallTotalSum})
+const getcart = async (req, res) => {
+    try {
+        // Get user ID from the token (added by jwtAuth middleware)
+        const userId = req.user.userId; // or req.userId depending on your middleware
+        console.log('User ID from token is:', userId);
+        
+        if (!userId) {
+            return res.status(401).json({ 
+                success: false, 
+                message: 'User not authenticated' 
+            });
+        }
+        
+        const cartfind = await Cart.find({ userid: userId });
+        console.log('cart find is:', cartfind);
+        
+        let overallTotalSum = 0;
+        cartfind.forEach((cartItem) => {
+            const itemTotal = cartItem.price * cartItem.quantity;
+            overallTotalSum += itemTotal;
+        });
+        
+        const cartItems = await Cart.find({ userid: userId });
+        console.log('cart items:', cartItems);
+        
+        res.render('cart', { 
+            cartfind, 
+            cartItems, 
+            overallTotalSum 
+        });
+    } catch (error) {
+        console.log(error);
+        res.status(500).send('server error');
     }
-    catch(error)
-      {
-         console.log(error);
-         res.status(500).send('server error11')
-         
-      }
 }
 
 const addToCart = async (req, res) => {

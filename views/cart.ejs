@@ -731,6 +731,8 @@
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@10"></script>
 
 <script>
+    const token = localStorage.getItem('userAccessToken');
+
     $(document).ready(function() {
         // Handle increment button click
         $(document).on('click', '.increase', function(e) {
@@ -753,6 +755,9 @@
             $.ajax({
                 url: `/updateQuantity/${productId}`,
                 method: 'POST',
+                headers:{
+                      'Authorization': `Bearer ${token}`
+                },
                 data: { 
                     action: action 
                 },

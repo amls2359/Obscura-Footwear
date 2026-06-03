@@ -611,10 +611,10 @@
                 <a href="">CONTACT</a>
                 <a href="/userProfile">ACCOUNT</a>
                 <a href="" id="logout-button" class="logout-link">LOGOUT</a>
-                <a href="/wishlist" class="wishlist-link">
+                <a href="/Wishlist" class="wishlist-link" data-bs-toggle="tooltip" data-bs-placement="bottom" data-bs-title="Wishlist">
                     <i class="fas fa-heart"></i>
                 </a>
-                <a href="/cart" class="cart-link">
+                <a href="/cart" class="cart-link" data-bs-toggle="tooltip" data-bs-placement="bottom" data-bs-title="Cart">
                     <i class="fa fa-shopping-cart"></i>
                 </a>
             </div>
@@ -774,6 +774,9 @@
 
     <script>
     $(document).ready(function () {
+      document.querySelectorAll('[data-bs-toggle="tooltip"]').forEach(function(el) {
+        new bootstrap.Tooltip(el);
+      });
       // Mobile menu toggle functionality
       $('.mobile-menu-toggle').click(function() {
           $('.nav-links').toggleClass('active');

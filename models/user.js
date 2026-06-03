@@ -9,7 +9,8 @@ const userSchema = new mongoose.Schema({
     wallet : {type:Number,default:0},
     referralcode:{type:String},
     googleId:{type:String},
-    isDeleted: { type: Boolean, default: false } 
+    isDeleted: { type: Boolean, default: false } ,
+    refreshToken:{type:String}
 
 });
 

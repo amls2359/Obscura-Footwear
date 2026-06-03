@@ -510,7 +510,7 @@
                         <tr>
                             <td><%= index+1 %></td>
                             <td><%= products.productname %> </td>
-                            <td><%=products.category.name %> </td>
+                            <td><%= products.category && products.category.name ? products.category.name : 'Unknown / Missing' %> </td>
                             <td><%=products.price %></td>
                             <td>
                                 <% if(products.image && products.image.length > 0) { %>

@@ -6,32 +6,99 @@ const path = require('path');
 const ProductOffer = require('../models/productOffer')
 const CategoryOffer = require('../models/categoryOffer')
 const Wishlist = require('../models/wishlist')
+const {
+  successResponse,
+  errorResponse,
+  wantsJsonResponse,
+} = require('../utils/reposnseHandler');
 
+const formatProductManagementForJson = (product) => ({
+  _id: product._id,
+  productname: product.productname,
+  category: product.category?._id
+    ? { _id: product.category._id, name: product.category.name }
+    : { name: product.category?.name || 'Unknown / Missing' },
+  price: product.price,
+  stock: product.stock,
+  brand: product.brand || 'N/A',
+  image: product.image || [],
+  isListed: product.isListed,
+});
 
 const productmanagement = async (req, res) => {
+  const json = wantsJsonResponse(req);
+
   try {
     const products = await Product.find({}).populate('category');
-    // Ensure products have valid prices and filter out products without category
-    const validProducts = products
-      .filter(product => product.category)
-      .map(product => ({
-        ...product._doc,
-        price: product.price ? Number(product.price) : 0,
-        // Ensure image paths are correct
-        image: product.image ? product.image.map(img => img.replace(/\\/g, '/')) : [],
-        // Ensure brand has a default if empty
-        brand: product.brand || 'N/A'
-      }));
-    res.render("productmanagement", { products: validProducts });
+    const withCategory = products.filter((p) => p.category).length;
+    console.log(
+      `[productmanagement] Total: ${products.length}, With category: ${withCategory}, Missing category: ${products.length - withCategory}`
+    );
+
+    const validProducts = products.map((product) => ({
+      ...product._doc,
+      category: product.category || { name: 'Unknown / Missing' },
+      price: product.price ? Number(product.price) : 0,
+      image: product.image ? product.image.map((img) => img.replace(/\\/g, '/')) : [],
+      brand: product.brand || 'N/A',
+    }));
+
+    if (json) {
+      return successResponse(res, 'Product management list fetched successfully', {
+        count: validProducts.length,
+        total: products.length,
+        withCategory,
+        missingCategory: products.length - withCategory,
+        products: validProducts.map(formatProductManagementForJson),
+      });
+    }
+
+    return res.render('productmanagement', { products: validProducts });
   } catch (error) {
-    console.error("Error:", error);
-    res.status(500).render("productmanagement", { 
-      categories: [], 
-      errorMessage: "Error loading product management",
-      formData: {}
+    console.error('Error:', error);
+    if (json) return errorResponse(res, 'Error loading product management', 500);
+    return res.status(500).render('productmanagement', {
+      products: [],
+      categories: [],
+      errorMessage: 'Error loading product management',
+      formData: {},
     });
   }
 };
+
+const getProductsApi = async (req, res) => {
+  try {
+    const products = await Product.find({}).populate('category').lean();
+    return successResponse(res, 'Products fetched successfully', {
+      count: products.length,
+      products: products.map((product) => ({
+        _id: product._id,
+        productname: product.productname,
+        category: product.category
+          ? { _id: product.category._id, name: product.category.name }
+          : null,
+        price: product.price,
+        stock: product.stock,
+        brand: product.brand || 'N/A',
+        isListed: product.isListed,
+        image: product.image || [],
+      })),
+    });
+  } catch (error) {
+    console.error('[api/products] Error:', error);
+    return errorResponse(res, 'Failed to fetch products', 500);
+  }
+};
+
+const getProductPage = async(req,res)=>{
+  try{
+    const products = await Product.find({}).populate('category').lean();
+    res.render('allproduct',{products})
+  }
+  catch(error){
+    res.status(500).render('error',{message:'Failed to load products'})
+  }
+}
 
 // controllers/productController.js
 const addproductget = async (req, res) => {
@@ -324,6 +391,48 @@ const getdeleteProduct= async(req,res)=>
   }
 }
 
+const formatAllProductForJson = (product) => ({
+  _id: product._id,
+  productname: product.productname,
+  category: product.category
+    ? { _id: product.category._id, name: product.category.name }
+    : null,
+  price: product.price,
+  stock: product.stock,
+  brand: product.brand || 'N/A',
+  image: product.image || [],
+  isListed: product.isListed,
+  isInWishlist: !!product.isInWishlist,
+});
+
+const formatRelatedProductForJson = (product) => ({
+  _id: product._id,
+  productname: product.productname,
+  price: product.price,
+  image: product.image || [],
+  category: product.category
+    ? { _id: product.category._id, name: product.category.name }
+    : null,
+});
+
+const formatProductDetailForJson = (product, pricing) => ({
+  _id: product._id,
+  productname: product.productname,
+  description: product.description,
+  model: product.model,
+  brand: product.brand || 'N/A',
+  stock: product.stock,
+  image: product.image || [],
+  isListed: product.isListed,
+  category: product.category
+    ? { _id: product.category._id, name: product.category.name }
+    : null,
+  price: pricing.originalPrice,
+  discountedPrice: pricing.discountedPrice,
+  discountAmount: pricing.discountAmount,
+  isInWishlist: pricing.isInWishlist,
+});
+
 const getproducts = async (req, res) => {
   try {
     const PAGE_SIZE = 4;
@@ -360,7 +469,7 @@ const getproducts = async (req, res) => {
     const validProducts = rawProducts.filter(p => p.category);
 
     // Step 3: Apply manual pagination after filtering
-    const totalPage = Math.ceil(validProducts.length / PAGE_SIZE);
+    const totalPage = Math.ceil(validProducts.length / PAGE_SIZE) || 1;
     const paginatedProducts = validProducts.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE);
 
     // Step 4: Wishlist handling
@@ -381,7 +490,25 @@ const getproducts = async (req, res) => {
     if (priceRange) queryString += `&priceRange=${priceRange}`;
     if (sortAlphabetically) queryString += `&sortAlphabetically=${sortAlphabetically}`;
 
-    // Step 6: Render the view
+    // Step 6: JSON or HTML response
+    if (wantsJsonResponse(req)) {
+      return successResponse(res, 'Products fetched successfully', {
+        currentPage: page,
+        totalPage,
+        pageSize: PAGE_SIZE,
+        totalProducts: validProducts.length,
+        filters: {
+          category,
+          priceRange,
+          sortprice: sortprice || null,
+          sortAlphabetically: sortAlphabetically || null,
+        },
+        categories: categories.map((c) => ({ _id: c._id, name: c.name })),
+        products: paginatedProducts.map(formatAllProductForJson),
+        queryString,
+      });
+    }
+
     res.render('allproduct', {
       productcollection: paginatedProducts,
       currentPage: page,
@@ -396,6 +523,9 @@ const getproducts = async (req, res) => {
 
   } catch (error) {
     console.error('Error loading products:', error);
+    if (wantsJsonResponse(req)) {
+      return errorResponse(res, 'Error loading products', 500);
+    }
     return res.redirect('/error');
   }
 };
@@ -404,135 +534,231 @@ const getproducts = async (req, res) => {
 
 
 const productdetails = async (req, res) => {
-    try {
-        const pid = req.params.id;
-        const product = await Product.findById(pid).populate('category');
+  try {
+    const pid = req.params.id;
+    const product = await Product.findById(pid).populate('category');
 
-        if (!product) {
-            req.flash('error', 'Product not found');
-            return res.redirect('/allproducts');
-        }
-
-        let discountAmount = 0;
-        let productoffer = null;
-        let categoryoffer = null;
-
-        // Check for product offers
-        productoffer = await ProductOffer.findOne({ productname: product.productname });
-        
-        // Check for category offers
-        categoryoffer = await CategoryOffer.findOne({ category: product.category._id });
-
-        // Calculate discount based on the best offer
-        const originalPrice = parseFloat(product.price);
-        let bestDiscountPercentage = 0;
-
-        if (productoffer && productoffer.productoffer > 0) {
-            bestDiscountPercentage = productoffer.productoffer;
-        }
-
-        if (categoryoffer && categoryoffer.alloffer > bestDiscountPercentage) {
-            bestDiscountPercentage = categoryoffer.alloffer;
-        }
-
-        // Calculate final price
-        discountAmount = (originalPrice * bestDiscountPercentage) / 100;
-        const discountedPrice = originalPrice - discountAmount;
-
-        // Get related products
-        const relatedProducts = await Product.find({ 
-            category: product.category._id,
-            _id: { $ne: product._id }
-        }).limit(3).populate('category');
-
-        // Check if product is in user's wishlist
-        let isInWishlist = false;
-        const userId = req.session.userid;
-        
-        if (userId) {
-            const wishlistItem = await Wishlist.findOne({ 
-                userid: userId, 
-                productid: pid
-            });
-            isInWishlist = !!wishlistItem;
-        }
-
-        res.render('productdetails', {
-            product: {
-                ...product._doc,
-                isInWishlist,
-                price: originalPrice,
-                discountedPrice: discountedPrice
-            },
-            relatedProducts,
-            productoffer,
-            categoryoffer,
-            discountAmount,
-        });
-
-    } catch (err) {
-        console.error('Error in productdetails:', err);
-        res.redirect('/allproducts');
+    if (!product) {
+      if (wantsJsonResponse(req)) {
+        return errorResponse(res, 'Product not found', 404);
+      }
+      req.flash('error', 'Product not found');
+      return res.redirect('/allproduct');
     }
+
+    let discountAmount = 0;
+    let productoffer = null;
+    let categoryoffer = null;
+
+    productoffer = await ProductOffer.findOne({ productname: product.productname });
+
+    if (product.category) {
+      categoryoffer = await CategoryOffer.findOne({ category: product.category._id });
+    }
+
+    const originalPrice = parseFloat(product.price);
+    let bestDiscountPercentage = 0;
+
+    if (productoffer && productoffer.productoffer > 0) {
+      bestDiscountPercentage = productoffer.productoffer;
+    }
+
+    if (categoryoffer && categoryoffer.alloffer > bestDiscountPercentage) {
+      bestDiscountPercentage = categoryoffer.alloffer;
+    }
+
+    discountAmount = (originalPrice * bestDiscountPercentage) / 100;
+    const discountedPrice = originalPrice - discountAmount;
+
+    const relatedProducts = product.category
+      ? await Product.find({
+          category: product.category._id,
+          _id: { $ne: product._id },
+          isListed: true,
+        })
+          .limit(3)
+          .populate('category')
+      : [];
+
+    let isInWishlist = false;
+    const userId = req.session.userid;
+
+    if (userId) {
+      const wishlistItem = await Wishlist.findOne({
+        userid: userId,
+        productid: pid,
+      });
+      isInWishlist = !!wishlistItem;
+    }
+
+    const pricing = {
+      originalPrice,
+      discountedPrice,
+      discountAmount,
+      isInWishlist,
+    };
+
+    if (wantsJsonResponse(req)) {
+      // Format product data for JSON response
+      const productData = {
+        _id: product._id,
+        productname: product.productname,
+        description: product.description,
+        category: product.category ? {
+          _id: product.category._id,
+          name: product.category.name
+        } : null,
+        originalPrice: pricing.originalPrice,
+        discountedPrice: pricing.discountedPrice,
+        discountAmount: pricing.discountAmount,
+        discountPercentage: bestDiscountPercentage,
+        stock: product.stock,
+        brand: product.brand || 'N/A',
+        isListed: product.isListed,
+        image: product.image || [],
+        isInWishlist: pricing.isInWishlist,
+      };
+
+      // Format related products
+      const formattedRelatedProducts = relatedProducts.map(relatedProduct => ({
+        _id: relatedProduct._id,
+        productname: relatedProduct.productname,
+        price: relatedProduct.price,
+        category: relatedProduct.category ? {
+          _id: relatedProduct.category._id,
+          name: relatedProduct.category.name
+        } : null,
+        image: relatedProduct.image?.[0] || null,
+        stock: relatedProduct.stock,
+      }));
+
+      // Prepare offers data
+      const offers = {
+        productOffer: productoffer ? {
+          productname: productoffer.productname,
+          discount: productoffer.productoffer
+        } : null,
+        categoryOffer: categoryoffer ? {
+          categoryId: categoryoffer.category,
+          discount: categoryoffer.alloffer
+        } : null,
+        bestDiscount: bestDiscountPercentage
+      };
+
+      // Return success response with all data
+      return successResponse(res, 'Product details fetched successfully', {
+        product: productData,
+        relatedProducts: formattedRelatedProducts,
+        offers: offers,
+        pricing: {
+          originalPrice: pricing.originalPrice,
+          discountedPrice: pricing.discountedPrice,
+          discountAmount: pricing.discountAmount,
+          discountPercentage: bestDiscountPercentage,
+          youSave: pricing.discountAmount > 0 ? pricing.discountAmount : 0
+        }
+      });
+    }
+
+    // Render HTML for browser requests
+    res.render('productdetails', {
+      product: {
+        ...product._doc,
+        isInWishlist,
+        price: originalPrice,
+        discountedPrice,
+      },
+      relatedProducts,
+      productoffer,
+      categoryoffer,
+      discountAmount,
+    });
+  } catch (err) {
+    console.error('Error in productdetails:', err);
+    if (wantsJsonResponse(req)) {
+      return errorResponse(res, 'Error loading product details', 500);
+    }
+    req.flash('error', 'Error loading product details');
+    return res.redirect('/allproduct');
+  }
 };
 
 
 const productFilter = async (req, res) => {
-  try {
-    console.log('Entered into product filter');
+  const json = wantsJsonResponse(req);
 
+  try {
     const categories = await Category.find({ islisted: true });
 
     const {
-      category,
+      category = 'All Categories',
       sortprice,
-      priceRange,
+      priceRange = '',
       sortAlphabetically,
-      page = 1
-    } = req.body;
+      page = 1,
+    } = { ...req.query, ...req.body };
 
     const query = buildQuery(category, priceRange);
     const PAGE_SIZE = 4;
     const currentPage = parseInt(page) || 1;
 
-    if (!req.session.userid) {
+    if (!json && !req.session.userid) {
       return res.status(401).send('Unauthorized');
     }
 
-    // ✅ Step 1: Fetch many more products than needed
     const rawProducts = await Product.find(query)
       .sort(buildSortOption(sortprice, sortAlphabetically))
       .populate({
         path: 'category',
-        match: { islisted: true }
+        match: { islisted: true },
       })
-      .limit(PAGE_SIZE * 5); // To ensure we have enough valid ones
+      .limit(PAGE_SIZE * 5);
 
-    // ✅ Step 2: Filter out those with blocked/unlisted categories
-    const filteredProducts = rawProducts.filter(p => p.category);
-
-    // ✅ Step 3: Manual pagination using slice
+    const filteredProducts = rawProducts.filter((p) => p.category);
     const totalCount = filteredProducts.length;
-    const totalPage = Math.ceil(totalCount / PAGE_SIZE);
-    const paginatedProducts = filteredProducts.slice((currentPage - 1) * PAGE_SIZE, currentPage * PAGE_SIZE);
+    const totalPage = Math.ceil(totalCount / PAGE_SIZE) || 1;
+    const paginatedProducts = filteredProducts.slice(
+      (currentPage - 1) * PAGE_SIZE,
+      currentPage * PAGE_SIZE
+    );
 
-    // ✅ Step 4: Build query string for pagination
+    let wishlistProductIds = [];
+    if (req.session.userid) {
+      const wishlistItems = await Wishlist.find({ userid: req.session.userid });
+      wishlistProductIds = wishlistItems.map((item) => item.productid.toString());
+    }
+
+    paginatedProducts.forEach((product) => {
+      product.isInWishlist = wishlistProductIds.includes(product._id.toString());
+    });
+
     let queryString = '';
-    if (category && category !== 'All Categories') {
-      queryString += `&category=${category}`;
-    }
-    if (sortprice && sortprice !== 'All Prices') {
-      queryString += `&sortprice=${sortprice}`;
-    }
-    if (priceRange) {
-      queryString += `&priceRange=${priceRange}`;
-    }
-    if (sortAlphabetically) {
-      queryString += `&sortAlphabetically=${sortAlphabetically}`;
+    if (category && category !== 'All Categories') queryString += `&category=${category}`;
+    if (sortprice && sortprice !== 'All Prices') queryString += `&sortprice=${sortprice}`;
+    if (priceRange) queryString += `&priceRange=${priceRange}`;
+    if (sortAlphabetically) queryString += `&sortAlphabetically=${sortAlphabetically}`;
+
+    const responseData = {
+      currentPage,
+      totalPage,
+      pageSize: PAGE_SIZE,
+      totalProducts: totalCount,
+      filters: {
+        category,
+        priceRange,
+        sortprice: sortprice || null,
+        sortAlphabetically: sortAlphabetically || null,
+      },
+      categories: categories.map((c) => ({ _id: c._id, name: c.name })),
+      products: paginatedProducts.map(formatAllProductForJson),
+      queryString,
+    };
+
+    if (json) {
+      return successResponse(res, 'Products filtered successfully', responseData);
     }
 
-    // ✅ Step 5: Render the view
-    res.render('allproduct', {
+    return res.render('allproduct', {
       productcollection: paginatedProducts,
       currentPage,
       totalPage,
@@ -541,12 +767,12 @@ const productFilter = async (req, res) => {
       category,
       priceRange,
       queryString,
-      categories
+      categories,
     });
-
   } catch (error) {
     console.error('Error fetching products:', error);
-    res.status(500).send('Internal server error');
+    if (json) return errorResponse(res, 'Error filtering products', 500);
+    return res.status(500).send('Internal server error');
   }
 };
 
@@ -602,6 +828,8 @@ const buildSortOption = ( sortprice,sortAlphabetically)=>{
 module.exports = 
 {
   productmanagement,
+  getProductsApi,
+  getProductPage,
   addproductget,
   addproductpost,
   getEditProduct,

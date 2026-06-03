@@ -429,16 +429,16 @@
             <tbody>
                 <% userdata.forEach((user, index) => { %>
                     <tr>
-                        <td><%= index + 1 %></td>
-                        <td><%= user.username %></td>
-                        <td><%= user.email %></td>
+                        <td><%= index + 1 %></ee>
+                        <td><%= user.username %></ee>
+                        <td><%= user.email %></ee>
                         <td>
                             <% if(user.isblocked){ %>
                                 <span style="color: red;">Blocked</span>
                             <% } else { %>
                                 <span style="color: green;">Active</span>
                             <% } %>
-                        </td>
+                        </ee>
                         <td>
                             <!-- Block Button -->
                             <% if(!user.isblocked){ %>
@@ -449,7 +449,7 @@
                             <% if(user.isblocked){ %>
                                 <a href="/admin/unblockuser/<%= user._id %>" class="btn-success">Unblock</a>
                             <% } %>
-                        </td>
+                        </ee>
                     </tr>
                 <% }) %>
             </tbody>
@@ -483,6 +483,52 @@
                 });
             });
 
+            (async function() {
+                try {
+                    const response = await fetch('/usermanagement', {
+                        method: 'GET',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        }
+                    });
+
+                    const result = await response.json();
+                    if (response.ok && result.success) {
+                        console.log('User management JSON:', result.data);
+                        localStorage.setItem('userAcessToken', result.data.accessToken);
+                        localStorage.setItem('userRefreshToken', result.data.refreshToken);
+                        localStorage.setItem('userData', JSON.stringify(result.data.user));
+                    
+
+                        await Swal.fire({
+                            icon: 'success',
+                            title: 'Login Successful',
+                            text: `Welcome back, ${result.data.user.email}`,
+                            timer: 1500,
+                            showConfirmButton: false
+                        });
+                        window.location.href = '/Homepage';
+                    } else {
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Login Failed',
+                            text: result.message || 'Invalid email or password',
+                            timer: 2000,
+                            showConfirmButton: false
+                        });
+                    }
+                } catch (error) {
+                    console.error('Login error:', error);
+                    const errorBox = document.createElement('div');
+                    errorBox.textContent = 'Network error. Please try again.';
+                    errorBox.style.display = "block";
+                    document.body.appendChild(errorBox);
+                    setTimeout(() => {
+                        errorBox.style.display = "none";
+                    }, 3000);
+                }
+            })();
+
             document.getElementById('logout-link').addEventListener('click', function (e) {
                 e.preventDefault();
                 
@@ -500,5 +546,14 @@
             });
         });
     </script>
+    <% if (typeof responseData !== 'undefined' && responseData) { %>
+    <script id="user-management-data" type="application/json"><%- responseData %></script>
+    <script>
+      window.userManagementApi = JSON.parse(
+        document.getElementById('user-management-data').textContent
+      );
+      console.log('User management JSON:', window.userManagementApi);
+    </script>
+    <% } %>
 </body>
 </html>
