@@ -108,5 +108,16 @@ mongoose.connect(process.env.MONGODB_URI)
   })
   .catch(err => console.error('Database connection error:', err));
 
+  mongoose.connection.once("open", async () => {
+    console.log("Connected DB:", mongoose.connection.name);
+
+    const collections = await mongoose.connection.db.listCollections().toArray();
+
+    console.log(
+        "Collections:",
+        collections.map(c => c.name)
+    );
+});
+
 
 
