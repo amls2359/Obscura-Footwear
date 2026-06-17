@@ -314,7 +314,7 @@ const postEditProduct = async (req, res) => {
     // Update category listings if needed
     const newCategory = await Category.findById(category);
     if (newCategory) {
-      newCategory.islisted = true;
+      newCategory.isListed = true;
       await newCategory.save();
     }
 
@@ -454,7 +454,7 @@ const getproducts = async (req, res) => {
     const sortOptions = buildSortOption(sortprice, sortAlphabetically);
 
     // Get listed categories for sidebar
-    const categories = await Category.find({ islisted: true });
+    const categories = await Category.find({ isListed: true });
 
     // Step 1: Fetch more products than needed
     const rawProducts = await Product.find(query)
