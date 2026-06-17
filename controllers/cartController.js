@@ -44,7 +44,7 @@ const addToCart = async (req, res) => {
     try {
         console.log('Add to cart initiated');
         const productId = req.params.productId;
-        const userId = req.session.userId || req.session.userid || req.session.user._id;
+        const userId = req.user.userId
 
         console.log('Product ID:', productId);
 

@@ -45,7 +45,11 @@ router.get('/auth/google',
 
 // Callback after Google login
 router.get('/auth/google/callback',
-  passport.authenticate('google', { failureRedirect: '/guesthomepage' }),
+  passport.authenticate('google', 
+    { 
+      failureRedirect: '/guesthomepage',
+      session: false
+     }),
   UserController.googleUser
 );
 

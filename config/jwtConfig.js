@@ -24,7 +24,7 @@ const generateTokens = (user) => {
 
 const verifyAccessToken = (token) => {
     try {
-        return jwt.verify(token, process.env.JWT_SECRET);
+        return jwt.verify(token, process.env.JWT_ACCESS_SECRET);
     } catch (error) {
         return null;
     }
@@ -50,7 +50,7 @@ const generateSuperAdminTokens = (superAdmin) => {
 
     const accessToken = jwt.sign(
         payload, 
-        process.env.JWT_SECRET, 
+        process.env.JWT_ACCESS_SECRET, 
         { expiresIn: process.env.JWT_SUPERADMIN_ACCESS_EXPIRY || '1h' }
     );
 
@@ -66,7 +66,7 @@ const generateSuperAdminTokens = (superAdmin) => {
 
 const verifyAdminAccessToken = (token) => {
     try {
-        const decoded = jwt.verify(token, process.env.JWT_SECRET);
+        const decoded = jwt.verify(token, process.env.JWT_ACCESS_SECRET);
         return decoded;
     } catch (error) {
         if (error.name === 'TokenExpiredError') {

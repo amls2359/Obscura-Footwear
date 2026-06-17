@@ -26,6 +26,7 @@ const createSuperAdmin = require('./seeds/superAdminSeeds');
 const app = express();
 const port = process.env.PORT || 3001;
 
+
 app.use(session({
   secret: 'your-secret-key-should-be-long-and-complex',
   resave: false,
@@ -106,3 +107,6 @@ mongoose.connect(process.env.MONGODB_URI)
     });
   })
   .catch(err => console.error('Database connection error:', err));
+
+
+

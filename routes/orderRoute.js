@@ -1,8 +1,8 @@
 const express= require('express')
 const router = express.Router()
 const orderController = require('../controllers/orderController')
-const {jwtAuth} = require('../Middleware/jwtAuth')
-const {isUser} = require('../Middleware/roleMiddleware')
+const {jwtAuth,jwtAdminAuth} = require('../Middleware/jwtAuth')
+const {isUser,isSuperAdmin} = require('../Middleware/roleMiddleware')
 
 router.get('/checkout', jwtAuth, isUser, orderController.getCheckout)
 router.get('/orderAddress', jwtAuth, isUser, orderController.addAddressCheckout)
@@ -10,9 +10,9 @@ router.post('/checkoutaddress', jwtAuth, isUser, orderController.addAddressCheck
 router.post('/checkoutPost', jwtAuth, isUser, orderController.checkoutPost)
 router.get('/placeOrder', jwtAuth, isUser, orderController.placeOrder)
 router.get('/userOrderDetails', jwtAuth, isUser, orderController.userOrders)
-router.get('/orderDetails/:orderid/:productid', jwtAuth, isUser, orderController.orderDetailsGet)
+router.get('/orderDetails/:orderid/:productid', jwtAdminAuth, isSuperAdmin, orderController.orderDetailsGet)
 router.get('/returnOrder/:orderId/:productId', jwtAuth, isUser, orderController.orderReturn)
 router.get('/cancelOrder/:orderId/:productId', jwtAuth, isUser, orderController.cancelOrder)
-router.get('/Invoice/:orderid', jwtAuth, isUser, orderController.Invoice)
+router.get('/Invoice/:orderid', jwtAdminAuth, isSuperAdmin, orderController.Invoice)
 
 module.exports=router

@@ -49,7 +49,7 @@ $(document).ready(function(){
 		var formData = $(this).serialize();
 
 		$.ajax({
-			url:"/createOrder",
+			url:"/create/orderId",
 			type:"POST",
 			data: formData,
 			success:function(res){
@@ -61,7 +61,7 @@ $(document).ready(function(){
 						"name": ""+res.product_name+"",
 						"description": ""+res.description+"",
 						"image": "https://dummyimage.com/600x400/000/fff",
-						"order_id": ""+res.order_id+"",
+						"order_id": ""+res.orderid+"",
 						"handler": function (response){
 							alert("Payment Succeeded");
 							// window.open("/","_self")
@@ -81,6 +81,7 @@ $(document).ready(function(){
 					var razorpayObject = new Razorpay(options);
 				
 					razorpayObject.on('payment.failed', function (response){
+						console.log(response)
 						alert("Payment Failed");
 
 					});

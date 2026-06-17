@@ -7,13 +7,14 @@ const Wishlist = require('../models/wishlist');
 const Wallet = require('../models/wallet')
 const bcrypt = require('bcrypt')
 const otpModel = require('../models/otpModel')
-const { generateTokens, verifyAccessToken } = require('../config/jwtConfig');
+const { generateTokens, verifyAccessToken, verifyRefreshToken } = require('../config/jwtConfig');
 const {
     successResponse,
     errorResponse,
     wantsJsonResponse,
 } = require('../utils/reposnseHandler');
 
+const jwt = require('jsonwebtoken');
 
 
 const googleUser = async (req, res) => {
@@ -21,19 +22,53 @@ const googleUser = async (req, res) => {
         console.log('✅ Reached googleUser controller');
 
         if (!req.user) {
-            console.log('❌ No user found in req.user');
-            return res.redirect('/guesthomepage'); // or some safe fallback
+            return res.redirect('/guesthomepage');
         }
 
         console.log('👤 Google user:', req.user);
 
-        // Save user ID in session
-        req.session.userid = req.user._id;
-        req.session.isAuthenticated = true;
-        console.log(`💾 Session set: ${req.session.userid}`);
+        // Generate Access Token (short life)
+        const accessToken = jwt.sign(
+            {
+                userId: req.user._id,
+                email: req.user.email,
+                role: req.user.role || 'user'
+            },
+            process.env.JWT_ACCESS_SECRET,
+            { expiresIn: '15m' }
+        );
 
-        // Redirect to Homepage
-        res.redirect('/Homepage');
+        // Generate Refresh Token (long life)
+        const refreshToken = jwt.sign(
+            {
+                userId: req.user._id,
+                email: req.user.email
+            },
+            process.env.JWT_REFRESH_SECRET,
+            { expiresIn: '7d' }
+        );
+
+        // ✅ Access Token Cookie
+        res.cookie('accessToken', accessToken, {
+            httpOnly: true,
+            secure: process.env.NODE_ENV === 'production',
+            sameSite: 'lax',
+            maxAge: 15 * 60 * 1000,
+            path: '/'
+        });
+
+        // ✅ Refresh Token Cookie
+        res.cookie('refreshToken', refreshToken, {
+            httpOnly: true,
+            secure: process.env.NODE_ENV === 'production',
+            sameSite: 'lax',
+            maxAge: 7 * 24 * 60 * 60 * 1000,
+            path: '/'
+        });
+
+        // 👉 Redirect instead of passing token to frontend
+        return res.redirect('/Homepage');
+
     } catch (error) {
         console.error('❌ Google login error:', error);
         return res.status(500).json({ error: 'Failed to log in with Google' });
@@ -140,7 +175,7 @@ const sendOtpEmail = async (email, otp) => {
                 user: process.env.EMAIL_ADDRESS,
                 pass: process.env.EMAIL_PASSWORD,
             },
-            tls:{
+            tls: {
                 ciphers: 'SSLv3'
             }
         });
@@ -164,11 +199,10 @@ const sendOtpEmail = async (email, otp) => {
 //! User Login Handler
 const userLoginPost = async (req, res) => {
     const { email, password } = req.body;
-    console.log(`Login attempt for email: ${email}`);
+        console.log("LOGIN CONTROLLER HIT");
 
     const wantsJson = wantsJsonResponse(req);
-    
-    // Initialize all template variables with default values
+
     const templateData = {
         email: email || '',
         emailError: null,
@@ -177,13 +211,13 @@ const userLoginPost = async (req, res) => {
         successMessage: null
     };
 
-    // Basic validation
+    // Validate required fields
     if (!email || !password) {
         const errorResponse = {
             emailError: !email ? 'Email is required' : null,
             passwordError: !password ? 'Password is required' : null
         };
-        
+
         if (wantsJson) {
             return res.status(400).json({
                 success: false,
@@ -191,14 +225,16 @@ const userLoginPost = async (req, res) => {
                 errors: errorResponse
             });
         }
+
         return res.render('UserLogin', {
             ...templateData,
             ...errorResponse
         });
     }
 
-    // Email format validation
+    // Validate email format
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
     if (!emailRegex.test(email)) {
         if (wantsJson) {
             return res.status(400).json({
@@ -206,6 +242,7 @@ const userLoginPost = async (req, res) => {
                 message: 'Please enter a valid email address'
             });
         }
+
         return res.render('UserLogin', {
             ...templateData,
             email,
@@ -214,9 +251,9 @@ const userLoginPost = async (req, res) => {
     }
 
     try {
-        console.log('Step 1: Searching for user');
+
+        // Find user
         const user = await UserCollection.findOne({ email });
-        console.log('Step 2: User found:', user ? user._id : 'No user');
 
         if (!user) {
             if (wantsJson) {
@@ -225,33 +262,36 @@ const userLoginPost = async (req, res) => {
                     message: 'No account found with this email'
                 });
             }
+
             return res.render('UserLogin', {
                 ...templateData,
                 email,
                 emailError: 'No account found with this email'
             });
         }
-        
-        console.log('Step 3: Checking password field');
+
+        // Google account check
         if (!user.password) {
-            console.log('Step 4: No password field - Google account');
             if (wantsJson) {
                 return res.status(401).json({
                     success: false,
                     message: 'This account was registered using Google. Please login with Google.'
                 });
             }
+
             return res.render('UserLogin', {
                 ...templateData,
                 email,
                 passwordError: 'This account was registered using Google. Please login with Google.'
             });
         }
-        
-        console.log('Step 5: Comparing password');
-        const validPassword = bcrypt.compareSync(password, user.password);
-        console.log('Step 6: Password valid:', validPassword);
-        
+
+        // Verify password
+        const validPassword = await bcrypt.compare(
+            password,
+            user.password
+        );
+
         if (!validPassword) {
             if (wantsJson) {
                 return res.status(401).json({
@@ -259,104 +299,92 @@ const userLoginPost = async (req, res) => {
                     message: 'Incorrect password'
                 });
             }
+
             return res.render('UserLogin', {
                 ...templateData,
                 email,
                 passwordError: 'Incorrect password'
             });
         }
-        
-        console.log('Step 7: Generating tokens');
-        // Generate tokens
-        const { accessToken, refreshToken } = generateTokens({
-            _id: user._id,
-            email: user.email,
-            role: user.role || 'user',
+
+        // Generate Access Token (15m)
+        const accessToken = jwt.sign(
+            {
+                userId: user._id,
+                email: user.email,
+                role: user.role || 'user'
+            },
+            process.env.JWT_ACCESS_SECRET,
+            {
+                expiresIn: '15m'
+            }
+        );
+
+        console.log('Generated Access Token:', accessToken);
+
+        // Generate Refresh Token (7d)
+        const refreshToken = jwt.sign(
+            {
+                userId: user._id,
+                email: user.email,
+                role: user.role || 'user'
+            },
+            process.env.JWT_REFRESH_SECRET,
+            {
+                expiresIn: '7d'
+            }
+        );
+
+        console.log('Generated Refresh Token:', refreshToken);
+
+        // Set Access Token Cookie
+        res.cookie('accessToken', accessToken, {
+            httpOnly: true,
+            secure: process.env.NODE_ENV === 'production',
+            sameSite: 'lax',
+            maxAge: 15 * 60 * 1000,
+            path: '/'
         });
 
-        console.log('Tokens generated:', {
-            accessTokenExists: !!accessToken,
-            refreshTokenExists: !!refreshToken
+        // Set Refresh Token Cookie
+        res.cookie('refreshToken', refreshToken, {
+            httpOnly: true,
+            secure: process.env.NODE_ENV === 'production',
+            sameSite: 'lax',
+            maxAge: 7 * 24 * 60 * 60 * 1000,
+            path: '/'
         });
 
-        // Save refresh token to user document
-        user.refreshToken = refreshToken;
-        await user.save();
-        console.log('Refresh token saved to user');
+        console.log('Access Token set:', accessToken);
+        console.log('Refresh Token set:', refreshToken);
 
-        // Set session
-        req.session.userid = user._id;
-        req.session.email = user.email;
-        req.session.isAuthenticated = true;
-        req.session.username = user.username || '';
-        req.session.role = user.role || 'user';
-        req.session.isSuperAdmin = false;
-
-        // Helper function to set token cookies
-        const setTokenCookies = () => {
-            res.cookie('accessToken', accessToken, {
-                httpOnly: true,
-                secure: process.env.NODE_ENV === 'production',
-                maxAge: 2 * 60 * 60 * 1000, // 2 hours
-                sameSite: 'lax',
-            });
-            res.cookie('refreshToken', refreshToken, {
-                httpOnly: true,
-                secure: process.env.NODE_ENV === 'production',
-                maxAge: 30 * 24 * 60 * 60 * 1000, // 30 days
-                sameSite: 'lax',
-            });
-        };
-
-        // If AJAX request, return JSON
+        // API response
         if (wantsJson) {
-            setTokenCookies();
-            
             return res.status(200).json({
                 success: true,
                 message: 'Login successful',
-                data: {
-                    accessToken: accessToken,
-                    refreshToken: refreshToken,
-                    user: {
-                        userId: user._id,
-                        username: user.username,
-                        email: user.email,
-                        role: user.role || 'user'
-                    },
-                    tokenExpiry: Date.now() + 2 * 60 * 60 * 1000 // 2 hours
+                user: {
+                    userId: user._id,
+                    username: user.username,
+                    email: user.email,
+                    role: user.role || 'user'
                 }
             });
         }
 
-        // Traditional form submission - use session and redirect
-        req.session.save(err => {
-            if (err) {
-                console.error("Session save error:", err);
-                return res.render('UserLogin', {
-                    ...templateData,
-                    email,
-                    errorMessage: 'An error occurred during login. Please try again.'
-                });
-            }
-
-            setTokenCookies();
-
-            const returnTo = req.session.returnTo || '/Homepage';
-            delete req.session.returnTo;
-            return res.redirect('/Homepage');
-        });
+        // EJS redirect
+        return res.redirect('/Homepage');
 
     } catch (err) {
-        console.error("Login error:", err);
-        
+        console.error('Login error:', err);
+
         if (wantsJson) {
             return res.status(500).json({
                 success: false,
                 message: 'An internal server error occurred. Please try again later.'
             });
         }
-        
+
         return res.render('UserLogin', {
             ...templateData,
             email,
@@ -794,7 +822,7 @@ const resendOtpPost = async (req, res) => {
 
 const wishlist = async (req, res) => {
     try {
-        const userid = req.session.userid;
+        const userid = req.user.userId;
 
         // Fetch wishlist items and populate productid
         const wishlistItems = await Wishlist.find({ userid })
@@ -844,7 +872,7 @@ const wishlist = async (req, res) => {
 const addToWishlist = async (req, res) => {
     try {
         const productid = req.params.id;
-        const userid = req.session.userid;
+        const userid = req.user.userId;
 
         if (!userid) {
             return res.status(401).json({ success: false, message: 'Please login to add items to wishlist' });
@@ -881,7 +909,7 @@ const addToWishlist = async (req, res) => {
 const removeWishlist = async (req, res) => {
     try {
         const productId = req.params.id;
-        const userid = req.session.userid;
+        const userid = req.user.userId;
 
         if (!userid) {
             return res.status(401).json({ success: false, message: 'Please login to remove items from wishlist' });
@@ -914,7 +942,7 @@ const getWallet = async (req, res) => {
     console.log('entered into wallet details');
 
     try {
-        const userId = req.session.userid;
+        const userId = req.user.userId;
         const userData = await UserCollection.findById(userId);
         const Walletdetails = await Wallet.find({ userid: userId }).sort({ date: -1 });
 

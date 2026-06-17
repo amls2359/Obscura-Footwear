@@ -12,7 +12,7 @@ const PDFDocument = require('pdfkit')
 
 const getCheckout = async (req, res) => {
     try {
-        const userId = req.session.userid; // Make sure this matches your session setup
+        const userId = req.user.userId; // Make sure this matches your session setup
         console.log(`userid is ${userId}`);
 
         const errorMessage = req.session.checkoutError || null;
@@ -86,7 +86,7 @@ const checkoutPost= async(req,res)=>
       console.log('req.body is :',req.body);
       const paymentmethod = req.body.paymentmethod || req.body.paymentMethod;
       
-      const userId = req.session.userid
+      const userId = req.user.userId;
       const currentDate = new Date()
 
       const user = await UserCollection.findById( userId)
@@ -205,12 +205,12 @@ const addAddressCheckoutPost = async(req,res)=>
 {
     try
     {
-       const userId = req.session.userid
+       const userId = req.user.userId
        console.log(`user id id ${userId}`);
 
        const address =
        {
-       userid:req.session.userid,
+       userid:req.user.userId,
        firstname:req.body.firstname,
        lastname:req.body.lastname,
        address:req.body.address,
@@ -339,7 +339,7 @@ const orderDetailsGet= async(req,res)=>
 
 const userOrders = async (req, res) => {
   try {
-    const userid = req.session.userid;
+    const userid = req.user.userId;
     const orders = await OrderCollection.find({ userid: userid });
 
     for (let i = 0; i < orders.length; i++) {
@@ -478,7 +478,7 @@ const orderReturn = async (req, res) => {
     const orderId = req.params.orderId; // Should be the order ID
     const productId = req.params.productId;
     const selectedStatus = 'returned';
-    const userSessionId = req.session.userid;
+    const userSessionId = req.user.userId;
 
     console.log(`📦 Order ID: ${orderId}`);
     console.log(`🛒 Product ID: ${productId}`);
@@ -597,10 +597,11 @@ const orderReturn = async (req, res) => {
 
 const Invoice = async (req, res) => {
   try {
-    let userId = req.session.userid;
+    let userId = req.user.userId;
     const orderId = req.params.orderid;
 
     const invoiceDetails = await UserCollection.findOne({ _id: userId });
+    console.log('invoice details is', invoiceDetails);
     const specificOrder = await OrderCollection.findById(orderId);
 
     if (!specificOrder) {

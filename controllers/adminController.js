@@ -200,159 +200,146 @@ const dashboard = async (req, res) => {
 const adminLoginPost = async (req, res) => {
     try {
         console.log('entered into admin login');
-        
+
         const { email, password } = req.body;
-        
-        const wantsJson = req.headers['accept']?.includes('application/json') || 
-                          req.headers['content-type']?.includes('application/json') ||
-                          req.xhr;
-        
-        // Find user by email
+
+        const wantsJson =
+            req.headers['accept']?.includes('application/json') ||
+            req.headers['content-type']?.includes('application/json') ||
+            req.xhr;
+
+        // Find admin
         const user = await SuperAdmin.findOne({ email });
-        
-        // Check if user exists
+
         if (!user) {
             if (wantsJson) {
                 return res.status(401).json({
                     success: false,
-                    message: 'Invalid email or password'
+                    message: 'Invalid email or password',
                 });
             }
-            return res.render('adminLogin', { 
-                errorMessage: 'Invalid email or password', 
-                successMessage: null 
+
+            return res.render('adminLogin', {
+                errorMessage: 'Invalid email or password',
+                successMessage: null,
             });
         }
-        
-        // Only allow SuperAdmin to access admin portal
+
+        // Allow only super admin
         if (user.role !== 'superAdmin' || !user.isSuperAdmin) {
             if (wantsJson) {
                 return res.status(403).json({
                     success: false,
-                    message: 'Access denied. Only Super Admin can access this portal.'
+                    message:
+                        'Access denied. Only Super Admin can access this portal.',
                 });
             }
-            return res.render('adminLogin', { 
-                errorMessage: 'Access denied. Only Super Admin can access this portal.', 
-                successMessage: null 
+
+            return res.render('adminLogin', {
+                errorMessage:
+                    'Access denied. Only Super Admin can access this portal.',
+                successMessage: null,
             });
         }
-        
-        // Check if account is blocked
+
+        // Check blocked status
         if (user.isblocked) {
             if (wantsJson) {
                 return res.status(403).json({
                     success: false,
-                    message: 'Your account has been blocked.'
+                    message: 'Your account has been blocked.',
                 });
             }
-            return res.render('adminLogin', { 
-                errorMessage: 'Your account has been blocked.', 
-                successMessage: null 
+
+            return res.render('adminLogin', {
+                errorMessage: 'Your account has been blocked.',
+                successMessage: null,
             });
         }
-        
+
         // Verify password
-        const validPassword = await bcrypt.compare(password, user.password);
+        const validPassword = await bcrypt.compare(
+            password,
+            user.password
+        );
+
         console.log(`Valid password: ${validPassword}`);
-        
+
         if (!validPassword) {
             if (wantsJson) {
                 return res.status(401).json({
                     success: false,
-                    message: 'Invalid email or password'
+                    message: 'Invalid email or password',
                 });
             }
-            return res.render('adminLogin', { 
-                errorMessage: 'Invalid email or password', 
-                successMessage: null 
+
+            return res.render('adminLogin', {
+                errorMessage: 'Invalid email or password',
+                successMessage: null,
             });
         }
-        
-        const { accessToken, refreshToken } = generateSuperAdminTokens(user);
-        user.refreshToken = refreshToken;
+
+        // Generate JWT tokens
+        const { accessToken, refreshToken } =
+            generateSuperAdminTokens(user);
         await user.save();
-        
-        // Set session
-        req.session.userid = user._id;
-        req.session.email = user.email;
-        req.session.admin = user.email;
-        req.session.isAuthenticated = true;
-        req.session.role = 'superAdmin';
-        req.session.isSuperAdmin = true;
 
-        const setTokenCookies = () => {
-            res.cookie('accessToken', accessToken, {
-                httpOnly: true,
-                secure: process.env.NODE_ENV === 'production',
-                maxAge: 2 * 60 * 60 * 1000,
-                sameSite: 'lax',
-            });
-            res.cookie('refreshToken', refreshToken, {
-                httpOnly: true,
-                secure: process.env.NODE_ENV === 'production',
-                maxAge: 30 * 24 * 60 * 60 * 1000,
-                sameSite: 'lax',
-            });
-        };
-
-        req.session.save((err) => {
-            if (err) {
-                console.error('Session save error:', err);
-                if (wantsJson) {
-                    return res.status(500).json({
-                        success: false,
-                        message: 'Error creating session',
-                    });
-                }
-                return res.render('adminLogin', {
-                    errorMessage: 'Error during login. Please try again.',
-                    successMessage: null,
-                });
-            }
-
-            setTokenCookies();
-
-            if (wantsJson) {
-                return res.json({
-                    success: true,
-                    message: 'Super Admin login successful',
-                    data: {
-                        user: {
-                            id: user._id,
-                            email: user.email,
-                            username: user.username,
-                            role: 'superAdmin',
-                            isSuperAdmin: true,
-                        },
-                        accessToken,
-                        refreshToken,
-                        tokenExpiry: {
-                            accessTokenExpiry:
-                                process.env.JWT_SUPERADMIN_ACCESS_EXPIRY || '2h',
-                            refreshTokenExpiry:
-                                process.env.JWT_SUPERADMIN_REFRESH_EXPIRY || '30d',
-                        },
-                    },
-                });
-            }
-
-            return res.redirect('/admin/dashboard');
+        // Set cookies
+        res.cookie('accessToken', accessToken, {
+            httpOnly: true,
+            secure: process.env.NODE_ENV === 'production',
+            sameSite: 'lax',
+            maxAge: 2 * 60 * 60 * 1000, // 2 hours
         });
-        
+
+        res.cookie('refreshToken', refreshToken, {
+            httpOnly: true,
+            secure: process.env.NODE_ENV === 'production',
+            sameSite: 'lax',
+            maxAge: 30 * 24 * 60 * 60 * 1000, // 30 days
+        });
+
+        console.log('✅ Admin JWT cookies set successfully');
+
+        if (wantsJson) {
+            return res.status(200).json({
+                success: true,
+                message: 'Super Admin login successful',
+                data: {
+                    user: {
+                        id: user._id,
+                        email: user.email,
+                        username: user.username,
+                        role: 'superAdmin',
+                        isSuperAdmin: true,
+                    },
+                    tokenExpiry: {
+                        accessTokenExpiry:
+                            process.env.JWT_SUPERADMIN_ACCESS_EXPIRY || '2h',
+                        refreshTokenExpiry:
+                            process.env.JWT_SUPERADMIN_REFRESH_EXPIRY || '30d',
+                    },
+                },
+            });
+        }
+
+        return res.redirect('/admin/dashboard');
+
     } catch (error) {
-        console.error("Admin login error:", error);
-        
-        if (req.headers['accept']?.includes('application/json')) {
+        console.error('Admin login error:', error);
+
+        if (
+            req.headers['accept']?.includes('application/json')
+        ) {
             return res.status(500).json({
                 success: false,
-                message: 'Internal Server Error'
+                message: 'Internal Server Error',
             });
         }
-        
-        res.render('adminLogin', { 
-            errorMessage: 'Internal Server Error', 
-            successMessage: null 
+
+        return res.render('adminLogin', {
+            errorMessage: 'Internal Server Error',
+            successMessage: null,
         });
     }
 };

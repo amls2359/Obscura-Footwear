@@ -10,7 +10,8 @@ const userSchema = new mongoose.Schema({
     referralcode:{type:String},
     googleId:{type:String},
     isDeleted: { type: Boolean, default: false } ,
-    refreshToken:{type:String}
+    refreshToken:{type:String},
+    refreshTokenExpiry:{type:Date}
 
 });
 

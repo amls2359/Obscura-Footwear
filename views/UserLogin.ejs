@@ -280,7 +280,7 @@
             <div id="error-message-global" class="error-message global"></div>
             <div id="success-message" class="success-message"></div>
 
-            <form id="login-form">
+            <form id="login-form" method="POST" action="/userLoginPost">
                 <div class="input-field">
                     <label for="email">Email Address</label>
                     <input type="text" name="email" id="email" placeholder="Enter your email" autocomplete="email">
@@ -321,38 +321,6 @@
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@10"></script>
     
     <script>
-        // Debug function to check localStorage
-        function debugLocalStorage() {
-            console.log('=== LOCALSTORAGE DEBUG ===');
-            console.log('All items in localStorage:');
-            for (let i = 0; i < localStorage.length; i++) {
-                const key = localStorage.key(i);
-                const value = localStorage.getItem(key);
-                if (key && value) {
-                    console.log(`${key}:`, value.substring(0, 50) + (value.length > 50 ? '...' : ''));
-                }
-            }
-            
-            const token = localStorage.getItem('userAccessToken');
-            if (token) {
-                console.log('✅ Token found! Length:', token.length);
-                // Try to decode token to see if it's valid
-                try {
-                    const base64Url = token.split('.')[1];
-                    const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
-                    const payload = JSON.parse(atob(base64));
-                    console.log('Token payload:', payload);
-                    console.log('User ID from token:', payload.userId);
-                    console.log('Token expiry:', new Date(payload.exp * 1000).toLocaleString());
-                } catch(e) {
-                    console.log('Token is not a valid JWT or cannot be decoded:', e.message);
-                }
-            } else {
-                console.log('❌ No token found in localStorage');
-            }
-            console.log('========================');
-        }
-
         // Function to show error
         function showError(elementId, message) {
             const errorElement = document.getElementById(elementId);
@@ -428,127 +396,70 @@
             }
         });
 
-        // Form submission
-        document.getElementById('login-form').addEventListener('submit', async function(event) {
-            event.preventDefault();
+        // document.getElementById('login-form').addEventListener('submit', async function(event) 
+        // {
+        //     event.preventDefault();
             
-            const email = document.getElementById('email').value.trim();
-            const password = document.getElementById('password').value.trim();
+        //     const email = document.getElementById('email').value.trim();
+        //     const password = document.getElementById('password').value.trim();
             
-            // Clear previous errors
-            clearErrors();
+        //     // Clear previous errors
+        //     clearErrors();
             
-            // Validate form
-            let isValid = true;
+        //     // Validate form
+        //     let isValid = true;
             
-            if (!email) {
-                showError('email-error', 'Email is required');
-                isValid = false;
-            } else if (!validateEmailFormat(email)) {
-                showError('email-error', 'Please enter a valid email address');
-                isValid = false;
-            }
+        //     if (!email) {
+        //         showError('email-error', 'Email is required');
+        //         isValid = false;
+        //     } else if (!validateEmailFormat(email)) {
+        //         showError('email-error', 'Please enter a valid email address');
+        //         isValid = false;
+        //     }
             
-            if (!password) {
-                showError('password-error', 'Password is required');
-                isValid = false;
-            } else if (password.length < 6) {
-                showError('password-error', 'Password must be at least 6 characters');
-                isValid = false;
-            }
+        //     if (!password) {
+        //         showError('password-error', 'Password is required');
+        //         isValid = false;
+        //     } else if (password.length < 6) {
+        //         showError('password-error', 'Password must be at least 6 characters');
+        //         isValid = false;
+        //     }
             
-            if (!isValid) return;
+        //     if (!isValid) return;
             
-            // Show loading state
-            const submitBtn = document.getElementById('loginBtn');
-            const originalText = submitBtn.innerHTML;
-            submitBtn.innerHTML = '<span class="loading-spinner"></span> Logging in...';
-            submitBtn.disabled = true;
+        //     // Show loading state
+        //     const submitBtn = document.getElementById('loginBtn');
+        //     const originalText = submitBtn.innerHTML;
+        //     submitBtn.innerHTML = '<span class="loading-spinner"></span> Logging in...';
+        //     submitBtn.disabled = true;
             
-            try {
-                console.log('Sending login request...');
+        //     // Here you would typically make an API call to your backend
+        //     // For demo purposes, we'll simulate a login attempt
+        //     try {
+        //         // Simulate API call
+        //         await new Promise(resolve => setTimeout(resolve, 1500));
                 
-                const response = await fetch('/userLoginPost', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'Accept': 'application/json',
-                    },
-                    body: JSON.stringify({ email, password })
-                });
+        //         // Show success message (for demo purposes)
+        //         const successMessage = document.getElementById('success-message');
+        //         successMessage.textContent = 'Login successful! Redirecting...';
+        //         successMessage.style.display = 'block';
                 
-                const result = await response.json();
-                console.log('Login response received:', result);
+        //         // Redirect after 2 seconds
+        //         setTimeout(() => {
+        //             window.location.href = '/Homepage';
+        //         }, 2000);
                 
-                if (response.ok && result.success) {
-                    // Store tokens in localStorage
-                    if (result.data && result.data.accessToken) {
-                        localStorage.setItem('userAccessToken', result.data.accessToken);
-                        console.log('✅ Access token stored successfully');
-                    } else {
-                        console.warn('⚠️ No accessToken in response');
-                    }
-                    
-                    if (result.data && result.data.refreshToken) {
-                        localStorage.setItem('userRefreshToken', result.data.refreshToken);
-                        console.log('✅ Refresh token stored successfully');
-                    }
-                    
-                    if (result.data && result.data.user) {
-                        localStorage.setItem('user', JSON.stringify(result.data.user));
-                        console.log('✅ User data stored successfully');
-                    }
-                    
-                    // Store token expiry if provided
-                    if (result.data && result.data.tokenExpiry) {
-                        localStorage.setItem('tokenExpiry', result.data.tokenExpiry);
-                    }
-                    
-                    // Debug: Check what was stored
-                    debugLocalStorage();
-                    
-                    // Show success message
-                    await Swal.fire({
-                        icon: 'success',
-                        title: 'Login Successful!',
-                        text: `Welcome back, ${result.data.user?.username || 'User'}!`,
-                        timer: 1500,
-                        showConfirmButton: false,
-                        background: '#fff',
-                        backdrop: true
-                    });
-                    
-                    // Redirect to homepage
-                    console.log('Redirecting to homepage...');
-                    window.location.href = '/Homepage';
-                } else {
-                    // Show error message
-                    const errorMsg = result.message || 'Login failed. Please check your credentials.';
-                    console.error('Login failed:', errorMsg);
-                    
-                    const errorDiv = document.getElementById('error-message-global');
-                    errorDiv.textContent = errorMsg;
-                    errorDiv.style.display = 'block';
-                    
-                    setTimeout(() => {
-                        errorDiv.style.display = 'none';
-                    }, 5000);
-                }
-            } catch (error) {
-                console.error('Login error:', error);
-                const errorDiv = document.getElementById('error-message-global');
-                errorDiv.textContent = 'Network error. Please check your connection and try again.';
-                errorDiv.style.display = 'block';
+        //     } catch (error) {
+        //         // Show error message
+        //         const errorMessage = document.getElementById('error-message-global');
+        //         errorMessage.textContent = 'Invalid email or password. Please try again.';
+        //         errorMessage.style.display = 'block';
                 
-                setTimeout(() => {
-                    errorDiv.style.display = 'none';
-                }, 5000);
-            } finally {
-                // Reset button
-                submitBtn.innerHTML = originalText;
-                submitBtn.disabled = false;
-            }
-        });
+        //         // Reset button
+        //         submitBtn.innerHTML = originalText;
+        //         submitBtn.disabled = false;
+        //     }
+        // });
         
         // Auto-hide messages after 5 seconds
         function autoHideMessages() {
@@ -578,20 +489,6 @@
         
         // Check for existing messages
         autoHideMessages();
-        
-        // Run debug on page load
-        debugLocalStorage();
-        
-        // Check if user is already logged in
-        const existingToken = localStorage.getItem('userAccessToken');
-        if (existingToken) {
-            console.log('User already has a token. They might be redirected soon.');
-            // Optional: Auto-redirect to homepage if already logged in
-            // window.location.href = '/Homepage';
-        }
-        
-        // Expose debug function to console for manual checking
-        window.debugLocalStorage = debugLocalStorage;
     </script>
 </body>
 </html>

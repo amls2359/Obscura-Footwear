@@ -7,10 +7,10 @@ const bcrypt = require('bcrypt')
 
 const userProfileget = async(req,res)=>
 {
-    console.log('user id is :',req.session.userid);
+    console.log('user id is :',req.user.userId);
     try
     {
-       const user= await UserCollection.findOne({_id:req.session.userid})
+       const user= await UserCollection.findOne({_id:req.user.userId})
        console.log(user);
        res.render('userProfile',{user})
     }
@@ -25,7 +25,7 @@ const editProfileGet = async(req,res)=>
 {
     try
     {
-      const user = await UserCollection.findOne({_id:req.session.userid})
+      const user = await UserCollection.findOne({_id:req.user.userId})
       res.render('editProfile',{user})
 
     }
@@ -41,7 +41,7 @@ const editProfilePost = async(req,res)=>
 {
     try
   {
-   const userId = req.session.userid
+   const userId = req.user.userId
    console.log('userid is :',userId );
    console.log('value:',req.body.username);
    console.log('value:',req.body.number);
@@ -65,8 +65,8 @@ const changePasswordGet = async(req,res)=>
 
 const changePasswordPost = async(req,res)=>
 {
-   const userId = req.session.userid
-   console.log('session user id is :', userId);
+   const userId = req.user.userId
+   console.log('user id is :', userId);
 
    const {currentPassword,newPassword}=req.body
    console.log('current password is:',currentPassword);
@@ -106,8 +106,8 @@ const showUserAddress = async(req,res)=>
 {
    try
    {
-     const userId = req.session.userid
-     console.log('session id is:',userId);
+     const userId = req.user.userId
+     console.log('user id is:',userId);
      const addresses = await AddressCollection.find({userid:userId})
      console.log('address is :',addresses);
      res.render('userAddress',{addresses})
@@ -138,7 +138,7 @@ const addAddressPost = async(req,res)=>
   
   try
   {
-     const userId= req.session.userid
+     const userId= req.user.userId
      const address =
      {
        userid:userId,
