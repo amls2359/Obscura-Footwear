@@ -461,7 +461,7 @@ const getproducts = async (req, res) => {
       .sort(sortOptions)
       .populate({
         path: 'category',
-        match: { islisted: true },
+        match: { isListed: true },
       })
       .limit(PAGE_SIZE * 5); // Fetch more to allow filtering
 
