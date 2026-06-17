@@ -465,6 +465,16 @@ const getproducts = async (req, res) => {
       })
       .limit(PAGE_SIZE * 5); // Fetch more to allow filtering
 
+      console.log("RAW PRODUCTS:", rawProducts.length);
+
+      console.log(
+  "CATEGORY STATUS:",
+  rawProducts.map(product => ({
+    name: product.name,
+    category: product.category
+  }))
+);
+
     // Step 2: Filter out products with blocked categories
     const validProducts = rawProducts.filter(p => p.category);
 
