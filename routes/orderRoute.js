@@ -10,7 +10,7 @@ router.post('/checkoutaddress', jwtAuth, isUser, orderController.addAddressCheck
 router.post('/checkoutPost', jwtAuth, isUser, orderController.checkoutPost)
 router.get('/placeOrder', jwtAuth, isUser, orderController.placeOrder)
 router.get('/userOrderDetails', jwtAuth, isUser, orderController.userOrders)
-router.get('/orderDetails/:orderid/:productid', jwtAdminAuth, isSuperAdmin, orderController.orderDetailsGet)
+router.get('/orderDetails/:orderid/:productid', jwtAuth, isUser, orderController.orderDetailsGet)
 router.get('/returnOrder/:orderId/:productId', jwtAuth, isUser, orderController.orderReturn)
 router.get('/cancelOrder/:orderId/:productId', jwtAuth, isUser, orderController.cancelOrder)
 router.get('/Invoice/:orderid', jwtAdminAuth, isSuperAdmin, orderController.Invoice)
