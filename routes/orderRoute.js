@@ -13,6 +13,6 @@ router.get('/userOrderDetails', jwtAuth, isUser, orderController.userOrders)
 router.get('/orderDetails/:orderid/:productid', jwtAuth, isUser, orderController.orderDetailsGet)
 router.get('/returnOrder/:orderId/:productId', jwtAuth, isUser, orderController.orderReturn)
 router.get('/cancelOrder/:orderId/:productId', jwtAuth, isUser, orderController.cancelOrder)
-router.get('/Invoice/:orderid', jwtAdminAuth, isSuperAdmin, orderController.Invoice)
+router.get('/Invoice/:orderid', jwtAuth, isUser, orderController.Invoice)
 
 module.exports=router
