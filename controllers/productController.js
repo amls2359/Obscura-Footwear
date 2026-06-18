@@ -1,7 +1,7 @@
 // controllers/productController.js
 const Product = require('../models/product');
 const Category = require('../models/category');
-const fs=require('fs')
+const fs = require('fs')
 const path = require('path');
 const ProductOffer = require('../models/productOffer')
 const CategoryOffer = require('../models/categoryOffer')
@@ -90,13 +90,13 @@ const getProductsApi = async (req, res) => {
   }
 };
 
-const getProductPage = async(req,res)=>{
-  try{
+const getProductPage = async (req, res) => {
+  try {
     const products = await Product.find({}).populate('category').lean();
-    res.render('allproduct',{products})
+    res.render('allproduct', { products })
   }
-  catch(error){
-    res.status(500).render('error',{message:'Failed to load products'})
+  catch (error) {
+    res.status(500).render('error', { message: 'Failed to load products' })
   }
 }
 
@@ -104,27 +104,27 @@ const getProductPage = async(req,res)=>{
 const addproductget = async (req, res) => {
   try {
     console.log('in');
-    
+
     const categories = await Category.find({ islisted: true }).lean();
-    const product= await Product.find({isListed:true}).lean()
+    const product = await Product.find({ isListed: true }).lean()
 
     res.render("addProduct", {
-        categories: categories || [],
-        product:product|| [],
-        errorMessage: null,
-        formData: {},
-        errors: {} // Add this empty errors object
+      categories: categories || [],
+      product: product || [],
+      errorMessage: null,
+      formData: {},
+      errors: {} // Add this empty errors object
     });
   } catch (error) {
     console.log('error');
-    
+
     console.error("Error fetching categories:", error);
     res.render("addProduct", {
-        categories: [],
-        product:[],
-        errorMessage: "Error loading categories",
-        formData: {},
-        errors: {} // Add this empty errors object
+      categories: [],
+      product: [],
+      errorMessage: "Error loading categories",
+      formData: {},
+      errors: {} // Add this empty errors object
     });
   }
 };
@@ -132,14 +132,14 @@ const addproductget = async (req, res) => {
 const handleFileUpload = (files) => {
   return new Promise((resolve, reject) => {
     if (!files || files.length === 0) return resolve([]);
-    
+
     const images = [];
     let processed = 0;
-    
+
     files.forEach(file => {
       const newFilename = Date.now() + '-' + file.originalname;
       const uploadPath = path.join(__dirname, '../public/images', newFilename);
-      
+
       fs.rename(file.path, uploadPath, (err) => {
         if (err) return reject(err);
         images.push('images/' + newFilename);
@@ -203,7 +203,7 @@ const addproductpost = async (req, res) => {
 
     await newProduct.save();
     res.redirect('/productmanagement');
-    
+
   } catch (error) {
     console.error("Error adding product:", error);
     const categories = await Category.find({ islisted: false }).lean();
@@ -223,7 +223,7 @@ const addproductpost = async (req, res) => {
 const unlistProduct = async (req, res) => {
   try {
     console.log('entered into unlist');
-    
+
     const productId = req.params.id;
     const product = await Product.findById(productId);
     if (!product) {
@@ -231,7 +231,7 @@ const unlistProduct = async (req, res) => {
     }
     product.isListed = !product.isListed;
     console.log(`islisted :${product.isListed}`);
-    
+
     await product.save();
     res.redirect('/productmanagement');
   } catch (err) {
@@ -323,69 +323,61 @@ const postEditProduct = async (req, res) => {
     console.error("Update error:", err);
     const product = await Product.findById(req.params.id).populate('category');
     const categories = await Category.find();
-    res.render('editProduct', { 
-      product, 
+    res.render('editProduct', {
+      product,
       categories,
-      errorMessage: 'Failed to update product' 
+      errorMessage: 'Failed to update product'
     });
   }
 };
 
 
-const deleteImage=async(req,res)=>
-{
-  const productId=req.body.productId
-  const imageIndex=req.body.imageIndex;
-  try
-  {
-    const product=await Product.findById(productId)
-    if(!product)
-    {
+const deleteImage = async (req, res) => {
+  const productId = req.body.productId
+  const imageIndex = req.body.imageIndex;
+  try {
+    const product = await Product.findById(productId)
+    if (!product) {
       return res.status(404).send('Product not found')
     }
-    if(imageIndex>0|| imageIndex >=product.image.length)
-     {
-        return res.send(400).send('Invalid image index')
-     }
-     product.image.splice(imageIndex,1)
-     await product.save()
-     .then((c)=>{
-      console.log('deleted');
-      res.status(200).send('Image removed successfully')
-      
-     })
-     .catch((c)=>{
-      console.log(err);
-      
-     })
-}
-catch(err)
-{
-  console.log(err);
-  res.status(500).send('Internal server error')
-  
-}
+    if (imageIndex > 0 || imageIndex >= product.image.length) {
+      return res.send(400).send('Invalid image index')
+    }
+    product.image.splice(imageIndex, 1)
+    await product.save()
+      .then((c) => {
+        console.log('deleted');
+        res.status(200).send('Image removed successfully')
+
+      })
+      .catch((c) => {
+        console.log(err);
+
+      })
+  }
+  catch (err) {
+    console.log(err);
+    res.status(500).send('Internal server error')
+
+  }
 }
 
-const getdeleteProduct= async(req,res)=>
-{
-  try
-  {
-    const productId=req.params.id
-    console.log('id:',productId);
+const getdeleteProduct = async (req, res) => {
+  try {
+    const productId = req.params.id
+    console.log('id:', productId);
     await Product.findByIdAndDelete(productId)
-    .then((x)=>{
-      console.log('product deleted',x);
-      res.redirect('/productmanagement')
-    })
-    .catch((x)=>{
-      console.log('error in deleting the product');
-      res.redirect('/productmanagement')
-      
-    })
- }
-  catch(err)
-  {
+      .then((x) => {
+        console.log('product deleted', x);
+        res.redirect('/productmanagement')
+      })
+      .catch((x) => {
+        console.log('error in deleting the product');
+        res.redirect('/productmanagement')
+
+      })
+  }
+  catch (err) {
     console.log(err);
     res.status(404).send('Internal server error')
   }
@@ -465,15 +457,23 @@ const getproducts = async (req, res) => {
       })
       .limit(PAGE_SIZE * 5); // Fetch more to allow filtering
 
-      console.log("RAW PRODUCTS:", rawProducts.length);
+    console.log("RAW PRODUCTS:", rawProducts.length);
 
-      console.log(
-  "CATEGORY STATUS:",
-  rawProducts.map(product => ({
-    name: product.productname,
-    category: product.category
-  }))
-);
+    console.log(
+      "CATEGORY STATUS:",
+      rawProducts.map(product => ({
+        name: product.productname,
+        category: product.category
+      }))
+    );
+
+    const testProduct = await Product.findOne();
+    console.log("PRODUCT CATEGORY ID:", testProduct.category);
+
+    const testCategory = await Category.findById(testProduct.category);
+    console.log("FOUND CATEGORY:", testCategory);
+
+    console.log("RAW PRODUCTS:", rawProducts.length);
 
     // Step 2: Filter out products with blocked categories
     const validProducts = rawProducts.filter(p => p.category);
@@ -582,12 +582,12 @@ const productdetails = async (req, res) => {
 
     const relatedProducts = product.category
       ? await Product.find({
-          category: product.category._id,
-          _id: { $ne: product._id },
-          isListed: true,
-        })
-          .limit(3)
-          .populate('category')
+        category: product.category._id,
+        _id: { $ne: product._id },
+        isListed: true,
+      })
+        .limit(3)
+        .populate('category')
       : [];
 
     let isInWishlist = false;
@@ -812,30 +812,26 @@ const buildQuery = (category, priceRange) => {
 };
 
 
-const buildSortOption = ( sortprice,sortAlphabetically)=>{
-  let sortOption={}
-  if(sortprice === 'lowtoHigh')
-  {
-    sortOption.price=1
+const buildSortOption = (sortprice, sortAlphabetically) => {
+  let sortOption = {}
+  if (sortprice === 'lowtoHigh') {
+    sortOption.price = 1
   }
-  else if(sortprice === 'High to Low')
-  {
-     sortOption.price= -1
+  else if (sortprice === 'High to Low') {
+    sortOption.price = -1
   }
 
-  if(sortAlphabetically === 'ascending')
-  {
-       sortOption.productname = 1
+  if (sortAlphabetically === 'ascending') {
+    sortOption.productname = 1
   }
-  else if(sortAlphabetically === 'descending')
-  {
-     sortOption.productname = -1
+  else if (sortAlphabetically === 'descending') {
+    sortOption.productname = -1
   }
-  return  sortOption
+  return sortOption
 }
 
 
-module.exports = 
+module.exports =
 {
   productmanagement,
   getProductsApi,
