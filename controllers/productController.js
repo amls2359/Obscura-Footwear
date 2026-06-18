@@ -454,14 +454,14 @@ const getproducts = async (req, res) => {
     const sortOptions = buildSortOption(sortprice, sortAlphabetically);
 
     // Get listed categories for sidebar
-    const categories = await Category.find({ isListed: true });
+    const categories = await Category.find({ islisted: true });
 
     // Step 1: Fetch more products than needed
     const rawProducts = await Product.find(query)
       .sort(sortOptions)
       .populate({
         path: 'category',
-        match: { isListed: true },
+        match: { islisted: true },
       })
       .limit(PAGE_SIZE * 5); // Fetch more to allow filtering
 
@@ -470,7 +470,7 @@ const getproducts = async (req, res) => {
       console.log(
   "CATEGORY STATUS:",
   rawProducts.map(product => ({
-    name: product.name,
+    name: product.productname,
     category: product.category
   }))
 );
